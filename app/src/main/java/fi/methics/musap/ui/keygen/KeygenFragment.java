@@ -1,27 +1,26 @@
-package fi.methics.musap.ui.notifications;
+package fi.methics.musap.ui.keygen;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import fi.methics.musap.databinding.FragmentNotificationsBinding;
+import fi.methics.musap.databinding.FragmentKeygenBinding;
 
-public class NotificationsFragment extends Fragment {
+public class KeygenFragment extends Fragment {
 
-    private FragmentNotificationsBinding binding;
+    private FragmentKeygenBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         NotificationsViewModel notificationsViewModel =
                 new ViewModelProvider(this).get(NotificationsViewModel.class);
 
-        binding = FragmentNotificationsBinding.inflate(inflater, container, false);
+        binding = FragmentKeygenBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         return root;

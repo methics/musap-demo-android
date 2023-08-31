@@ -1,4 +1,4 @@
-package fi.methics.musap.ui.notifications;
+package fi.methics.musap.ui.keygen;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

@@ -23,9 +23,9 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="fi.methics.musap.ui.notifications.NotificationsFragment"
+        android:name="fi.methics.musap.ui.keygen.KeygenFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_keygen" />
     <fragment
         android:id="@+id/keystoreFragment"
         android:name="fi.methics.musap.ui.dashboard.KeystoreFragment"
@@ -72,5 +72,10 @@
             android:id="@+id/action_androidKeystoreFragment_to_keystoreFragment"
             app:destination="@id/keystoreFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/navigation_sign"
+        android:name="fi.methics.musap.ui.sign.SignFragment"
+        android:label="fragment_sign"
+        tools:layout="@layout/fragment_sign" />
 
 </navigation>
