@@ -3,14 +3,17 @@ package fi.methics.musap.sdk.keygeneration;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 
-import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+
+import fi.methics.musap.sdk.util.MLog;
 
 public class AndroidKeyGenerator {
 
     public void generateKey(KeyGenReq req) throws Exception {
+        String algorithm = this.resolveAlgorithm(req);
+
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(
-                KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
+                algorithm, "AndroidKeyStore");
         kpg.initialize(new KeyGenParameterSpec.Builder(
                 req.getKeyAlias(),
                 KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
@@ -19,6 +22,9 @@ public class AndroidKeyGenerator {
                 .build());
 
         kpg.generateKeyPair();
+
+        MLog.d("Key generation successful");
+
     }
 
     private String resolveAlgorithm(KeyGenReq req) {

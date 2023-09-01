@@ -14,11 +14,7 @@ import java.util.List;
 import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentKeystoreBinding;
 import fi.methics.musap.sdk.keyuri.KeyURI;
-import fi.methics.musap.ui.dashboard.placeholder.PlaceholderContent.PlaceholderItem;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link PlaceholderItem}.
- */
 public class KeystoreRecyclerViewAdapter extends RecyclerView.Adapter<KeystoreRecyclerViewAdapter.ViewHolder> {
 
     private final List<KeyURI> mValues;

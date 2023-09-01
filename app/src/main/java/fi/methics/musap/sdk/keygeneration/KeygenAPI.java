@@ -18,6 +18,7 @@ public class KeygenAPI {
         try {
             switch (req.getSscd().getSscdType()) {
                 case PHONE_KEYSTORE:
+                    MLog.d("Generating a key in Android keystore");
                     new AndroidKeyGenerator().generateKey(req);
                     break;
             }
