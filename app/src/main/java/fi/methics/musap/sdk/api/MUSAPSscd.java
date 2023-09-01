@@ -6,6 +6,11 @@ public class MUSAPSscd {
 
     private MUSAPSscdType sscdType;
 
+    public MUSAPSscd(MUSAPSscdType sscdType) {
+        this.sscdType = sscdType;
+    }
+
+
     public MUSAPSscdType getSscdType() {
         return sscdType;
     }

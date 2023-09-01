@@ -14,9 +14,6 @@ import fi.methics.musap.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Note: Dashboard -> key discovery
-    //       Notification -> sign
-
     private ActivityMainBinding binding;
 
     @Override
