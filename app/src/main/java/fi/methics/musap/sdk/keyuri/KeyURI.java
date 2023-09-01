@@ -13,10 +13,19 @@ public class KeyURI {
 
     private final String name;
     private final String loa;
+    private final String uri;
 
     public KeyURI(String name, String loa) {
         this.name = name;
         this.loa = loa;
+        this.uri = null; // TODO
+    }
+
+    // TODO: Parse String KeyURI to KeyURI object
+    public KeyURI(String keyURI) {
+        this.name = null;
+        this.loa  = null;
+        this.uri  = keyURI;
     }
 
     public String getName() {
@@ -58,5 +67,16 @@ public class KeyURI {
 
     private boolean compareValue(String criteriaValue, String ownValue) {
         return Objects.equals(criteriaValue, ownValue);
+    }
+
+    public String getUri() {
+        return this.uri;
+    }
+
+    public boolean matches(KeyURI keyUri) {
+        if (this.equals(keyUri)) return true;
+        if (this.getUri().equals(keyUri.getUri())) return true;
+        // TODO: Allow some partial match?
+        return false;
     }
 }

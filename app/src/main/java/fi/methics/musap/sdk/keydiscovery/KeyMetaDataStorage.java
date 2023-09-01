@@ -29,7 +29,10 @@ public class KeyMetaDataStorage {
      */
     private static final String KEY_JSON_PREFIX = "keyjson_";
 
-    public KeyMetaDataStorage() {
+    private Context context;
+
+    public KeyMetaDataStorage(Context context) {
+        this.context = context;
     }
 
     /**
@@ -38,10 +41,9 @@ public class KeyMetaDataStorage {
      *  1. A set of all known key names.
      *  2. For each key name, there is an entry "keyjson_<keyname>" that contains the key
      *     metadata.
-     * @param context
      * @param key
      */
-    public void storeKey(Context context, MUSAPKey key) {
+    public void storeKey(MUSAPKey key) {
         if (key == null) {
             MLog.e("Cannot store null MUSAP key");
             throw new IllegalArgumentException("Cannot store null MUSAP key");
@@ -51,7 +53,7 @@ public class KeyMetaDataStorage {
             throw new IllegalArgumentException("Cannot store unnamed MUSAP key");
         }
 
-        Set<String> oldKeyNames = this.getKeyNameSet(context);
+        Set<String> oldKeyNames = this.getKeyNameSet();
         Set<String> newKeyNames = new HashSet<>(oldKeyNames);
 
         newKeyNames.add(key.getKeyName());
@@ -59,18 +61,18 @@ public class KeyMetaDataStorage {
         String keyJson = new Gson().toJson(key);
         MLog.d("KeyJson=" + keyJson);
 
-        this.getSharedPref(context)
+        this.getSharedPref()
                 .edit()
                 .putStringSet(KEY_NAME_SET, newKeyNames)
                 .putString(this.makeStoreName(key), keyJson)
                 .apply();
     }
 
-    public List<MUSAPKey> listKeys(Context context) {
-        Set<String> keyNames = this.getKeyNameSet(context);
+    public List<MUSAPKey> listKeys() {
+        Set<String> keyNames = this.getKeyNameSet();
         List<MUSAPKey> keyList = new ArrayList<>();
         for (String keyName: keyNames) {
-            String keyJson = this.getKeyJson(context, keyName);
+            String keyJson = this.getKeyJson(keyName);
             if (keyJson == null) {
                 MLog.e("Missing key metadata JSON for key name " + keyName);
             } else {
@@ -83,20 +85,20 @@ public class KeyMetaDataStorage {
     }
 
 
-    public void storeKeyMetaData(Context context, KeyBindReq req) {
+    public void storeKeyMetaData(KeyBindReq req) {
         Set<String> metadatas = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
                         .getStringSet(SSCD_SET, new HashSet<>());
         Set<String> newMetadatas = new HashSet<>(metadatas);
         newMetadatas.add(req.getSscd());
 
-        this.getSharedPref(context)
+        this.getSharedPref()
                 .edit()
                 .putStringSet(SSCD_SET, newMetadatas)
                 .apply();
     }
 
-    public MUSAPKey getKeyMetadata(Context context, String keyName) {
-        String keyJson = this.getKeyJson(context, keyName);
+    public MUSAPKey getKeyMetadata(String keyName) {
+        String keyJson = this.getKeyJson(keyName);
         return new Gson().fromJson(keyJson, MUSAPKey.class);
     }
 
@@ -108,15 +110,15 @@ public class KeyMetaDataStorage {
         return KEY_JSON_PREFIX + keyName;
     }
 
-    private Set<String> getKeyNameSet(Context c) {
-        return this.getSharedPref(c).getStringSet(KEY_NAME_SET, new HashSet<>());
+    private Set<String> getKeyNameSet() {
+        return this.getSharedPref().getStringSet(KEY_NAME_SET, new HashSet<>());
     }
 
-    private String getKeyJson(Context c, String keyName) {
-        return this.getSharedPref(c).getString(this.makeStoreName(keyName), null);
+    private String getKeyJson(String keyName) {
+        return this.getSharedPref().getString(this.makeStoreName(keyName), null);
     }
 
-    private SharedPreferences getSharedPref(Context c) {
-        return c.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    private SharedPreferences getSharedPref() {
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 }

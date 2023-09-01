@@ -1,5 +1,9 @@
 package fi.methics.musap.sdk.keyuri;
 
+import java.util.List;
+
+import fi.methics.musap.sdk.MUSAPSscdType;
+
 public class MUSAPSscd {
 
     private String sscdName;
@@ -7,16 +11,17 @@ public class MUSAPSscd {
     private String sscdId;
     private String country;
     private String provider;
-
     private boolean keygenSupported;
+    private List<String> supportedKeyAlgorithms;
 
-    private MUSAPSscd(String sscdName, String sscdType, String sscdId, String country, String provider, boolean keygenSupported) {
-        this.sscdName = sscdName;
-        this.sscdType = sscdType;
-        this.sscdId = sscdId;
-        this.country = country;
-        this.provider = provider;
-        this.keygenSupported = keygenSupported;
+    private MUSAPSscd(Builder builder) {
+        this.sscdName = builder.sscdName;
+        this.sscdType = builder.sscdType;
+        this.sscdId   = builder.sscdId;
+        this.country  = builder.country;
+        this.provider = builder.provider;
+        this.keygenSupported = builder.keygenSupported;
+        this.supportedKeyAlgorithms = builder.supportedKeyAlgorithms;
     }
 
     public String getSscdName() {
@@ -43,6 +48,10 @@ public class MUSAPSscd {
         return keygenSupported;
     }
 
+    public List<String> getSupportedKeyAlgorithms() {
+        return this.supportedKeyAlgorithms;
+    }
+
     public static class Builder {
         private String sscdName;
         private String sscdType;
@@ -50,6 +59,7 @@ public class MUSAPSscd {
         private String country;
         private String provider;
         private boolean keygenSupported;
+        private List<String> supportedKeyAlgorithms;
 
         public Builder setSscdName(String sscdName) {
             this.sscdName = sscdName;
@@ -81,8 +91,13 @@ public class MUSAPSscd {
             return this;
         }
 
+        public Builder setSupportedKeyAlgorithms(List<String> supportedKeyAlgorithms) {
+            this.supportedKeyAlgorithms = supportedKeyAlgorithms;
+            return this;
+        }
+
         public MUSAPSscd build() {
-            return new MUSAPSscd(sscdName, sscdType, sscdId, country, provider, keygenSupported);
+            return new MUSAPSscd(this);
         }
     }
 

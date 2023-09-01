@@ -15,6 +15,8 @@ public class MUSAPKey {
     private List<MUSAPCertificate> certificateChain;
     private List<String> keyUsages;
     private List<MUSAPLoa> loa;
+    private String keyAlgorithm;
+    private String keyUri;
 
     private MUSAPKey(Builder builder) {
         this.keyName          = builder.keyName;
@@ -27,6 +29,8 @@ public class MUSAPKey {
         this.certificateChain = builder.certificateChain;
         this.keyUsages        = builder.keyUsages;
         this.loa              = builder.loa;
+        this.keyAlgorithm     = builder.keyAlgorithm;
+        this.keyUri           = builder.keyUri;
         this.createdDate      = Instant.now();
     }
 
@@ -70,6 +74,14 @@ public class MUSAPKey {
         return loa;
     }
 
+    public String getKeyAlgorithm() {
+        return this.keyAlgorithm;
+    }
+
+    public KeyURI getKeyUri() {
+        return new KeyURI(this.keyUri);
+    }
+
     public static class Builder {
         private String keyName;
         private String keyType;
@@ -81,6 +93,8 @@ public class MUSAPKey {
         private List<MUSAPCertificate> certificateChain;
         private List<String> keyUsages;
         private List<MUSAPLoa> loa;
+        private String keyAlgorithm;
+        private String keyUri;
 
         public Builder setKeyName(String keyName) {
             this.keyName = keyName;
@@ -129,6 +143,16 @@ public class MUSAPKey {
 
         public Builder setLoa(List<MUSAPLoa> loa) {
             this.loa = loa;
+            return this;
+        }
+
+        public Builder setKeyAlgorithm(String keyAlgorithm) {
+            this.keyAlgorithm = keyAlgorithm;
+            return this;
+        }
+
+        public Builder setKeyUri(String keyUri) {
+            this.keyUri = keyUri;
             return this;
         }
 

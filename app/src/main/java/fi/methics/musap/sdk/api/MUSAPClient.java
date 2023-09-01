@@ -23,14 +23,14 @@ public class MUSAPClient {
     }
 
     public List<KeyURI> listMatchingMethods(Map<KeyDiscoveryCriteria, String> criteria) {
-        KeyDiscoveryAPI api = new KeyDiscoveryAPI();
+        KeyDiscoveryAPI api = new KeyDiscoveryAPI(context.get());
 
         return api.listMatchingMethods(criteria);
     }
 
     public void bindKey(KeyBindReq req) {
-        KeyMetaDataStorage storage = new KeyMetaDataStorage();
-        storage.storeKeyMetaData(context.get(), req);
+        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        storage.storeKeyMetaData(req);
     }
 
     public void generateKey(KeyGenReq req) {
