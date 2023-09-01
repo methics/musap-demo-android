@@ -76,6 +76,15 @@
         android:id="@+id/navigation_sign"
         android:name="fi.methics.musap.ui.sign.SignFragment"
         android:label="fragment_sign"
-        tools:layout="@layout/fragment_sign" />
+        tools:layout="@layout/fragment_sign" >
+        <action
+            android:id="@+id/action_navigation_sign_to_signMethodFragment"
+            app:destination="@id/signMethodFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signMethodFragment"
+        android:name="fi.methics.musap.ui.sign.SignMethodFragment"
+        android:label="fragment_sign_method_list"
+        tools:layout="@layout/fragment_sign_method_list" />
 
 </navigation>

@@ -5,6 +5,7 @@ import android.content.Context;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
 import fi.methics.musap.sdk.keydiscovery.KeyDiscoveryAPI;
@@ -13,6 +14,7 @@ import fi.methics.musap.sdk.keydiscovery.KeyMetaDataStorage;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keygeneration.KeygenAPI;
 import fi.methics.musap.sdk.keyuri.KeyURI;
+import fi.methics.musap.sdk.keyuri.MUSAPKey;
 
 public class MUSAPClient {
 
@@ -34,6 +36,13 @@ public class MUSAPClient {
     }
 
     public void generateKey(KeyGenReq req) {
-        new KeygenAPI().generateKey(req);
+        MUSAPKey key = new KeygenAPI().generateKey(req);
+        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        storage.storeKey(key);
+    }
+
+    public Set<String> listKeyNames() {
+        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        return storage.listKeyNames();
     }
 }
