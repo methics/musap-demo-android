@@ -3,13 +3,14 @@ package fi.methics.musap.sdk.keygeneration;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
 import fi.methics.musap.sdk.util.MLog;
 
 public class AndroidKeyGenerator {
 
-    public void generateKey(KeyGenReq req) throws Exception {
+    public KeyPair generateKey(KeyGenReq req) throws Exception {
         String algorithm = this.resolveAlgorithm(req);
 
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(
@@ -21,10 +22,10 @@ public class AndroidKeyGenerator {
                         KeyProperties.DIGEST_SHA512)
                 .build());
 
-        kpg.generateKeyPair();
+        KeyPair keyPair = kpg.generateKeyPair();
 
         MLog.d("Key generation successful");
-
+        return keyPair;
     }
 
     private String resolveAlgorithm(KeyGenReq req) {

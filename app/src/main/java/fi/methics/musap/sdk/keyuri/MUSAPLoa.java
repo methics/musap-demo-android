@@ -1,5 +1,6 @@
 package fi.methics.musap.sdk.keyuri;
 
+// TODO: This is duplicated by fi.methics.musap.util.LoA
 public class MUSAPLoa {
 
     public static final String LOA_SCHEME_EIDAS = "EIDAS-2014";

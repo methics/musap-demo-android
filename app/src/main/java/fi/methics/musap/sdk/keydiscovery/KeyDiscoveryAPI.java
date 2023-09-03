@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 import fi.methics.musap.sdk.keyuri.KeyURI;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
@@ -13,6 +14,7 @@ import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 public class KeyDiscoveryAPI {
 
     private Context context;
+    private List<MUSAPSscdInterface> sscds = new ArrayList<>();
 
     public KeyDiscoveryAPI(Context context) {
         this.context = context;
@@ -37,8 +39,8 @@ public class KeyDiscoveryAPI {
      * List all SSCDs integrated to this MUSAP Library
      * @return SSCD list
      */
-    public List<MUSAPSscd> listSscds() {
-        return new ArrayList<>();
+    public List<MUSAPSscdInterface> listSscds() {
+        return sscds;
     }
 
     /**
@@ -46,8 +48,17 @@ public class KeyDiscoveryAPI {
      * @param req SSCD search request
      * @return MUSAP SSCDs
      */
-    public List<MUSAPSscd> listMatchingSscds(SscdSearchReq req) {
-        return new ArrayList<>();
+    public List<MUSAPSscdInterface> listMatchingSscds(SscdSearchReq req) {
+        return sscds;
+    }
+
+    /**
+     * Enable given SSCD. The SSCD will be available for the user to select after this call.
+     * Get the list of available SSCDs with {@link #listSscds()}.
+     * @param sscd SSCD
+     */
+    public void enableSscd(MUSAPSscdInterface sscd) {
+        this.sscds.add(sscd);
     }
 
     /**
