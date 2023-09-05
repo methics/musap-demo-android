@@ -2,7 +2,6 @@ package fi.methics.musap.sdk.keydiscovery;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -84,6 +83,9 @@ public class KeyMetaDataStorage {
         return keyList;
     }
 
+    public Set<String> listKeyNames() {
+        return this.getKeyNameSet();
+    }
 
     public void storeKeyMetaData(KeyBindReq req) {
         Set<String> metadatas = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
