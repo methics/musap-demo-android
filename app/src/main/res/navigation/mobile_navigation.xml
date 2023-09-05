@@ -92,7 +92,7 @@
     </fragment>
     <fragment
         android:id="@+id/androidKeystoreSignFragment"
-        android:name="fi.methics.musap.ui.sign.AndroidKeystoreSignFragment"
+        android:name="fi.methics.musap.ui.sign.AksSignFragment"
         android:label="fragment_android_keystore_sign"
         tools:layout="@layout/fragment_android_keystore_sign" />
 

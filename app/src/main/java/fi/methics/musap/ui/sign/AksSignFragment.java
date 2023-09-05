@@ -14,14 +14,13 @@ import android.widget.Toast;
 import fi.methics.musap.MUSAPClientHolder;
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MBase64;
-import fi.methics.musap.sdk.api.MUSAPClient;
 import fi.methics.musap.sdk.api.MUSAPException;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.sign.MUSAPSigner;
 import fi.methics.musap.sdk.util.MLog;
 
 
-public class AndroidKeystoreSignFragment extends Fragment {
+public class AksSignFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,7 +31,7 @@ public class AndroidKeystoreSignFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public AndroidKeystoreSignFragment() {
+    public AksSignFragment() {
         // Required empty public constructor
     }
 
@@ -72,7 +71,7 @@ public class AndroidKeystoreSignFragment extends Fragment {
                 try {
                     byte[] signature = signer.sign(data);
                     String signatureStr = MBase64.toBase64String(signature);
-                    Toast.makeText(AndroidKeystoreSignFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AksSignFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
 
                 } catch (MUSAPException e) {
                     MLog.e("Failed to sign", e.getCause());
