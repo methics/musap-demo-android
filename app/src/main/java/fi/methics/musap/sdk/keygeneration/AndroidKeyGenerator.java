@@ -6,11 +6,13 @@ import android.security.keystore.KeyProperties;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
+import fi.methics.musap.sdk.api.MUSAPConstants;
+import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.util.MLog;
 
 public class AndroidKeyGenerator {
 
-    public KeyPair generateKey(KeyGenReq req) throws Exception {
+    public MUSAPKey generateKey(KeyGenReq req) throws Exception {
         String algorithm = this.resolveAlgorithm(req);
 
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(
@@ -25,7 +27,13 @@ public class AndroidKeyGenerator {
         KeyPair keyPair = kpg.generateKeyPair();
 
         MLog.d("Key generation successful");
-        return keyPair;
+
+        MUSAPKey generatedKey = new MUSAPKey.Builder()
+                .setSscdType(MUSAPConstants.ANDROID_KS_TYPE)
+                .setKeyName(req.getKeyAlias())
+                .build();
+
+        return generatedKey;
     }
 
     private String resolveAlgorithm(KeyGenReq req) {
