@@ -18,12 +18,13 @@ public class MUSAPKey {
     private String keyAlgorithm;
     private String keyUri;
 
+    private MUSAPKeyAttestation attestation;
+
     private MUSAPKey(Builder builder) {
         this.keyName          = builder.keyName;
         this.keyType          = builder.keyType;
         this.sscdId           = builder.sscdId;
         this.sscdType         = builder.sscdType;
-        this.createdDate      = builder.createdDate;
         this.publicKey        = builder.publicKey;
         this.certificate      = builder.certificate;
         this.certificateChain = builder.certificateChain;
@@ -31,6 +32,7 @@ public class MUSAPKey {
         this.loa              = builder.loa;
         this.keyAlgorithm     = builder.keyAlgorithm;
         this.keyUri           = builder.keyUri;
+        this.attestation      = builder.attestation;
         this.createdDate      = Instant.now();
     }
 
@@ -87,7 +89,6 @@ public class MUSAPKey {
         private String keyType;
         private String sscdId;
         private String sscdType;
-        private Instant createdDate;
         private MUSAPPublicKey publicKey;
         private MUSAPCertificate certificate;
         private List<MUSAPCertificate> certificateChain;
@@ -95,6 +96,8 @@ public class MUSAPKey {
         private List<MUSAPLoa> loa;
         private String keyAlgorithm;
         private String keyUri;
+
+        private MUSAPKeyAttestation attestation;
 
         public Builder setKeyName(String keyName) {
             this.keyName = keyName;
@@ -113,11 +116,6 @@ public class MUSAPKey {
 
         public Builder setSscdType(String sscdType) {
             this.sscdType = sscdType;
-            return this;
-        }
-
-        public Builder setCreatedDate(Instant createdDate) {
-            this.createdDate = createdDate;
             return this;
         }
 
@@ -153,6 +151,11 @@ public class MUSAPKey {
 
         public Builder setKeyUri(String keyUri) {
             this.keyUri = keyUri;
+            return this;
+        }
+
+        public Builder setAttestation(MUSAPKeyAttestation attestation) {
+            this.attestation = attestation;
             return this;
         }
 

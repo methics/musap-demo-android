@@ -1,5 +1,6 @@
 package fi.methics.musap.sdk.util;
 
+// TODO: This is duplicated by fi.methics.musap.keyuri.MUSAPLoa
 public class LoA {
 
     public static final String ANY = "ANY";
