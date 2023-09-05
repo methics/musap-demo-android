@@ -45,4 +45,28 @@ public class MUSAPClient {
         KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
         return storage.listKeyNames();
     }
+
+    /**
+     * Get a MUSAP key by keyname.
+     * This is not ideal way to get a key, but easy for now.
+     * In the future, get key by KeyURI instead.
+     * @param keyName
+     * @return
+     */
+    public MUSAPKey getKeyByName(String keyName) {
+        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        return storage.getKeyMetadata(keyName);
+    }
+
+    public MUSAPKey getKeyByUri(String keyUri) {
+        // TODO: Getting a key by URI is important because passing MUSAPKey object
+        //  between activities/fragements is harder than passing strings
+        return null;
+    }
+
+    public MUSAPKey getKeyByUri(KeyURI keyUri) {
+        // TODO: Getting a key by URI is important because passing MUSAPKey object
+        //  between activities/fragements is harder than passing strings
+        return null;
+    }
 }

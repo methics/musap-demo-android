@@ -1,27 +1,35 @@
 package fi.methics.musap.ui.sign;
 
+import androidx.navigation.NavController;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import fi.methics.musap.ui.sign.placeholder.PlaceholderContent.PlaceholderItem;
+import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentSignMethodBinding;
 
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link PlaceholderItem}.
- * TODO: Replace the implementation with code for your data type.
- */
+
 public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMethodRecyclerViewAdapter.ViewHolder> {
 
     private final List<String> mValues;
 
-    public SignMethodRecyclerViewAdapter(List<String> items) {
+    protected static final String KEY_ALIAS = "keyalias";
+    protected static final String DTBS = "dtbs";
+
+    private final NavController controller;
+
+
+    public SignMethodRecyclerViewAdapter(List<String> items, NavController navController) {
         mValues = items;
+
+        this.controller = navController;
+
     }
 
     @Override
@@ -52,6 +60,22 @@ public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMeth
             super(binding.getRoot());
             mIdView = binding.itemNumber;
             mContentView = binding.content;
+
+            final String dtbs = "Sample text to sign";
+
+            mIdView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String keyAlias = mItem;
+
+
+                    Bundle args = new Bundle();
+                    args.putString(KEY_ALIAS, keyAlias);
+                    args.putString(DTBS, dtbs);
+
+                    controller.navigate(R.id.action_signMethodFragment_to_androidKeystoreSignFragment, args);
+                }
+            });
         }
 
         @Override

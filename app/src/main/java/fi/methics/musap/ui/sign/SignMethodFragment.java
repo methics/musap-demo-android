@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,16 +20,13 @@ import java.util.Set;
 
 import fi.methics.musap.MUSAPClientHolder;
 import fi.methics.musap.R;
-import fi.methics.musap.ui.sign.placeholder.PlaceholderContent;
 
 /**
  * A fragment representing a list of Items.
  */
 public class SignMethodFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
 
     /**
@@ -73,7 +72,9 @@ public class SignMethodFragment extends Fragment {
 
             Set<String> keyNames = MUSAPClientHolder.getClient().listKeyNames();
             List<String> keys = new ArrayList<>(keyNames);
-            recyclerView.setAdapter(new SignMethodRecyclerViewAdapter(keys));
+
+            NavController navController = Navigation.findNavController(SignMethodFragment.this.getActivity(), R.id.nav_host_fragment_activity_main);
+            recyclerView.setAdapter(new SignMethodRecyclerViewAdapter(keys, navController));
         }
         return view;
     }
