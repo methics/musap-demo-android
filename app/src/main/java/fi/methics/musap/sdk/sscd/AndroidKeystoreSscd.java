@@ -41,14 +41,7 @@ public class AndroidKeystoreSscd implements MUSAPSscdInterface {
         // 4. Return the MUSAPKey
 
         MLog.d("Generating a key in Android keystore");
-        KeyPair keyPair = new AndroidKeyGenerator().generateKey(req);
-
-        MUSAPKey key = new MUSAPKey.Builder()
-                .setKeyName(req.getKeyAlias())
-                .setPublicKey(new MUSAPPublicKey(keyPair.getPublic().getEncoded()))
-                .setSscdType(this.getSscdInfo().getSscdType())
-                .setSscdId(this.getSscdInfo().getSscdId())
-                .build();
+        MUSAPKey key = new AndroidKeyGenerator().generateKey(req);
         new KeyMetaDataStorage(this.context).storeKey(key);
         return key;
     }
