@@ -55,7 +55,7 @@ public class AndroidKeystoreSscd implements MUSAPSscdInterface {
                 .setProvider("Google")
                 .setKeygenSupported(true)
                 .setSupportedKeyAlgorithms(Arrays.asList("RSA2048"))
-                .setSscdId(UUID.randomUUID().toString())
+                .setSscdId("ANDROID_KEYSTORE")
                 .build();
     }
 }

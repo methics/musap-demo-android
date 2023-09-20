@@ -45,17 +45,9 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <RadioGroup
+            android:id="@+id/radioGroupKeystores"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:checkedButton="@id/radioButton">
-
-            <RadioButton
-                android:id="@+id/radioButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:text="Phone Keystore" />
-        </RadioGroup>
+            android:layout_height="match_parent"/>
 
         <Button
             android:id="@+id/button_generate"

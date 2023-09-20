@@ -1,5 +1,7 @@
 package fi.methics.musap.sdk.sscd;
 
+import android.content.Context;
+
 import java.util.Arrays;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
@@ -9,7 +11,11 @@ import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 
 public class MethicsDemoSscd implements MUSAPSscdInterface {
+    private Context context;
 
+    public MethicsDemoSscd(Context context) {
+        this.context = context;
+    }
     public static final String SSCD_TYPE = "METHICS_DEMO";
     @Override
     public MUSAPKey bindKey(KeyBindReq req) {

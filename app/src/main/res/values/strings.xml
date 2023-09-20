@@ -1,11 +1,7 @@
 <resources>
     <string name="app_name">MUSAP</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Key Discovery</string>
-    <string name="title_notifications">Keygen</string>
+    <string name="title_dashboard">Keystore List</string>
+    <string name="title_notifications">Key Generation</string>
     <string name="title_sign">Sign</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-
 </resources>

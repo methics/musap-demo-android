@@ -17,9 +17,12 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import fi.methics.musap.MUSAPClientHolder;
 import fi.methics.musap.R;
+import fi.methics.musap.sdk.api.MUSAPClient;
+import fi.methics.musap.sdk.util.MLog;
 
 /**
  * A fragment representing a list of Items.
@@ -70,8 +73,13 @@ public class SignMethodFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            Set<String> keyNames = MUSAPClientHolder.getClient().listKeyNames();
+            Set<String> keyNames = MUSAPClient.listKeys().stream().map(key -> key.getKeyUri()).map(uri -> uri.toString()).collect(Collectors.toSet());
             List<String> keys = new ArrayList<>(keyNames);
+
+            MLog.d("Found keys: ");
+            for (String keyuri : keys) {
+                MLog.d("  " + keyuri);
+            }
 
             NavController navController = Navigation.findNavController(SignMethodFragment.this.getActivity(), R.id.nav_host_fragment_activity_main);
             recyclerView.setAdapter(new SignMethodRecyclerViewAdapter(keys, navController));

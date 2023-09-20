@@ -12,13 +12,10 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="fi.methics.musap.ui.dashboard.DashboardFragment"
+        android:id="@+id/keystore_list"
+        android:name="fi.methics.musap.ui.list.KeystoreListFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" >
-        <action
-            android:id="@+id/action_navigation_dashboard_to_keystoreFragment"
-            app:destination="@id/keystoreFragment" />
+        tools:layout="@layout/fragment_keystore" >
     </fragment>
 
     <fragment
@@ -27,55 +24,19 @@
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_keygen" />
     <fragment
-        android:id="@+id/keystoreFragment"
-        android:name="fi.methics.musap.ui.dashboard.KeystoreFragment"
+        android:id="@+id/keystoreListFragment"
+        android:name="fi.methics.musap.ui.list.KeystoreListFragment"
         android:label="fragment_keystore_list"
         tools:layout="@layout/fragment_keystore_list" >
         <action
-            android:id="@+id/action_keystoreFragment_to_navigation_dashboard"
-            app:destination="@id/navigation_dashboard" />
-        <action
-            android:id="@+id/action_keystoreFragment_to_mobileIdDiscoveryFragment"
-            app:destination="@id/mobileIdDiscoveryFragment" />
-        <action
-            android:id="@+id/action_keystoreFragment_to_remoteSignDiscoveryFragment"
-            app:destination="@id/remoteSignDiscoveryFragment" />
-        <action
-            android:id="@+id/action_keystoreFragment_to_androidKeystoreFragment"
-            app:destination="@id/androidKeystoreFragment" />
+            android:id="@+id/action_keystoreFragment_to_keystoreDetailsFragment"
+            app:destination="@id/keystoreDetailsFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/mobileIdDiscoveryFragment"
-        android:name="fi.methics.musap.ui.dashboard.MobileIdDiscoveryFragment"
-        android:label="fragment_mobile_id_discovery"
-        tools:layout="@layout/fragment_mobile_id_discovery" >
-        <action
-            android:id="@+id/action_mobileIdDiscoveryFragment_to_keystoreFragment"
-            app:destination="@id/keystoreFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/remoteSignDiscoveryFragment"
-        android:name="fi.methics.musap.ui.dashboard.RemoteSignDiscoveryFragment"
-        android:label="fragment_remote_sign_discovery"
-        tools:layout="@layout/fragment_remote_sign_discovery" >
-        <action
-            android:id="@+id/action_remoteSignDiscoveryFragment_to_keystoreFragment"
-            app:destination="@id/keystoreFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/androidKeystoreFragment"
-        android:name="fi.methics.musap.ui.dashboard.AndroidKeystoreFragment"
-        android:label="fragment_android_keystore"
-        tools:layout="@layout/fragment_android_keystore" >
-        <action
-            android:id="@+id/action_androidKeystoreFragment_to_keystoreFragment"
-            app:destination="@id/keystoreFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/navigation_sign"
         android:name="fi.methics.musap.ui.sign.SignFragment"
-        android:label="fragment_sign"
+        android:label="@string/title_sign"
         tools:layout="@layout/fragment_sign" >
         <action
             android:id="@+id/action_navigation_sign_to_signMethodFragment"
@@ -95,5 +56,9 @@
         android:name="fi.methics.musap.ui.sign.AndroidKeystoreSignFragment"
         android:label="fragment_android_keystore_sign"
         tools:layout="@layout/fragment_android_keystore_sign" />
+    <fragment
+        android:id="@+id/keystoreDetailsFragment"
+        android:name="fi.methics.musap.ui.list.KeystoreDetailsFragment"
+        android:label="KeystoreDetailsFragment" />
 
 </navigation>

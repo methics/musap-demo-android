@@ -9,12 +9,11 @@ import java.util.Map;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 import fi.methics.musap.sdk.keyuri.KeyURI;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 
 public class KeyDiscoveryAPI {
 
     private Context context;
-    private List<MUSAPSscdInterface> sscds = new ArrayList<>();
+    private static List<MUSAPSscdInterface> sscds = new ArrayList<>();
 
     public KeyDiscoveryAPI(Context context) {
         this.context = context;
@@ -57,8 +56,8 @@ public class KeyDiscoveryAPI {
      * Get the list of available SSCDs with {@link #listSscds()}.
      * @param sscd SSCD
      */
-    public void enableSscd(MUSAPSscdInterface sscd) {
-        this.sscds.add(sscd);
+    public void enableSSCD(MUSAPSscdInterface sscd) {
+        sscds.add(sscd);
     }
 
     /**

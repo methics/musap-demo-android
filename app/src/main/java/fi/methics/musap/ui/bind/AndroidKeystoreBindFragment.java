@@ -1,4 +1,4 @@
-package fi.methics.musap.ui.dashboard;
+package fi.methics.musap.ui.bind;
 
 import android.os.Bundle;
 
@@ -15,9 +15,9 @@ import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
 import fi.methics.musap.sdk.keydiscovery.KeyBindReqBuilder;
 
 
-public class AndroidKeystoreFragment extends Fragment {
+public class AndroidKeystoreBindFragment extends Fragment {
 
-    public AndroidKeystoreFragment() {
+    public AndroidKeystoreBindFragment() {
         // Required empty public constructor
     }
 

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.util.MLog;
@@ -52,6 +53,8 @@ public class KeyMetaDataStorage {
             throw new IllegalArgumentException("Cannot store unnamed MUSAP key");
         }
 
+        MLog.d("Storing key");
+
         Set<String> oldKeyNames = this.getKeyNameSet();
         Set<String> newKeyNames = new HashSet<>(oldKeyNames);
 
@@ -84,7 +87,8 @@ public class KeyMetaDataStorage {
     }
 
     public Set<String> listKeyNames() {
-        return this.getKeyNameSet();
+        return listKeys().stream().map(key -> key.getKeyName()).collect(Collectors.toSet());
+        //return this.getKeyNameSet();
     }
 
     public void storeKeyMetaData(KeyBindReq req) {
