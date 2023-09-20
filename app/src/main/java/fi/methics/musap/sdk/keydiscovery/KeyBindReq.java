@@ -1,5 +1,7 @@
 package fi.methics.musap.sdk.keydiscovery;
 
+import java.util.List;
+
 public class KeyBindReq {
 
     private final String sscd;

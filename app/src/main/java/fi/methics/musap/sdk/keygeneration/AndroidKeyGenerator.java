@@ -3,6 +3,7 @@ package fi.methics.musap.sdk.keygeneration;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
 import fi.methics.musap.sdk.api.MUSAPConstants;
@@ -23,7 +24,7 @@ public class AndroidKeyGenerator {
                         KeyProperties.DIGEST_SHA512)
                 .build());
 
-        kpg.generateKeyPair();
+        KeyPair keyPair = kpg.generateKeyPair();
 
         MLog.d("Key generation successful");
 
