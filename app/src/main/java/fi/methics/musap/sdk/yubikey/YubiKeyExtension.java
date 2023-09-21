@@ -25,7 +25,6 @@ import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.util.MLog;
-import fi.methics.musap.ui.home.HomeFragment;
 
 public class YubiKeyExtension implements MUSAPSscdInterface {
 
@@ -48,9 +47,9 @@ public class YubiKeyExtension implements MUSAPSscdInterface {
     private final Context c;
 
     public YubiKeyExtension(Activity activity) {
-        this.managementKey = new byte[0];
+        this.managementKey = MANAGEMENT_KEY;
         this.pin = DEFAULT_PIN;
-        this.type = ManagementKeyType.TDES;
+        this.type = TYPE;
         this.c = activity.getBaseContext();
         this.activity = activity;
         this.yubiKitManager = new YubiKitManager(this.c);
@@ -58,6 +57,8 @@ public class YubiKeyExtension implements MUSAPSscdInterface {
 
     @Override
     public MUSAPKey bindKey(KeyBindReq req) throws Exception {
+        // Bind an existing YubiKey keypair to MUSAP by signing with it
+        // Get the public key, and verify that it matches 
         return null;
     }
 
@@ -103,6 +104,9 @@ public class YubiKeyExtension implements MUSAPSscdInterface {
 
                 KeyPairGenerator ecKpg = KeyPairGenerator.getInstance("YKPivEC");
                 MLog.d("Initialized KeyPairGenerator");
+
+                // PinPolicy and TouchPolicy should come from the using app
+                // Pin and used slot comes from the user
 
                 ecKpg.initialize(
                         new PivAlgorithmParameterSpec(
