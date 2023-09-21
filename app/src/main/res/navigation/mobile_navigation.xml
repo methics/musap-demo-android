@@ -12,27 +12,20 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/keystore_list"
+        android:id="@+id/navigation_keystore_list"
         android:name="fi.methics.musap.ui.list.KeystoreListFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_keystore" >
+        <action
+            android:id="@+id/action_keystoreFragment_to_keystoreDetailsFragment"
+            app:destination="@id/keystore_details_fragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_keygen"
         android:name="fi.methics.musap.ui.keygen.KeygenFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_keygen" />
-    <fragment
-        android:id="@+id/keystoreListFragment"
-        android:name="fi.methics.musap.ui.list.KeystoreListFragment"
-        android:label="fragment_keystore_list"
-        tools:layout="@layout/fragment_keystore_list" >
-        <action
-            android:id="@+id/action_keystoreFragment_to_keystoreDetailsFragment"
-            app:destination="@id/keystoreDetailsFragment" />
-    </fragment>
-
     <fragment
         android:id="@+id/navigation_sign"
         android:name="fi.methics.musap.ui.sign.SignFragment"
@@ -40,12 +33,12 @@
         tools:layout="@layout/fragment_sign" >
         <action
             android:id="@+id/action_navigation_sign_to_signMethodFragment"
-            app:destination="@id/signMethodFragment" />
+            app:destination="@id/sign_sign_method_fragment" />
     </fragment>
     <fragment
-        android:id="@+id/signMethodFragment"
+        android:id="@+id/sign_sign_method_fragment"
         android:name="fi.methics.musap.ui.sign.SignMethodFragment"
-        android:label="fragment_sign_method_list"
+        android:label="@string/title_keystore_list"
         tools:layout="@layout/fragment_sign_method_list" >
         <action
             android:id="@+id/action_signMethodFragment_to_androidKeystoreSignFragment"
@@ -56,8 +49,9 @@
         android:name="fi.methics.musap.ui.sign.AndroidKeystoreSignFragment"
         android:label="fragment_android_keystore_sign"
         tools:layout="@layout/fragment_android_keystore_sign" />
+
     <fragment
-        android:id="@+id/keystoreDetailsFragment"
+        android:id="@+id/keystore_details_fragment"
         android:name="fi.methics.musap.ui.list.KeystoreDetailsFragment"
         android:label="KeystoreDetailsFragment" />
 

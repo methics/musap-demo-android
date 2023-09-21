@@ -63,6 +63,7 @@ public class SignMethodFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sign_method_list, container, false);
 
+        MLog.d("SignMethodFragment created");
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
