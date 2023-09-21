@@ -72,7 +72,6 @@ public class HomeFragment extends Fragment {
 
                 try {
                     yubiKitManager.startNfcDiscovery(new NfcConfiguration(), HomeFragment.this.getActivity(), device -> {
-//                        Toast.makeText(c, "Found NFC", Toast.LENGTH_SHORT).show();
                         MLog.d("Found NFC");
 
                         connect(device);
@@ -126,8 +125,6 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-
-
 
     @Override
     public void onResume() {
