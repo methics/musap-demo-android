@@ -14,11 +14,15 @@ import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPPublicKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.sscd.settings.AndroidKeystoreSettings;
+import fi.methics.musap.sdk.sscd.settings.MethicsDemoSettings;
 import fi.methics.musap.sdk.util.MLog;
 
-public class AndroidKeystoreSscd implements MUSAPSscdInterface {
+public class AndroidKeystoreSscd implements MUSAPSscdInterface<AndroidKeystoreSettings> {
 
     private Context context;
+
+    private AndroidKeystoreSettings settings = new AndroidKeystoreSettings();
 
     public AndroidKeystoreSscd(Context context) {
         this.context = context;
@@ -58,4 +62,10 @@ public class AndroidKeystoreSscd implements MUSAPSscdInterface {
                 .setSscdId(UUID.randomUUID().toString())
                 .build();
     }
+
+    @Override
+    public AndroidKeystoreSettings getSettings() {
+        return settings;
+    }
+
 }

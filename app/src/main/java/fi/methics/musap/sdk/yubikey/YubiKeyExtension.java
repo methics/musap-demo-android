@@ -20,18 +20,21 @@ import java.security.KeyPairGenerator;
 import java.security.Security;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
+import fi.methics.musap.sdk.extension.SscdSettings;
 import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.util.MLog;
 
-public class YubiKeyExtension implements MUSAPSscdInterface {
+public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
 
 
     private static final byte[] MANAGEMENT_KEY = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     private static final ManagementKeyType TYPE = ManagementKeyType.TDES;
     private static final char[] DEFAULT_PIN = "123456".toCharArray();
+
+    private YubiKeySettings settings = new YubiKeySettings();
 
     /**
      * PIN
@@ -88,6 +91,11 @@ public class YubiKeyExtension implements MUSAPSscdInterface {
     @Override
     public boolean isKeygenSupported() {
         return true;
+    }
+
+    @Override
+    public YubiKeySettings getSettings() {
+        return settings;
     }
 
     private void connect(final NfcYubiKeyDevice device, final KeyGenReq req)  {
