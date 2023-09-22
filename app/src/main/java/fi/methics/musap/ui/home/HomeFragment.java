@@ -57,8 +57,6 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
-
         Button yubiTest = binding.buttonYubitest;
 
         yubiTest.setOnClickListener(new View.OnClickListener() {
@@ -70,12 +68,20 @@ public class HomeFragment extends Fragment {
                 } catch (Exception e) {
                     MLog.e("Failed to generate", e);
                 }
-
             }
         });
 
-//        final TextView textView = binding.textHome;
-//        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+        Button yubiSign = binding.buttonYubisign;
+        yubiSign.setOnClickListener(view -> {
+            YubiKeyExtension extension = new YubiKeyExtension(HomeFragment.this.getActivity());
+            try {
+                extension.sign();
+            } catch (Exception e) {
+                MLog.e("Failed to generate", e);
+            }
+        });
+
         return root;
     }
 

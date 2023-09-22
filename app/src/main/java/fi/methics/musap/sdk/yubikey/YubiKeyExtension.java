@@ -2,12 +2,15 @@ package fi.methics.musap.sdk.yubikey;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.yubico.yubikit.android.YubiKitManager;
 import com.yubico.yubikit.android.transport.nfc.NfcConfiguration;
 import com.yubico.yubikit.android.transport.nfc.NfcNotAvailable;
 import com.yubico.yubikit.android.transport.nfc.NfcYubiKeyDevice;
+import com.yubico.yubikit.core.application.ApplicationNotAvailableException;
+import com.yubico.yubikit.core.smartcard.ApduException;
 import com.yubico.yubikit.core.smartcard.SmartCardConnection;
 import com.yubico.yubikit.piv.KeyType;
 import com.yubico.yubikit.piv.ManagementKeyType;
@@ -26,20 +29,22 @@ import org.bouncycastle.operator.ContentSigner;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Security;
 import java.security.Signature;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.extension.SscdSettings;
 import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
@@ -201,6 +206,60 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
             } catch(Exception e) {
                 MLog.e("Failed to connect", e);
             }
+        });
+    }
+
+    public void sign() {
+        try {
+            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), this.activity, device -> {
+                MLog.d("Found NFC");
+                yubiSign(device);
+            });
+        } catch (Exception e) {
+            MLog.e("Failed to sign", e);
+        }
+    }
+
+    private void yubiSign(NfcYubiKeyDevice device) {
+        device.requestConnection(SmartCardConnection.class, result -> {
+            try {
+                String msg = "Test string";
+
+                SmartCardConnection connection = result.getValue();  // This may throw an IOException
+                PivSession pivSession = new PivSession(connection);
+
+                pivSession.authenticate(this.type, this.managementKey);
+
+                Slot slot = Slot.SIGNATURE;
+
+                PivProvider pivProvider = new PivProvider(pivSession);
+                KeyStore keyStore = KeyStore.getInstance("YKPiv", pivProvider);
+
+                keyStore.load(null);
+
+                PublicKey publicKey = keyStore.getCertificate(slot.getStringAlias()).getPublicKey();
+                PrivateKey privateKey = (PrivateKey) keyStore.getKey(slot.getStringAlias(), this.pin);
+
+                String algorithm = "SHA256withECDSA";
+
+                Signature signature = Signature.getInstance(algorithm, pivProvider);
+                signature.initSign(privateKey);
+                signature.update(msg.getBytes(StandardCharsets.UTF_8));
+                byte[] sigResult = signature.sign();
+
+                MLog.d("Signed");
+
+                Signature verify = Signature.getInstance(algorithm);
+                verify.initVerify(publicKey);
+                verify.update(msg.getBytes(StandardCharsets.UTF_8));
+                boolean valid = verify.verify(sigResult);
+
+                MLog.d("Valid signature=" + valid);
+
+            } catch(Exception e) {
+                MLog.e("Failed to sign", e);
+            }
+
         });
     }
 
