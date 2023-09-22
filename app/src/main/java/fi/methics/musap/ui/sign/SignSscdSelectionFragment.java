@@ -12,10 +12,10 @@ import androidx.navigation.Navigation;
 
 import fi.methics.musap.R;
 
-public class SignFragment extends Fragment {
+public class SignSscdSelectionFragment extends Fragment {
 
 
-    public SignFragment() {
+    public SignSscdSelectionFragment() {
         // Required empty public constructor
     }
 
@@ -35,7 +35,7 @@ public class SignFragment extends Fragment {
         Button b = v.findViewById(R.id.button_sign_next);
 
         b.setOnClickListener(view -> {
-            NavController navController = Navigation.findNavController(SignFragment.this.getActivity(), R.id.nav_host_fragment_activity_main);
+            NavController navController = Navigation.findNavController(SignSscdSelectionFragment.this.getActivity(), R.id.nav_host_fragment_activity_main);
             Bundle args = new Bundle();
             navController.navigate(R.id.action_navigation_sign_to_signMethodFragment, args);
         });

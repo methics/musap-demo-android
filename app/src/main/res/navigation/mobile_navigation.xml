@@ -28,7 +28,7 @@
         tools:layout="@layout/fragment_keygen" />
     <fragment
         android:id="@+id/navigation_sign"
-        android:name="fi.methics.musap.ui.sign.SignFragment"
+        android:name="fi.methics.musap.ui.sign.SignSscdSelectionFragment"
         android:label="@string/title_sign"
         tools:layout="@layout/fragment_sign" >
         <action
@@ -42,11 +42,11 @@
         tools:layout="@layout/fragment_sign_method_list" >
         <action
             android:id="@+id/action_signMethodFragment_to_androidKeystoreSignFragment"
-            app:destination="@id/androidKeystoreSignFragment" />
+            app:destination="@id/signingFragment" />
     </fragment>
     <fragment
-        android:id="@+id/androidKeystoreSignFragment"
-        android:name="fi.methics.musap.ui.sign.AndroidKeystoreSignFragment"
+        android:id="@+id/signingFragment"
+        android:name="fi.methics.musap.ui.sign.SigningFragment"
         android:label="fragment_android_keystore_sign"
         tools:layout="@layout/fragment_android_keystore_sign" />
 

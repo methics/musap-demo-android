@@ -7,12 +7,14 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
 import fi.methics.musap.sdk.api.MUSAPConstants;
+import fi.methics.musap.sdk.keyuri.KeyURI;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
+import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.util.MLog;
 
 public class AndroidKeyGenerator {
 
-    public MUSAPKey generateKey(KeyGenReq req) throws Exception {
+    public MUSAPKey generateKey(KeyGenReq req, MUSAPSscd sscd) throws Exception {
         String algorithm = this.resolveAlgorithm(req);
 
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(
@@ -31,7 +33,10 @@ public class AndroidKeyGenerator {
         MUSAPKey generatedKey = new MUSAPKey.Builder()
                 .setSscdType(MUSAPConstants.ANDROID_KS_TYPE)
                 .setKeyName(req.getKeyAlias())
+                .setKeyUri(new KeyURI(req.getKeyAlias(), sscd.getSscdType(), "loa3").getUri())
+                .setSscdId(sscd.getSscdId())
                 .build();
+        MLog.d("Generated key with KeyURI " + generatedKey.getKeyUri());
 
         return generatedKey;
     }

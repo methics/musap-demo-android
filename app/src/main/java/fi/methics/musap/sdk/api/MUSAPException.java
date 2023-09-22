@@ -6,4 +6,8 @@ public class MUSAPException extends Exception {
         super(cause);
     }
 
+    public MUSAPException(String msg) {
+        super(msg);
+    }
+
 }

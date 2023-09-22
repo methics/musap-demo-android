@@ -9,6 +9,7 @@ import java.security.Signature;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.util.MLog;
 
+@Deprecated
 public class AksSigner {
 
     protected byte[] sign(MUSAPKey key, byte[] data) throws GeneralSecurityException, IOException {

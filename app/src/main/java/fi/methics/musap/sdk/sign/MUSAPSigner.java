@@ -1,6 +1,7 @@
 package fi.methics.musap.sdk.sign;
 
 import fi.methics.musap.sdk.api.MUSAPException;
+import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.util.MLog;
 
@@ -12,7 +13,7 @@ public class MUSAPSigner {
         this.key = key;
     }
 
-    public byte[] sign(byte[] data) throws MUSAPException {
+    public MUSAPSignature sign(byte[] data) throws MUSAPException {
         if (this.key == null || data == null) {
             MLog.e("Missing key or data");
             throw new IllegalArgumentException("Missing key or data");
@@ -23,16 +24,13 @@ public class MUSAPSigner {
             throw new IllegalArgumentException("Missing key type");
         }
         try {
-            switch (this.key.getSscdType().toLowerCase()) {
-                case "aks":
-                case "android keystore":
-                    return new AksSigner().sign(this.key, data);
+            MUSAPSscdInterface sscd = this.key.getSscd();
+            if (sscd == null) {
+                throw new MUSAPException("No SSCD found for key " + this.key.getKeyUri());
             }
+            return sscd.sign(new SignatureReq(this.key, data));
         } catch (Exception e) {
             throw new MUSAPException(e);
         }
-
-        // Unknown signing method
-        throw new IllegalArgumentException("Cannot handle SSCD type " + this.key.getSscdType());
     }
 }

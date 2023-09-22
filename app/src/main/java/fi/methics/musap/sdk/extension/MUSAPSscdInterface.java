@@ -4,6 +4,8 @@ import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.sign.MUSAPSignature;
+import fi.methics.musap.sdk.sign.SignatureReq;
 
 /**
  * MUSAP SSCD extension interface. Every SSCD should implement this.
@@ -30,6 +32,14 @@ public interface MUSAPSscdInterface {
      * @return Recently generated MUSAPKey
      */
     public MUSAPKey generateKey(KeyGenReq req) throws Exception ;
+
+    /**
+     * Sign with the SSCD
+     * @param req Signature request
+     * @return Signature response
+     * @throws Exception
+     */
+    public MUSAPSignature sign(SignatureReq req) throws Exception;
 
     /**
      * Get SSCD info. Must not return null.

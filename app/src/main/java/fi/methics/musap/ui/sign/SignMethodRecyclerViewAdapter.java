@@ -20,7 +20,8 @@ public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMeth
     private final List<String> mValues;
 
     protected static final String KEY_ALIAS = "keyalias";
-    protected static final String DTBS = "dtbs";
+    protected static final String KEY_URI   = "keyuri";
+    protected static final String DTBS      = "dtbs";
 
     private final NavController controller;
 
@@ -58,23 +59,19 @@ public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMeth
 
         public ViewHolder(FragmentSignMethodBinding binding) {
             super(binding.getRoot());
-            mIdView = binding.itemNumber;
+            mIdView      = binding.itemNumber;
             mContentView = binding.content;
 
             final String dtbs = "Sample text to sign";
 
-            mIdView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String keyAlias = mItem;
+            mIdView.setOnClickListener(view -> {
+                String keyUri = mItem;
 
+                Bundle args = new Bundle();
+                args.putString(KEY_URI, keyUri);
+                args.putString(DTBS,    dtbs);
 
-                    Bundle args = new Bundle();
-                    args.putString(KEY_ALIAS, keyAlias);
-                    args.putString(DTBS, dtbs);
-
-                    controller.navigate(R.id.action_signMethodFragment_to_androidKeystoreSignFragment, args);
-                }
+                controller.navigate(R.id.action_signMethodFragment_to_androidKeystoreSignFragment, args);
             });
         }
 

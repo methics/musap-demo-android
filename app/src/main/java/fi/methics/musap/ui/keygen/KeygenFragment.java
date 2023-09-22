@@ -48,7 +48,7 @@ public class KeygenFragment extends Fragment {
 
         // TODO: Read the type from radio buttons
         final MUSAPSscdType type = MUSAPSscdType.PHONE_KEYSTORE;
-        final Map<Integer, MUSAPSscdInterface> sscds = new HashMap<>();
+        final Map<RadioButton, MUSAPSscdInterface> sscds = new HashMap<>();
         int i = 0;
         MLog.d("Found " + sscds.size() + " SSCDs");
         for (MUSAPSscdInterface sscd : MUSAPClient.listSSCDS()) {
@@ -59,7 +59,7 @@ public class KeygenFragment extends Fragment {
             rb.setId(100+i);
             MLog.d("Added radio button " + sscd.getSscdInfo().getSscdName() + " with id " + sscd.hashCode());
             binding.radioGroupKeystores.addView(rb);
-            sscds.put(rb.getId(), sscd);
+            sscds.put(rb, sscd);
         }
 
         generate.setOnClickListener(view -> {
@@ -68,11 +68,20 @@ public class KeygenFragment extends Fragment {
 
             KeyGenReq req = new KeyGenReqBuilder()
                     .setAlias(alias)
-                    .setSscd(new MUSAPSscd(type))
                     .createKeyGenReq();
 
-            MLog.d("Looking for radio button with id " +view.getId());
-            MUSAPSscdInterface sscd = sscds.get(view.getId());
+            MLog.d("Looking for selected radio button");
+            MUSAPSscdInterface sscd = null;
+            for (RadioButton rb : sscds.keySet()) {
+                if (rb.isChecked()) {
+                    sscd = sscds.get(rb);
+                    MLog.d(rb.getText() + " is selected");
+                }
+            }
+            if (sscd == null) {
+                MLog.d("No SSCD selected");
+                return;
+            }
             try {
                 MLog.d("Generating key");
                 MUSAPKey key = sscd.generateKey(req);

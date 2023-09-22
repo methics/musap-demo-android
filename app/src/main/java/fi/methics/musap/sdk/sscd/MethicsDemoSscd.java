@@ -9,6 +9,8 @@ import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.sign.MUSAPSignature;
+import fi.methics.musap.sdk.sign.SignatureReq;
 
 public class MethicsDemoSscd implements MUSAPSscdInterface {
     private Context context;
@@ -30,6 +32,11 @@ public class MethicsDemoSscd implements MUSAPSscdInterface {
     @Override
     public MUSAPKey generateKey(KeyGenReq req) throws Exception {
         throw new java.lang.UnsupportedOperationException();
+    }
+
+    @Override
+    public MUSAPSignature sign(SignatureReq req) throws Exception {
+        return null;
     }
 
     @Override

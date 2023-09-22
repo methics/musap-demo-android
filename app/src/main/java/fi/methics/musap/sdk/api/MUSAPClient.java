@@ -47,12 +47,14 @@ public class MUSAPClient {
         storage.storeKeyMetaData(req);
     }
 
+    @Deprecated
     public static void generateKey(KeyGenReq req) {
         MUSAPKey key = new KeygenAPI().generateKey(req);
         KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
         storage.storeKey(key);
     }
 
+    @Deprecated
     public static Set<String> listKeyNames() {
         KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
         return storage.listKeyNames();
@@ -78,14 +80,25 @@ public class MUSAPClient {
     }
 
     public static MUSAPKey getKeyByUri(String keyUri) {
-        // TODO: Getting a key by URI is important because passing MUSAPKey object
-        //  between activities/fragements is harder than passing strings
+        MLog.d("Searching for key with KeyURI " + keyUri);
+        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        for (MUSAPKey key : storage.listKeys()) {
+            if (key.getKeyUri().matches(new KeyURI(keyUri))) {
+                MLog.d("Found key " + key.getKeyName());
+                return key;
+            }
+        }
+        MLog.d("Found no key!");
         return null;
     }
 
     public static MUSAPKey getKeyByUri(KeyURI keyUri) {
-        // TODO: Getting a key by URI is important because passing MUSAPKey object
-        //  between activities/fragements is harder than passing strings
+        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        for (MUSAPKey key : storage.listKeys()) {
+            if (key.getKeyUri().matches(keyUri)) {
+                return key;
+            }
+        }
         return null;
     }
 }
