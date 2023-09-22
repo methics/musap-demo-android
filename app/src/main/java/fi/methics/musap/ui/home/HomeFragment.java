@@ -34,7 +34,10 @@ import java.security.Security;
 import java.security.Signature;
 
 import fi.methics.musap.databinding.FragmentHomeBinding;
+import fi.methics.musap.sdk.keygeneration.KeyGenReq;
+import fi.methics.musap.sdk.keygeneration.KeyGenReqBuilder;
 import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.yubikey.YubiKeyExtension;
 
 public class HomeFragment extends Fragment {
 
@@ -61,69 +64,19 @@ public class HomeFragment extends Fragment {
         yubiTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Context c = HomeFragment.this.getContext();
-
-                if (yubiKitManager == null) {
-                    yubiKitManager = new YubiKitManager(c);
-                }
-
-                Toast.makeText(c, "Looking for Yubikey...", Toast.LENGTH_SHORT).show();
-
+                YubiKeyExtension extension = new YubiKeyExtension(HomeFragment.this.getActivity());
                 try {
-                    yubiKitManager.startNfcDiscovery(new NfcConfiguration(), HomeFragment.this.getActivity(), device -> {
-                        MLog.d("Found NFC");
-
-                        connect(device);
-
-                    });
-                } catch (NfcNotAvailable e) {
-                    if (e.isDisabled()) {
-                        Toast.makeText(c, "NFC is not enabled", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(c, "NFC is not available", Toast.LENGTH_SHORT).show();
-                    }
+                    extension.generateKey(new KeyGenReqBuilder().createKeyGenReq());
+                } catch (Exception e) {
+                    MLog.e("Failed to generate", e);
                 }
+
             }
         });
 
 //        final TextView textView = binding.textHome;
 //        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
-    }
-
-    private void connect(NfcYubiKeyDevice device)  {
-        device.requestConnection(SmartCardConnection.class, result -> {
-            // The result is a Result<SmartCardConnection, IOException>, which represents either a successful connection, or an error.
-            try {
-                SmartCardConnection connection = result.getValue();  // This may throw an IOException
-                PivSession pivSession = new PivSession(connection);
-
-                pivSession.authenticate(TYPE, MANAGEMENT_KEY);
-
-                PivProvider pivProvider = new PivProvider(pivSession);
-                Security.insertProviderAt(pivProvider, 1); // JCA Security providers are indexed from 1
-
-                KeyPairGenerator ecKpg = KeyPairGenerator.getInstance("YKPivEC");
-                MLog.d("Initialized KeyPairGenerator");
-
-                ecKpg.initialize(
-                        new PivAlgorithmParameterSpec(
-                                Slot.AUTHENTICATION,
-                                KeyType.ECCP384,
-                                null, // PinPolicy
-                                null, // TouchPolicy
-                                DEFAULT_PIN // PIV PIN
-                        )
-                );
-                ecKpg.generateKeyPair();
-
-                MLog.d("Generated KeyPair");
-
-            } catch(Exception e) {
-                MLog.e("Failed to connect", e);
-            }
-        });
     }
 
     @Override

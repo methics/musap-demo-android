@@ -16,8 +16,27 @@ import com.yubico.yubikit.piv.Slot;
 import com.yubico.yubikit.piv.jca.PivAlgorithmParameterSpec;
 import com.yubico.yubikit.piv.jca.PivProvider;
 
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.math.BigInteger;
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.Security;
+import java.security.Signature;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 import fi.methics.musap.sdk.extension.SscdSettings;
@@ -116,19 +135,69 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
                 // PinPolicy and TouchPolicy should come from the using app
                 // Pin and used slot comes from the user
 
+                final Slot usedSlot = Slot.SIGNATURE;
+
                 ecKpg.initialize(
                         new PivAlgorithmParameterSpec(
-                                Slot.AUTHENTICATION,
+                                usedSlot,
                                 this.resolveKeyType(req),
                                 null, // PinPolicy
                                 null, // TouchPolicy
                                 this.pin // PIV PIN
                         )
                 );
-                ecKpg.generateKeyPair();
+                KeyPair keyPair= ecKpg.generateKeyPair();
 
                 MLog.d("Generated KeyPair");
 
+                X500Name name = new X500Name("CN=MUSAP Test");
+                X509v3CertificateBuilder builder = new X509v3CertificateBuilder(
+                        name,
+                        new BigInteger("123456789"),
+                        new Date(),
+                        new Date(),
+                        name,
+                        SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(keyPair.getPublic().getEncoded()))
+                        );
+                MLog.d("Built cert");
+
+                byte[] certBytes = builder.build(new ContentSigner() {
+
+                    private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                    @Override
+                    public AlgorithmIdentifier getAlgorithmIdentifier() {
+                        return new AlgorithmIdentifier(X9ObjectIdentifiers.ecdsa_with_SHA256);
+                    }
+
+                    @Override
+                    public OutputStream getOutputStream() {
+                        return this.buffer;
+                    }
+
+                    @Override
+                    public byte[] getSignature() {
+                        try {
+                            Signature sig = Signature.getInstance("SHA256withECDSA", pivProvider);
+                            sig.initSign(keyPair.getPrivate());
+                            sig.update(this.buffer.toByteArray());
+                            return sig.sign();
+                        } catch (Exception e) {
+                            MLog.e("Failed to init content signer", e);
+                            return null;
+                        }
+                    }
+                }).getEncoded();
+
+                MLog.d("Encoded cert");
+                X509Certificate builtCert = (X509Certificate) CertificateFactory.getInstance("X.509")
+                        .generateCertificate(new ByteArrayInputStream(certBytes));
+
+                pivSession.putCertificate(usedSlot, builtCert);
+
+
+                MLog.d("Put certificate to slot");
+
+//                pivSession.close();
             } catch(Exception e) {
                 MLog.e("Failed to connect", e);
             }
@@ -143,8 +212,8 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
     private KeyType resolveKeyType(KeyGenReq req) {
         // TODO: Implement
 
-        switch (req.getType()) {
-        }
+//        switch (req.getType()) {
+//        }
 
         return KeyType.ECCP384;
     }

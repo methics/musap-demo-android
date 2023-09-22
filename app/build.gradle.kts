@@ -50,6 +50,8 @@ dependencies {
     implementation("com.yubico.yubikit:android:2.3.0")
     implementation("com.github.tony19:logback-android:3.0.0")
     implementation("com.yubico.yubikit:piv:2.3.0")
+    implementation("org.bouncycastle:bcpkix-jdk15to18:1.71")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
