@@ -18,7 +18,7 @@ public class MethicsDemoSscd implements MUSAPSscdInterface {
     public MethicsDemoSscd(Context context) {
         this.context = context;
     }
-    public static final String SSCD_TYPE = "METHICS_DEMO";
+    public static final String SSCD_TYPE = "demo";
     @Override
     public MUSAPKey bindKey(KeyBindReq req) {
         // TODO:

@@ -5,5 +5,5 @@
     <string name="title_notifications">Key Generation</string>
     <string name="title_sign">Sign</string>
     <string name="title_keystore_list">Keystore List</string>
-    <string name="keystore_details">Keystore Details</string>
+    <string name="title_keystore_details">Keystore Details</string>
 </resources>

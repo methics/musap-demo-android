@@ -30,7 +30,7 @@ public class AndroidKeystoreSscd implements MUSAPSscdInterface {
         this.context = context;
     }
 
-    public static final String SSCD_TYPE = "ANDROID_KEYSTORE";
+    public static final String SSCD_TYPE = "aks";
     @Override
     public MUSAPKey bindKey(KeyBindReq req) {
         // "Old" keys cannot be bound to MUSAP.
@@ -80,7 +80,7 @@ public class AndroidKeystoreSscd implements MUSAPSscdInterface {
                 .setProvider("Google")
                 .setKeygenSupported(true)
                 .setSupportedKeyAlgorithms(Arrays.asList("RSA2048"))
-                .setSscdId("ANDROID_KEYSTORE") // TODO: This needs to be SSCD instance specific
+                .setSscdId("AKS") // TODO: This needs to be SSCD instance specific
                 .build();
     }
 }

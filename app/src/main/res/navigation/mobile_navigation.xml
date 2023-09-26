@@ -52,7 +52,7 @@
 
     <fragment
         android:id="@+id/keystore_details_fragment"
-        android:name="fi.methics.musap.ui.list.KeystoreDetailsFragment"
-        android:label="KeystoreDetailsFragment" />
+        android:label="@string/title_keystore_details"
+        android:name="fi.methics.musap.ui.list.KeystoreDetailsFragment"/>
 
 </navigation>
