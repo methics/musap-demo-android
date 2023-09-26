@@ -28,7 +28,7 @@ public class MUSAPSigner {
             if (sscd == null) {
                 throw new MUSAPException("No SSCD found for key " + this.key.getKeyUri());
             }
-            return sscd.sign(new SignatureReq(this.key, data));
+            return sscd.sign(new SignatureReqBuilder().setKey(this.key).setData(data).createSignatureReq());
         } catch (Exception e) {
             throw new MUSAPException(e);
         }

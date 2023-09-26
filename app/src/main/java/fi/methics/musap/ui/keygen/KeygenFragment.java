@@ -67,6 +67,7 @@ public class KeygenFragment extends Fragment {
             MLog.d("Alias=" + alias);
 
             KeyGenReq req = new KeyGenReqBuilder()
+                    .setActivity(this.getActivity())
                     .setAlias(alias)
                     .createKeyGenReq();
 
