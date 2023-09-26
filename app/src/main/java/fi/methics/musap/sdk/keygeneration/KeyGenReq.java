@@ -1,30 +1,29 @@
 package fi.methics.musap.sdk.keygeneration;
 
+import android.app.Activity;
+
 import fi.methics.musap.sdk.api.MUSAPSscd;
+import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 
 public class KeyGenReq {
 
-    private final KeyType type;
+    protected KeyType type;
+    protected String keyAlias;
+    protected Activity activity;
 
-    private final MUSAPSscd sscd;
+    protected KeyGenReq() {
 
-    private final String keyAlias;
-
-    public KeyGenReq(KeyType type, MUSAPSscd sscd, String keyAlias) {
-        this.type = type;
-        this.sscd = sscd;
-        this.keyAlias = keyAlias;
     }
 
     public KeyType getType() {
         return type;
     }
 
-    public MUSAPSscd getSscd() {
-        return sscd;
-    }
-
     public String getKeyAlias() {
         return keyAlias;
+    }
+
+    public Activity getActivity() {
+        return activity;
     }
 }

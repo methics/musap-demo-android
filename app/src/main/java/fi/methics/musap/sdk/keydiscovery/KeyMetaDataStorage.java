@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.util.MLog;
@@ -16,7 +17,7 @@ import fi.methics.musap.sdk.util.MLog;
 public class KeyMetaDataStorage {
 
     private static final String PREF_NAME = "musap";
-    private static final String SSCD_SET = "sscd";
+    private static final String SSCD_SET  = "sscd";
 
     /**
      * Set that contains all known key names
@@ -52,6 +53,8 @@ public class KeyMetaDataStorage {
             throw new IllegalArgumentException("Cannot store unnamed MUSAP key");
         }
 
+        MLog.d("Storing key");
+
         Set<String> oldKeyNames = this.getKeyNameSet();
         Set<String> newKeyNames = new HashSet<>(oldKeyNames);
 
@@ -83,10 +86,6 @@ public class KeyMetaDataStorage {
         return keyList;
     }
 
-    public Set<String> listKeyNames() {
-        return this.getKeyNameSet();
-    }
-
     public void storeKeyMetaData(KeyBindReq req) {
         Set<String> metadatas = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
                         .getStringSet(SSCD_SET, new HashSet<>());
@@ -98,12 +97,6 @@ public class KeyMetaDataStorage {
                 .putStringSet(SSCD_SET, newMetadatas)
                 .apply();
     }
-
-    public MUSAPKey getKeyMetadata(String keyName) {
-        String keyJson = this.getKeyJson(keyName);
-        return new Gson().fromJson(keyJson, MUSAPKey.class);
-    }
-
 
     private String makeStoreName(MUSAPKey key) {
         return KEY_JSON_PREFIX + key.getKeyName();

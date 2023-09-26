@@ -5,7 +5,7 @@
     android:id="@+id/layout_sign"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.sign.SignFragment" >
+    tools:context=".ui.sign.SignSscdSelectionFragment" >
 
     <TextView
         android:id="@+id/text_sign"

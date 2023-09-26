@@ -19,7 +19,7 @@ import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.sign.MUSAPSigner;
 import fi.methics.musap.sdk.util.MLog;
 
-
+@Deprecated
 public class AksSignFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
@@ -65,17 +65,17 @@ public class AksSignFragment extends Fragment {
                 String dtbs = v.findViewById(R.id.text_aks_dtbs).toString();
                 byte[] data = MBase64.toBytes(dtbs);
 
-                MUSAPKey key = MUSAPClientHolder.getClient().getKeyByName(alias);
-                MUSAPSigner signer = new MUSAPSigner(key);
-
-                try {
-                    byte[] signature = signer.sign(data);
-                    String signatureStr = MBase64.toBase64String(signature);
-                    Toast.makeText(AksSignFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
-
-                } catch (MUSAPException e) {
-                    MLog.e("Failed to sign", e.getCause());
-                }
+                //MUSAPKey key = MUSAPClientHolder.getClient().getKeyByName(alias);
+                //MUSAPSigner signer = new MUSAPSigner(key);
+//
+                //try {
+                //    byte[] signature = signer.sign(data);
+                //    String signatureStr = MBase64.toBase64String(signature);
+                //    Toast.makeText(AksSignFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
+//
+                //} catch (MUSAPException e) {
+                //    MLog.e("Failed to sign", e.getCause());
+                //}
 
             }
         });

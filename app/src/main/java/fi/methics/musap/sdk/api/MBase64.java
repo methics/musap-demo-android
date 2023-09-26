@@ -20,7 +20,6 @@ public class MBase64 {
         if (s == null) {
             return null;
         }
-
         return Base64.encodeToString(s.getBytes(StandardCharsets.UTF_8), FLAGS);
     }
 

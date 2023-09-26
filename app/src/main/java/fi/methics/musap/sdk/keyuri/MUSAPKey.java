@@ -3,6 +3,12 @@ package fi.methics.musap.sdk.keyuri;
 import java.time.Instant;
 import java.util.List;
 
+import fi.methics.musap.sdk.api.MUSAPClient;
+import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
+import fi.methics.musap.sdk.keydiscovery.KeyMetaDataStorage;
+import fi.methics.musap.sdk.sign.MUSAPSigner;
+import fi.methics.musap.sdk.util.MLog;
+
 public class MUSAPKey {
 
     private String keyName;
@@ -82,6 +88,25 @@ public class MUSAPKey {
 
     public KeyURI getKeyUri() {
         return new KeyURI(this.keyUri);
+    }
+
+    /**
+     * Get a handle to the SSCD that created this MUSAP key
+     * @return SSCD
+     */
+    public MUSAPSscdInterface getSscd() {
+        if (this.sscdId == null) {
+            MLog.d("No sscdid found");
+            return null;
+        }
+        MLog.d("Looking for an SSCD with id " + this.sscdId);
+        for (MUSAPSscdInterface sscd : MUSAPClient.listSSCDS()) {
+            if (this.sscdId.equals(sscd.getSscdInfo().getSscdId())) {
+                MLog.d("Found SSCD with id " + this.sscdId);
+                return sscd;
+            }
+        }
+        return null;
     }
 
     public static class Builder {

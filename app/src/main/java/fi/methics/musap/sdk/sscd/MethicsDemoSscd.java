@@ -1,5 +1,7 @@
 package fi.methics.musap.sdk.sscd;
 
+import android.content.Context;
+
 import java.util.Arrays;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
@@ -7,17 +9,25 @@ import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.sign.MUSAPSignature;
+import fi.methics.musap.sdk.sign.SignatureReq;
 import fi.methics.musap.sdk.sscd.settings.AndroidKeystoreSettings;
 import fi.methics.musap.sdk.sscd.settings.MethicsDemoSettings;
 
 public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> {
 
-    public static final String SSCD_TYPE = "METHICS_DEMO";
+    public static final String SSCD_TYPE = "demo";
+
+    private Context context;
 
     private MethicsDemoSettings settings = new MethicsDemoSettings();
 
     {
         settings.getSettings().put("demourl", "https://demo.methics.fi/appactivation/appactivation/sign?msisdn=");
+    }
+
+    public MethicsDemoSscd(Context context) {
+        this.context = context;
     }
 
     @Override
@@ -36,6 +46,11 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
     }
 
     @Override
+    public MUSAPSignature sign(SignatureReq req) throws Exception {
+        return null;
+    }
+
+    @Override
     public MUSAPSscd getSscdInfo() {
         return new MUSAPSscd.Builder()
                 .setSscdName("Methics Demo")
@@ -44,6 +59,7 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
                 .setProvider("Methics")
                 .setKeygenSupported(false)
                 .setSupportedKeyAlgorithms(Arrays.asList("RSA2048"))
+                .setSscdId("METHICS_DEMO") // TODO: This needs to be SSCD instance specific
                 .build();
     }
 

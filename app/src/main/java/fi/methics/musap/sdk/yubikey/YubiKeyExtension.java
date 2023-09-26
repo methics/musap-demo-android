@@ -38,6 +38,7 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Date;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
@@ -45,7 +46,10 @@ import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.sign.MUSAPSignature;
+import fi.methics.musap.sdk.sign.SignatureReq;
 import fi.methics.musap.sdk.util.MLog;
+import kotlin.NotImplementedError;
 
 public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
 
@@ -66,15 +70,13 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
 
     private final YubiKitManager yubiKitManager;
 
-    private final Activity activity;
     private final Context c;
 
-    public YubiKeyExtension(Activity activity) {
+    public YubiKeyExtension(Context context) {
         this.managementKey = MANAGEMENT_KEY;
         this.pin = DEFAULT_PIN;
         this.type = TYPE;
-        this.c = activity.getBaseContext();
-        this.activity = activity;
+        this.c = context;
         this.yubiKitManager = new YubiKitManager(this.c);
     }
 
@@ -88,7 +90,7 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
     @Override
     public MUSAPKey generateKey(KeyGenReq req) throws Exception {
         try {
-            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), this.activity, device -> {
+            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), req.getActivity(), device -> {
                 MLog.d("Found NFC");
                 connect(device, req);
             });
@@ -100,12 +102,33 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
             }
         }
 
-        return null;
+        throw new UnsupportedOperationException(); // TODO: Return MUSAPKey
+    }
+
+    @Override
+    public MUSAPSignature sign(SignatureReq req) throws Exception {
+        try {
+            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), req.getActivity(), device -> {
+                MLog.d("Found NFC");
+                yubiSign(device);
+            });
+        } catch (Exception e) {
+            MLog.e("Failed to sign", e);
+        }
+        throw new UnsupportedOperationException(); // TODO: Return MUSAPKey
     }
 
     @Override
     public MUSAPSscd getSscdInfo() {
-        return null;
+        return new MUSAPSscd.Builder()
+                .setSscdName("Yubikey")
+                .setSscdType("Yubikey")
+                .setCountry("FI")
+                .setProvider("Yubico")
+                .setKeygenSupported(true)
+                .setSupportedKeyAlgorithms(Arrays.asList("ECCP384"))
+                .setSscdId("YUBI") // TODO: This needs to be SSCD instance specific
+                .build();
     }
 
     @Override
@@ -201,17 +224,6 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
                 MLog.e("Failed to connect", e);
             }
         });
-    }
-
-    public void sign() {
-        try {
-            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), this.activity, device -> {
-                MLog.d("Found NFC");
-                yubiSign(device);
-            });
-        } catch (Exception e) {
-            MLog.e("Failed to sign", e);
-        }
     }
 
     private void yubiSign(NfcYubiKeyDevice device) {

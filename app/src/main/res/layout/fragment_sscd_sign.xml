@@ -2,61 +2,50 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout"
+    android:id="@+id/layout_aks_sign"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.bind.MobileIdKeystoreBindFragment">
-
-    <!-- TODO: Update blank fragment layout -->
+    tools:context=".ui.sign.SigningFragment">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/text_aks_sign"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:text="Mobile ID Key Discovery"
+        android:text="Sign"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/text_aks_sign"
         app:layout_constraintVertical_bias="0.25">
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/text_aks_dtbs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:layout_marginTop="32dp"
-            android:text="Enter your phone number"
+            android:layout_marginVertical="32dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-        <EditText
-            android:id="@+id/text_discovery_number"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_marginTop="32dp"
-            android:ems="10"
-            android:hint="Phone number"
-            android:inputType="number" />
-
         <Button
-            android:id="@+id/button_bind_mobileid"
+            android:id="@+id/button_aks_sign"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="Bind Mobile ID" />
+            android:layout_marginVertical="32dp"
+            android:text="Sign" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
