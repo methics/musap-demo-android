@@ -45,9 +45,7 @@ public class KeygenFragment extends Fragment {
         Button generate = binding.buttonGenerate;
 
         MLog.d("Keygen Fragment created");
-
-        // TODO: Read the type from radio buttons
-        final MUSAPSscdType type = MUSAPSscdType.PHONE_KEYSTORE;
+        Map<RadioButton, MUSAPSscdInterface> radioButtons = this.createRadiButtons();
 
         generate.setOnClickListener(view -> {
             String alias = binding.edittextAlias.getText().toString();
@@ -58,7 +56,6 @@ public class KeygenFragment extends Fragment {
                     .setAlias(alias)
                     .createKeyGenReq();
 
-            Map<RadioButton, MUSAPSscdInterface> radioButtons = this.createRadiButtons();
             MUSAPSscdInterface sscd = this.getSelectedSscd(radioButtons);
             if (sscd == null) {
                 MLog.d("No SSCD selected");
