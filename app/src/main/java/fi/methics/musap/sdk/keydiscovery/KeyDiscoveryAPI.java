@@ -19,21 +19,6 @@ public class KeyDiscoveryAPI {
         this.context = context;
     }
 
-    @Deprecated // Use listKeys() instead
-    public List<KeyURI> listMatchingMethods(Map<KeyDiscoveryCriteria, String> criteria) {
-        List<KeyURI> matching = new ArrayList<>();
-
-        List<KeyURI> knownUris = new KnownKeyURI().getAllKnownKeyURIs();
-
-        for (KeyURI keyUri: knownUris) {
-            if (keyUri.matchesCriteria(criteria)) {
-                matching.add(keyUri);
-            }
-        }
-
-        return matching;
-    }
-
     /**
      * List all SSCDs integrated to this MUSAP Library
      * @return SSCD list

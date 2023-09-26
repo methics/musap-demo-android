@@ -31,7 +31,7 @@ public interface MUSAPSscdInterface {
      * @throws Exception TODO: Make new MUSAPException class?
      * @return Recently generated MUSAPKey
      */
-    public MUSAPKey generateKey(KeyGenReq req) throws Exception ;
+    public MUSAPKey generateKey(KeyGenReq req) throws Exception;
 
     /**
      * Sign with the SSCD
