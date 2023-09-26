@@ -57,30 +57,30 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        Button yubiTest = binding.buttonYubitest;
-
-        yubiTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                YubiKeyExtension extension = new YubiKeyExtension(HomeFragment.this.getActivity());
-                try {
-                    extension.generateKey(new KeyGenReqBuilder().createKeyGenReq());
-                } catch (Exception e) {
-                    MLog.e("Failed to generate", e);
-                }
-            }
-        });
-
-
-        Button yubiSign = binding.buttonYubisign;
-        yubiSign.setOnClickListener(view -> {
-            YubiKeyExtension extension = new YubiKeyExtension(HomeFragment.this.getActivity());
-            try {
-                extension.sign();
-            } catch (Exception e) {
-                MLog.e("Failed to generate", e);
-            }
-        });
+//        Button yubiTest = binding.buttonYubitest;
+//
+//        yubiTest.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                YubiKeyExtension extension = new YubiKeyExtension(HomeFragment.this.getActivity());
+//                try {
+//                    extension.generateKey(new KeyGenReqBuilder().createKeyGenReq());
+//                } catch (Exception e) {
+//                    MLog.e("Failed to generate", e);
+//                }
+//            }
+//        });
+//
+//
+//        Button yubiSign = binding.buttonYubisign;
+//        yubiSign.setOnClickListener(view -> {
+//            YubiKeyExtension extension = new YubiKeyExtension(HomeFragment.this.getActivity());
+//            try {
+//                extension.sign();
+//            } catch (Exception e) {
+//                MLog.e("Failed to generate", e);
+//            }
+//        });
 
         return root;
     }

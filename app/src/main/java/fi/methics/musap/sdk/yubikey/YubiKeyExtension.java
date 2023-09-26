@@ -2,15 +2,12 @@ package fi.methics.musap.sdk.yubikey;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.yubico.yubikit.android.YubiKitManager;
 import com.yubico.yubikit.android.transport.nfc.NfcConfiguration;
 import com.yubico.yubikit.android.transport.nfc.NfcNotAvailable;
 import com.yubico.yubikit.android.transport.nfc.NfcYubiKeyDevice;
-import com.yubico.yubikit.core.application.ApplicationNotAvailableException;
-import com.yubico.yubikit.core.smartcard.ApduException;
 import com.yubico.yubikit.core.smartcard.SmartCardConnection;
 import com.yubico.yubikit.piv.KeyType;
 import com.yubico.yubikit.piv.ManagementKeyType;
@@ -29,7 +26,6 @@ import org.bouncycastle.operator.ContentSigner;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -199,10 +195,8 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
 
                 pivSession.putCertificate(usedSlot, builtCert);
 
-
                 MLog.d("Put certificate to slot");
 
-//                pivSession.close();
             } catch(Exception e) {
                 MLog.e("Failed to connect", e);
             }
