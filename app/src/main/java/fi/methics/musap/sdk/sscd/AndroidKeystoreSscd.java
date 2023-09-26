@@ -20,11 +20,15 @@ import fi.methics.musap.sdk.keyuri.MUSAPPublicKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.sign.MUSAPSignature;
 import fi.methics.musap.sdk.sign.SignatureReq;
+import fi.methics.musap.sdk.sscd.settings.AndroidKeystoreSettings;
+import fi.methics.musap.sdk.sscd.settings.MethicsDemoSettings;
 import fi.methics.musap.sdk.util.MLog;
 
-public class AndroidKeystoreSscd implements MUSAPSscdInterface {
+public class AndroidKeystoreSscd implements MUSAPSscdInterface<AndroidKeystoreSettings> {
 
     private Context context;
+
+    private AndroidKeystoreSettings settings = new AndroidKeystoreSettings();
 
     public AndroidKeystoreSscd(Context context) {
         this.context = context;
@@ -83,4 +87,10 @@ public class AndroidKeystoreSscd implements MUSAPSscdInterface {
                 .setSscdId("AKS") // TODO: This needs to be SSCD instance specific
                 .build();
     }
+
+    @Override
+    public AndroidKeystoreSettings getSettings() {
+        return settings;
+    }
+
 }

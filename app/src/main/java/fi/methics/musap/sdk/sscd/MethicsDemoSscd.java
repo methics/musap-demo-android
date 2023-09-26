@@ -11,14 +11,19 @@ import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.sign.MUSAPSignature;
 import fi.methics.musap.sdk.sign.SignatureReq;
+import fi.methics.musap.sdk.sscd.settings.AndroidKeystoreSettings;
+import fi.methics.musap.sdk.sscd.settings.MethicsDemoSettings;
 
-public class MethicsDemoSscd implements MUSAPSscdInterface {
-    private Context context;
+public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> {
 
-    public MethicsDemoSscd(Context context) {
-        this.context = context;
-    }
     public static final String SSCD_TYPE = "demo";
+
+    private MethicsDemoSettings settings = new MethicsDemoSettings();
+
+    {
+        settings.getSettings().put("demourl", "https://demo.methics.fi/appactivation/appactivation/sign?msisdn=");
+    }
+
     @Override
     public MUSAPKey bindKey(KeyBindReq req) {
         // TODO:
@@ -51,4 +56,10 @@ public class MethicsDemoSscd implements MUSAPSscdInterface {
                 .setSscdId("METHICS_DEMO") // TODO: This needs to be SSCD instance specific
                 .build();
     }
+
+    @Override
+    public MethicsDemoSettings getSettings() {
+        return settings;
+    }
+
 }

@@ -11,7 +11,7 @@ import fi.methics.musap.sdk.sign.SignatureReq;
  * MUSAP SSCD extension interface. Every SSCD should implement this.
  * TODO: The API here should be changed to be asynchronous with some sort of callbacks
  */
-public interface MUSAPSscdInterface {
+public interface MUSAPSscdInterface<T extends SscdSettings> {
 
     // TODO: Should the bindKey and generateKey be the same API?
     //       Each SSCD basically supports either binding or generating.
@@ -54,5 +54,7 @@ public interface MUSAPSscdInterface {
     public default boolean isKeygenSupported() {
         return this.getSscdInfo().isKeygenSupported();
     }
+
+    public T getSettings();
 
 }
