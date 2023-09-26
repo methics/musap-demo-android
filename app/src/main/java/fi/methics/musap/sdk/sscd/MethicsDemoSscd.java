@@ -18,10 +18,16 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
 
     public static final String SSCD_TYPE = "demo";
 
+    private Context context;
+
     private MethicsDemoSettings settings = new MethicsDemoSettings();
 
     {
         settings.getSettings().put("demourl", "https://demo.methics.fi/appactivation/appactivation/sign?msisdn=");
+    }
+
+    public MethicsDemoSscd(Context context) {
+        this.context = context;
     }
 
     @Override

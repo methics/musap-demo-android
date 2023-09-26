@@ -45,6 +45,8 @@ import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.sign.MUSAPSignature;
+import fi.methics.musap.sdk.sign.SignatureReq;
 import fi.methics.musap.sdk.util.MLog;
 
 public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
@@ -100,6 +102,11 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
             }
         }
 
+        return null;
+    }
+
+    @Override
+    public MUSAPSignature sign(SignatureReq req) throws Exception {
         return null;
     }
 
