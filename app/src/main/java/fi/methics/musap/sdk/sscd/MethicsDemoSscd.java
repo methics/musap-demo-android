@@ -48,6 +48,7 @@ public class MethicsDemoSscd implements MUSAPSscdInterface {
                 .setProvider("Methics")
                 .setKeygenSupported(false)
                 .setSupportedKeyAlgorithms(Arrays.asList("RSA2048"))
+                .setSscdId("METHICS_DEMO") // TODO: This needs to be SSCD instance specific
                 .build();
     }
 }

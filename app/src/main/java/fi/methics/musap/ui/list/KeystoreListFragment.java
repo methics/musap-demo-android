@@ -81,7 +81,7 @@ public class KeystoreListFragment extends Fragment {
             NavController navController = Navigation.findNavController(KeystoreListFragment.this.getActivity(), R.id.nav_host_fragment_activity_main);
 
             List<MUSAPSscdInterface> sscds = MUSAPClient.listSSCDS();
-            recyclerView.setAdapter(new KeystoreRecyclerViewAdapter(sscds, width, this.getContext(), navController));
+            recyclerView.setAdapter(new KeystoreListViewAdapter(sscds, width, this.getContext(), navController));
         }
         return view;
     }

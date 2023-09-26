@@ -3,12 +3,10 @@ package fi.methics.musap.ui.list;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -18,7 +16,7 @@ import fi.methics.musap.databinding.FragmentKeystoreBinding;
 import fi.methics.musap.sdk.api.MUSAPConstants;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 
-public class KeystoreRecyclerViewAdapter extends RecyclerView.Adapter<KeystoreRecyclerViewAdapter.ViewHolder> {
+public class KeystoreListViewAdapter extends RecyclerView.Adapter<KeystoreListViewAdapter.ViewHolder> {
 
     private final List<MUSAPSscdInterface> mValues;
 
@@ -28,8 +26,8 @@ public class KeystoreRecyclerViewAdapter extends RecyclerView.Adapter<KeystoreRe
 
     private final NavController controller;
 
-    public KeystoreRecyclerViewAdapter(List<MUSAPSscdInterface> items, int windowWidth,
-                                       Context context, NavController navController) {
+    public KeystoreListViewAdapter(List<MUSAPSscdInterface> items, int windowWidth,
+                                   Context context, NavController navController) {
         this.mValues     = items;
         this.windowWidth = windowWidth;
         this.controller  = navController;
@@ -62,13 +60,12 @@ public class KeystoreRecyclerViewAdapter extends RecyclerView.Adapter<KeystoreRe
             mIdView = binding.itemNumber;
             mContentView = binding.content;
 
-            mIdView.getLayoutParams().width      = KeystoreRecyclerViewAdapter.this.windowWidth / 2;
-            mContentView.getLayoutParams().width = KeystoreRecyclerViewAdapter.this.windowWidth / 2;
+            mIdView.getLayoutParams().width      = KeystoreListViewAdapter.this.windowWidth / 2;
+            mContentView.getLayoutParams().width = KeystoreListViewAdapter.this.windowWidth / 2;
 
             mIdView.setOnClickListener(view -> {
-                String text = mIdView.getText().toString();
                 Bundle args = new Bundle();
-                args.putString(MUSAPConstants.SSCD_ID, text);
+                args.putString(MUSAPConstants.SSCD_ID, mItem.getSscdInfo().getSscdId());
                 controller.navigate(R.id.action_keystoreFragment_to_keystoreDetailsFragment, args);
             });
         }
