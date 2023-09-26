@@ -48,6 +48,45 @@ public class KeygenFragment extends Fragment {
 
         // TODO: Read the type from radio buttons
         final MUSAPSscdType type = MUSAPSscdType.PHONE_KEYSTORE;
+
+        generate.setOnClickListener(view -> {
+            String alias = binding.edittextAlias.getText().toString();
+            MLog.d("Alias=" + alias);
+
+            KeyGenReq req = new KeyGenReqBuilder()
+                    .setActivity(this.getActivity())
+                    .setAlias(alias)
+                    .createKeyGenReq();
+
+            Map<RadioButton, MUSAPSscdInterface> radioButtons = this.createRadiButtons();
+            MUSAPSscdInterface sscd = this.getSelectedSscd(radioButtons);
+            if (sscd == null) {
+                MLog.d("No SSCD selected");
+                return;
+            }
+
+            try {
+                MLog.d("Generating key");
+                MUSAPKey key = sscd.generateKey(req);
+                new KeyMetaDataStorage(KeygenFragment.this.getContext()).storeKey(key);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
+
+            // Reset text
+            binding.edittextAlias.getText().clear();
+        });
+
+        return root;
+    }
+
+    /**
+     * Create RadioButtons for each SSCD
+     * @return RadioButton to SSCD map
+     */
+    private Map<RadioButton, MUSAPSscdInterface> createRadiButtons() {
         final Map<RadioButton, MUSAPSscdInterface> sscds = new HashMap<>();
         int i = 0;
         MLog.d("Found " + sscds.size() + " SSCDs");
@@ -61,43 +100,24 @@ public class KeygenFragment extends Fragment {
             binding.radioGroupKeystores.addView(rb);
             sscds.put(rb, sscd);
         }
+        return sscds;
+    }
 
-        generate.setOnClickListener(view -> {
-            String alias = binding.edittextAlias.getText().toString();
-            MLog.d("Alias=" + alias);
-
-            KeyGenReq req = new KeyGenReqBuilder()
-                    .setActivity(this.getActivity())
-                    .setAlias(alias)
-                    .createKeyGenReq();
-
-            MLog.d("Looking for selected radio button");
-            MUSAPSscdInterface sscd = null;
-            for (RadioButton rb : sscds.keySet()) {
-                if (rb.isChecked()) {
-                    sscd = sscds.get(rb);
-                    MLog.d(rb.getText() + " is selected");
-                }
+    /**
+     * Find the selected SSCD
+     * @param radioButtons RadioButtons created with {@link #createRadiButtons()}
+     * @return
+     */
+    private MUSAPSscdInterface getSelectedSscd(Map<RadioButton, MUSAPSscdInterface> radioButtons) {
+        MLog.d("Looking for selected radio button");
+        MUSAPSscdInterface sscd = null;
+        for (RadioButton rb : radioButtons.keySet()) {
+            if (rb.isChecked()) {
+                sscd = radioButtons.get(rb);
+                MLog.d(rb.getText() + " is selected");
             }
-            if (sscd == null) {
-                MLog.d("No SSCD selected");
-                return;
-            }
-            try {
-                MLog.d("Generating key");
-                MUSAPKey key = sscd.generateKey(req);
-                new KeyMetaDataStorage(KeygenFragment.this.getContext()).storeKey(key);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            //MUSAPClientHolder.getClient().generateKey(req);
-            Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
-
-            // Reset text
-            binding.edittextAlias.getText().clear();
-        });
-
-        return root;
+        }
+        return sscd;
     }
 
     @Override
