@@ -1,22 +1,23 @@
-package fi.methics.musap.sdk.keydiscovery;
+package fi.methics.musap.sdk.discovery;
 
 import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keyuri.KeyURI;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
+import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 
 public class KeyDiscoveryAPI {
 
     private Context context;
     private static List<MUSAPSscdInterface> sscds = new ArrayList<>();
+    private MetadataStorage storage;
 
     public KeyDiscoveryAPI(Context context) {
         this.context = context;
+        this.storage = new MetadataStorage(this.context);
     }
 
     /**
@@ -34,6 +35,14 @@ public class KeyDiscoveryAPI {
      */
     public List<MUSAPSscdInterface> listMatchingSscds(SscdSearchReq req) {
         return sscds;
+    }
+
+    /**
+     * List active SSCDs. This returns all SSCDs that have either a generated or a bound key.
+     * @return Active SSCDs
+     */
+    public List<MUSAPSscd> listActiveSSCDs() {
+        return storage.listSscds();
     }
 
     /**
@@ -67,7 +76,7 @@ public class KeyDiscoveryAPI {
      * @return List of available keys
      */
     public List<MUSAPKey> listKeys() {
-        return new KeyMetaDataStorage(context).listKeys();
+        return new MetadataStorage(context).listKeys();
     }
 
 }

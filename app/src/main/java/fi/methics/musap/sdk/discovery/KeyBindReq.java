@@ -1,6 +1,4 @@
-package fi.methics.musap.sdk.keydiscovery;
-
-import java.util.List;
+package fi.methics.musap.sdk.discovery;
 
 public class KeyBindReq {
 

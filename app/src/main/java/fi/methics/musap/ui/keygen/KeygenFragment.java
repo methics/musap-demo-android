@@ -1,7 +1,6 @@
 package fi.methics.musap.ui.keygen;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,18 +12,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import fi.methics.musap.MUSAPClientHolder;
 import fi.methics.musap.databinding.FragmentKeygenBinding;
-import fi.methics.musap.sdk.MUSAPSscdType;
 import fi.methics.musap.sdk.api.MUSAPClient;
-import fi.methics.musap.sdk.api.MUSAPSscd;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keydiscovery.KeyMetaDataStorage;
+import fi.methics.musap.sdk.discovery.MetadataStorage;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReqBuilder;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
@@ -65,7 +59,7 @@ public class KeygenFragment extends Fragment {
             try {
                 MLog.d("Generating key");
                 MUSAPKey key = sscd.generateKey(req);
-                new KeyMetaDataStorage(KeygenFragment.this.getContext()).storeKey(key);
+                new MetadataStorage(KeygenFragment.this.getContext()).storeKey(key, sscd.getSscdInfo());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

@@ -5,8 +5,6 @@ import java.util.List;
 
 import fi.methics.musap.sdk.api.MUSAPClient;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keydiscovery.KeyMetaDataStorage;
-import fi.methics.musap.sdk.sign.MUSAPSigner;
 import fi.methics.musap.sdk.util.MLog;
 
 public class MUSAPKey {

@@ -4,13 +4,11 @@ import android.content.Context;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
-import fi.methics.musap.sdk.keydiscovery.KeyDiscoveryAPI;
-import fi.methics.musap.sdk.keydiscovery.KeyMetaDataStorage;
+import fi.methics.musap.sdk.discovery.KeyBindReq;
+import fi.methics.musap.sdk.discovery.KeyDiscoveryAPI;
+import fi.methics.musap.sdk.discovery.MetadataStorage;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.KeyURI;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
@@ -35,7 +33,7 @@ public class MUSAPClient {
     }
 
     public static void bindKey(KeyBindReq req) {
-        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        MetadataStorage storage = new MetadataStorage(context.get());
         storage.storeKeyMetaData(req);
     }
 
@@ -47,12 +45,12 @@ public class MUSAPClient {
      */
     public static void generateKey(MUSAPSscdInterface sscd, KeyGenReq req) throws Exception {
         MUSAPKey key = sscd.generateKey(req);
-        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
-        storage.storeKey(key);
+        MetadataStorage storage = new MetadataStorage(context.get());
+        storage.storeKey(key, sscd.getSscdInfo());
     }
 
     public static List<MUSAPKey> listKeys() {
-        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        MetadataStorage storage = new MetadataStorage(context.get());
         List<MUSAPKey> keys = storage.listKeys();
         MLog.d("Found " + keys.size() + " keys");
         return keys;
@@ -60,7 +58,7 @@ public class MUSAPClient {
 
     public static MUSAPKey getKeyByUri(String keyUri) {
         MLog.d("Searching for key with KeyURI " + keyUri);
-        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        MetadataStorage storage = new MetadataStorage(context.get());
         for (MUSAPKey key : storage.listKeys()) {
             if (key.getKeyUri().matches(new KeyURI(keyUri))) {
                 MLog.d("Found key " + key.getKeyName());
@@ -72,7 +70,7 @@ public class MUSAPClient {
     }
 
     public static MUSAPKey getKeyByUri(KeyURI keyUri) {
-        KeyMetaDataStorage storage = new KeyMetaDataStorage(context.get());
+        MetadataStorage storage = new MetadataStorage(context.get());
         for (MUSAPKey key : storage.listKeys()) {
             if (key.getKeyUri().matches(keyUri)) {
                 return key;

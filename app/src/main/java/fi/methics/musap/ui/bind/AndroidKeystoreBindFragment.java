@@ -11,8 +11,8 @@ import android.widget.Button;
 
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MUSAPClient;
-import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
-import fi.methics.musap.sdk.keydiscovery.KeyBindReqBuilder;
+import fi.methics.musap.sdk.discovery.KeyBindReq;
+import fi.methics.musap.sdk.discovery.KeyBindReqBuilder;
 
 
 public class AndroidKeystoreBindFragment extends Fragment {

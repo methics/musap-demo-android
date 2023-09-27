@@ -1,6 +1,5 @@
 package fi.methics.musap.sdk.yubikey;
 
-import android.app.Activity;
 import android.content.Context;
 import android.widget.Toast;
 
@@ -42,14 +41,13 @@ import java.util.Arrays;
 import java.util.Date;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
+import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.sign.MUSAPSignature;
 import fi.methics.musap.sdk.sign.SignatureReq;
 import fi.methics.musap.sdk.util.MLog;
-import kotlin.NotImplementedError;
 
 public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
 

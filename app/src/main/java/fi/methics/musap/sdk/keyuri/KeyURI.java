@@ -3,13 +3,11 @@ package fi.methics.musap.sdk.keyuri;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import fi.methics.musap.sdk.keydiscovery.KeyDiscoveryCriteria;
+import fi.methics.musap.sdk.discovery.KeyDiscoveryCriteria;
 import fi.methics.musap.sdk.util.LoA;
 import fi.methics.musap.sdk.util.MLog;
 

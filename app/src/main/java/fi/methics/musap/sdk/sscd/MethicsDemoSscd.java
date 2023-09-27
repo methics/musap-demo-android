@@ -5,13 +5,12 @@ import android.content.Context;
 import java.util.Arrays;
 
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
+import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.sign.MUSAPSignature;
 import fi.methics.musap.sdk.sign.SignatureReq;
-import fi.methics.musap.sdk.sscd.settings.AndroidKeystoreSettings;
 import fi.methics.musap.sdk.sscd.settings.MethicsDemoSettings;
 
 public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> {
