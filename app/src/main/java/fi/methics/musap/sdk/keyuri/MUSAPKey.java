@@ -98,7 +98,7 @@ public class MUSAPKey {
             return null;
         }
         MLog.d("Looking for an SSCD with id " + this.sscdId);
-        for (MUSAPSscdInterface sscd : MUSAPClient.listSSCDS()) {
+        for (MUSAPSscdInterface sscd : MUSAPClient.listEnabledSSCDS()) {
             if (this.sscdId.equals(sscd.getSscdInfo().getSscdId())) {
                 MLog.d("Found SSCD with id " + this.sscdId);
                 return sscd;

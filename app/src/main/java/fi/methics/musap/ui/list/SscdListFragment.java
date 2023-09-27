@@ -1,30 +1,28 @@
 package fi.methics.musap.ui.list;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MUSAPClient;
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
+import fi.methics.musap.sdk.util.MLog;
 
 /**
  * A fragment representing a list of Items.
  */
-public class KeystoreListFragment extends Fragment {
+public class SscdListFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -35,13 +33,13 @@ public class KeystoreListFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public KeystoreListFragment() {
+    public SscdListFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static KeystoreListFragment newInstance(int columnCount) {
-        KeystoreListFragment fragment = new KeystoreListFragment();
+    public static SscdListFragment newInstance(int columnCount) {
+        SscdListFragment fragment = new SscdListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -65,25 +63,27 @@ public class KeystoreListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_keystore_list, container, false);
+        View layout = inflater.inflate(R.layout.fragment_sscd_list, container, false);
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+        if (layout instanceof ConstraintLayout) {
 
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-            //if you need three fix imageview in width
-            int width = displaymetrics.widthPixels;
+            NavController navController = Navigation.findNavController(SscdListFragment.this.getActivity(), R.id.nav_host_fragment_activity_main);
 
-            NavController navController = Navigation.findNavController(KeystoreListFragment.this.getActivity(), R.id.nav_host_fragment_activity_main);
+            MLog.d("Listing Enabled SSCDs");
+            RecyclerView enabledList = layout.findViewById(R.id.listEnabled);
+            enabledList.setLayoutManager(new GridLayoutManager(enabledList.getContext(), mColumnCount));
+            enabledList.setAdapter(new EnabledSscdListViewAdapter(MUSAPClient.listEnabledSSCDS(), this.getContext(), navController));
 
-            List<MUSAPSscdInterface> sscds = MUSAPClient.listSSCDS();
-            recyclerView.setAdapter(new KeystoreListViewAdapter(sscds, width, this.getContext(), navController));
+            MLog.d("Listing Active SSCDs");
+            RecyclerView activeList = layout.findViewById(R.id.listActive);
+            activeList.setLayoutManager(new GridLayoutManager(activeList.getContext(), mColumnCount));
+            activeList.setAdapter(new ActiveSscdListViewAdapter(MUSAPClient.listActiveSSCDS(), this.getContext(), navController));
+
+            MLog.d("ACTIVE SSCDs: " + String.join(",", MUSAPClient.listActiveSSCDS().stream().map(s -> s.getSscdId()).collect(Collectors.toList()).toArray(new String[0])));
+
         }
-        return view;
+        return layout;
     }
 
 }

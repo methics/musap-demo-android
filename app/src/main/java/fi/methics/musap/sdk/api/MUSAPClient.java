@@ -12,20 +12,35 @@ import fi.methics.musap.sdk.discovery.MetadataStorage;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.KeyURI;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
+import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.util.MLog;
 
 public class MUSAPClient {
 
     private static WeakReference<Context> context;
     private static KeyDiscoveryAPI keyDiscovery;
+    private static MetadataStorage storage;
 
     public static void init(Context c) {
-        context = new WeakReference<>(c);
+        context      = new WeakReference<>(c);
         keyDiscovery = new KeyDiscoveryAPI(c);
+        storage      = new MetadataStorage(c);
     }
 
-    public static List<MUSAPSscdInterface> listSSCDS() {
-        return keyDiscovery.listSscds();
+    /**
+     * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSSCD(MUSAPSscdInterface)} first.
+     * @return List of SSCDs that can be used to generate or bind keys
+     */
+    public static List<MUSAPSscdInterface> listEnabledSSCDS() {
+        return keyDiscovery.listEnabledSscds();
+    }
+
+    /**
+     * List active SSCDs that have user keys generated or bound
+     * @return List of active SSCDs
+     */
+    public static List<MUSAPSscd> listActiveSSCDS() {
+        return storage.listActiveSscds();
     }
 
     public static void enableSSCD(MUSAPSscdInterface sscd) {

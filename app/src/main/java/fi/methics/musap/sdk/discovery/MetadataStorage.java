@@ -139,7 +139,7 @@ public class MetadataStorage {
      * List available active MUSAP SSCDs
      * @return active MUSAP SSCDs (that have keys bound or generated)
      */
-    public List<MUSAPSscd> listSscds() {
+    public List<MUSAPSscd> listActiveSscds() {
         Set<String> sscdIds = this.getSscdIdSet();
         List<MUSAPSscd> sscdList = new ArrayList<>();
         for (String sscdid : sscdIds) {

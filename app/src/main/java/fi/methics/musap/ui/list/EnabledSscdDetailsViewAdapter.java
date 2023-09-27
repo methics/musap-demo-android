@@ -1,41 +1,30 @@
 package fi.methics.musap.ui.list;
 
-import android.content.Context;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.navigation.NavController;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
-
-import fi.methics.musap.R;
-import fi.methics.musap.databinding.FragmentKeystoreBinding;
-import fi.methics.musap.sdk.api.MUSAPConstants;
+import fi.methics.musap.databinding.FragmentSscdBinding;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.util.MLog;
 
-public class KeystoreDetailsViewAdapter extends RecyclerView.Adapter<KeystoreDetailsViewAdapter.ViewHolder> {
+public class EnabledSscdDetailsViewAdapter extends RecyclerView.Adapter<EnabledSscdDetailsViewAdapter.ViewHolder> {
 
     private final MUSAPSscdInterface sscd;
 
 
-    public KeystoreDetailsViewAdapter(MUSAPSscdInterface sscd) {
-        MLog.d("new KeystoreDetailsViewAdapter()");
+    public EnabledSscdDetailsViewAdapter(MUSAPSscdInterface sscd) {
         this.sscd = sscd;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        MLog.d("Creating ViewHolder for " + this.sscd.getSscdInfo().getSscdId());
-        return new ViewHolder(FragmentKeystoreBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(FragmentSscdBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        MLog.d("Binding ViewHolder for " + this.sscd.getSscdInfo().getSscdId() + " on index " + position);
         switch (position) {
             case 0: holder.mIdView.setText("SSCD Name"); break;
             case 1: holder.mIdView.setText(sscd.getSscdInfo().getSscdName()); break;
@@ -60,7 +49,7 @@ public class KeystoreDetailsViewAdapter extends RecyclerView.Adapter<KeystoreDet
         public final TextView mIdView;
         public final TextView mContentView;
 
-        public ViewHolder(FragmentKeystoreBinding binding) {
+        public ViewHolder(FragmentSscdBinding binding) {
             super(binding.getRoot());
             mIdView      = binding.itemNumber;
             mContentView = binding.content;

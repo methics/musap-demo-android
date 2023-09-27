@@ -12,7 +12,7 @@ import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 public class KeyDiscoveryAPI {
 
     private Context context;
-    private static List<MUSAPSscdInterface> sscds = new ArrayList<>();
+    private static List<MUSAPSscdInterface> enabledSscds = new ArrayList<>();
     private MetadataStorage storage;
 
     public KeyDiscoveryAPI(Context context) {
@@ -24,8 +24,8 @@ public class KeyDiscoveryAPI {
      * List all SSCDs integrated to this MUSAP Library
      * @return SSCD list
      */
-    public List<MUSAPSscdInterface> listSscds() {
-        return sscds;
+    public List<MUSAPSscdInterface> listEnabledSscds() {
+        return enabledSscds;
     }
 
     /**
@@ -34,7 +34,7 @@ public class KeyDiscoveryAPI {
      * @return MUSAP SSCDs
      */
     public List<MUSAPSscdInterface> listMatchingSscds(SscdSearchReq req) {
-        return sscds;
+        return enabledSscds;
     }
 
     /**
@@ -42,16 +42,16 @@ public class KeyDiscoveryAPI {
      * @return Active SSCDs
      */
     public List<MUSAPSscd> listActiveSSCDs() {
-        return storage.listSscds();
+        return storage.listActiveSscds();
     }
 
     /**
      * Enable given SSCD. The SSCD will be available for the user to select after this call.
-     * Get the list of available SSCDs with {@link #listSscds()}.
+     * Get the list of available SSCDs with {@link #listEnabledSscds()}.
      * @param sscd SSCD
      */
     public void enableSSCD(MUSAPSscdInterface sscd) {
-        sscds.add(sscd);
+        enabledSscds.add(sscd);
     }
 
     /**

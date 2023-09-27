@@ -12,31 +12,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import fi.methics.musap.R;
-import fi.methics.musap.databinding.FragmentKeystoreBinding;
+import fi.methics.musap.databinding.FragmentSscdBinding;
 import fi.methics.musap.sdk.api.MUSAPConstants;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 
-public class KeystoreListViewAdapter extends RecyclerView.Adapter<KeystoreListViewAdapter.ViewHolder> {
+public class EnabledSscdListViewAdapter extends RecyclerView.Adapter<EnabledSscdListViewAdapter.ViewHolder> {
 
     private final List<MUSAPSscdInterface> mValues;
-
-    private final int windowWidth;
 
     private final Context context;
 
     private final NavController controller;
 
-    public KeystoreListViewAdapter(List<MUSAPSscdInterface> items, int windowWidth,
-                                   Context context, NavController navController) {
+    public EnabledSscdListViewAdapter(List<MUSAPSscdInterface> items, Context context, NavController navController) {
         this.mValues     = items;
-        this.windowWidth = windowWidth;
         this.controller  = navController;
         this.context     = context;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(FragmentKeystoreBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(FragmentSscdBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
@@ -55,13 +51,10 @@ public class KeystoreListViewAdapter extends RecyclerView.Adapter<KeystoreListVi
         public final TextView mContentView;
         public MUSAPSscdInterface mItem;
 
-        public ViewHolder(FragmentKeystoreBinding binding) {
+        public ViewHolder(FragmentSscdBinding binding) {
             super(binding.getRoot());
             mIdView = binding.itemNumber;
             mContentView = binding.content;
-
-            mIdView.getLayoutParams().width      = KeystoreListViewAdapter.this.windowWidth / 2;
-            mContentView.getLayoutParams().width = KeystoreListViewAdapter.this.windowWidth / 2;
 
             mIdView.setOnClickListener(view -> {
                 Bundle args = new Bundle();
