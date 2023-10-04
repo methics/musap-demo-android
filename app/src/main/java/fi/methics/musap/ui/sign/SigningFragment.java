@@ -14,10 +14,13 @@ import android.widget.Toast;
 import fi.methics.musap.MUSAPClientHolder;
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MBase64;
+import fi.methics.musap.sdk.api.MUSAPClient;
 import fi.methics.musap.sdk.api.MUSAPException;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
+import fi.methics.musap.sdk.sign.MUSAPSignature;
 import fi.methics.musap.sdk.sign.MUSAPSigner;
 import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.util.MusapCallback;
 
 
 public class SigningFragment extends Fragment {
@@ -50,14 +53,23 @@ public class SigningFragment extends Fragment {
             String dtbs1 = v.findViewById(R.id.text_aks_dtbs).toString();
             byte[] data = MBase64.toBytes(dtbs1);
 
-            MUSAPKey key = MUSAPClientHolder.getClient().getKeyByUri(keyuri);
+            MUSAPKey key = MUSAPClient.getKeyByUri(keyuri);
             MUSAPSigner signer = new MUSAPSigner(key);
 
             try {
-                byte[] signature = signer.sign(data).getRawSignature();
-                String signatureStr = MBase64.toBase64String(signature);
-                Toast.makeText(SigningFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
+                signer.sign(data, new MusapCallback<MUSAPSignature>() {
+                    @Override
+                    public void onSuccess(MUSAPSignature mSig) {
+                        byte[] signature = mSig.getRawSignature();
+                        String signatureStr = MBase64.toBase64String(signature);
+                        Toast.makeText(SigningFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
+                    }
 
+                    @Override
+                    public void onException(MUSAPException e) {
+                        MLog.e("Failed to sign", e.getCause());
+                    }
+                });
             } catch (MUSAPException e) {
                 MLog.e("Failed to sign", e.getCause());
             }

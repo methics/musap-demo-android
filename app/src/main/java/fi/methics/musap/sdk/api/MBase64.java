@@ -32,8 +32,7 @@ public class MBase64 {
         if (s == null) {
             return null;
         }
-
-        return s.getBytes(StandardCharsets.UTF_8);
+        return Base64.decode(s, FLAGS);
     }
 
     /**

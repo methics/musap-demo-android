@@ -149,6 +149,9 @@ public class MUSAPKey {
 
         public Builder setCertificate(MUSAPCertificate certificate) {
             this.certificate = certificate;
+            if (this.certificate != null && this.publicKey == null) {
+                this.publicKey = this.certificate.getPublicKey();
+            }
             return this;
         }
 

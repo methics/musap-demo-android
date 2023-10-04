@@ -4,7 +4,7 @@ import fi.methics.musap.sdk.api.MBase64;
 
 public class MUSAPSignature {
 
-    byte[] rawSignature;
+    private byte[] rawSignature;
 
     public MUSAPSignature(byte[] rawSignature) {
         this.rawSignature = rawSignature;

@@ -17,12 +17,14 @@ import java.util.Map;
 
 import fi.methics.musap.databinding.FragmentKeygenBinding;
 import fi.methics.musap.sdk.api.MUSAPClient;
+import fi.methics.musap.sdk.api.MUSAPException;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 import fi.methics.musap.sdk.discovery.MetadataStorage;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReqBuilder;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.util.MusapCallback;
 
 public class KeygenFragment extends Fragment {
 
@@ -58,16 +60,24 @@ public class KeygenFragment extends Fragment {
 
             try {
                 MLog.d("Generating key");
-                MUSAPKey key = sscd.generateKey(req);
-                new MetadataStorage(KeygenFragment.this.getContext()).storeKey(key, sscd.getSscdInfo());
+                MUSAPClient.generateKey(sscd, req, new MusapCallback<MUSAPKey>() {
+                    @Override
+                    public void onSuccess(MUSAPKey result) {
+                        Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
+                        binding.edittextAlias.getText().clear();
+                    }
+
+                    @Override
+                    public void onException(MUSAPException e) {
+                        Toast.makeText(KeygenFragment.this.getContext(), "Failed to generate key " + alias + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        binding.edittextAlias.getText().clear();
+                        MLog.e("Failed to generate", e);
+                    }
+                });
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
-            Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
-
-            // Reset text
-            binding.edittextAlias.getText().clear();
         });
 
         return root;

@@ -11,7 +11,7 @@ public class MLog {
     private static final String TAG = "MUSAPLog";
 
     public static void d(String msg) {
-        Log.d(TAG, msg);
+        largeLogD(msg);
     }
 
 
@@ -31,5 +31,14 @@ public class MLog {
         Log.d(tag, msg);
     }
 
+
+    private static void largeLogD(String content) {
+        if (content.length() > 4000) {
+            Log.d(TAG, content.substring(0, 4000));
+            largeLogD(content.substring(4000));
+        } else {
+            Log.d(TAG, content);
+        }
+    }
 
 }

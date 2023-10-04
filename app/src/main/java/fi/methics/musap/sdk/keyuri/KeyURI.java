@@ -58,8 +58,10 @@ public class KeyURI {
 
         for (String attribute : parts) {
             if (attribute.contains("=")) {
-                String key   = attribute.split("=")[0];
-                String value = attribute.split("=")[1];
+                String[] split = attribute.split("=");
+                if (split.length < 2) continue;
+                String key   = split[0];
+                String value = split[1];
                 MLog.d("Parsed " + key + "=" + value);
                 keyUriMap.put(key, value);
             } else {

@@ -1,4 +1,4 @@
-package fi.methics.musap.sdk.sscd;
+package fi.methics.musap.sdk.sscd.android;
 
 import android.content.Context;
 
@@ -8,6 +8,7 @@ import java.security.KeyStore;
 import java.security.Signature;
 import java.util.Arrays;
 
+import fi.methics.musap.sdk.api.MUSAPException;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.discovery.MetadataStorage;
@@ -17,7 +18,7 @@ import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.sign.MUSAPSignature;
 import fi.methics.musap.sdk.sign.SignatureReq;
-import fi.methics.musap.sdk.sscd.settings.AndroidKeystoreSettings;
+import fi.methics.musap.sdk.sscd.android.AndroidKeystoreSettings;
 import fi.methics.musap.sdk.util.MLog;
 
 public class AndroidKeystoreSscd implements MUSAPSscdInterface<AndroidKeystoreSettings> {
@@ -45,7 +46,6 @@ public class AndroidKeystoreSscd implements MUSAPSscdInterface<AndroidKeystoreSe
         // 2. Create a MUSAPKey from the keypair
         // 3. Store the MUSAPKey into fi.methics.musap.keydiscovery.KeyMetaDataStorage
         // 4. Return the MUSAPKey
-
         MLog.d("Generating a key in Android keystore");
         MUSAPKey key = new AndroidKeyGenerator().generateKey(req, this.getSscdInfo());
         MetadataStorage storage = new MetadataStorage(this.context);
