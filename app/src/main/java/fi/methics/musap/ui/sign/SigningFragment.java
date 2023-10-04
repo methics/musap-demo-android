@@ -11,9 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import fi.methics.musap.MUSAPClientHolder;
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.api.MBase64;
+import fi.methics.musap.sdk.util.MBase64;
 import fi.methics.musap.sdk.api.MUSAPClient;
 import fi.methics.musap.sdk.api.MUSAPException;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
@@ -21,6 +20,7 @@ import fi.methics.musap.sdk.sign.MUSAPSignature;
 import fi.methics.musap.sdk.sign.MUSAPSigner;
 import fi.methics.musap.sdk.util.MLog;
 import fi.methics.musap.sdk.util.MusapCallback;
+import fi.methics.musap.sdk.util.StringUtil;
 
 
 public class SigningFragment extends Fragment {
@@ -51,7 +51,7 @@ public class SigningFragment extends Fragment {
 
         sign.setOnClickListener(view -> {
             String dtbs1 = v.findViewById(R.id.text_aks_dtbs).toString();
-            byte[] data = MBase64.toBytes(dtbs1);
+            byte[] data  = StringUtil.toUTF8Bytes(dtbs);
 
             MUSAPKey key = MUSAPClient.getKeyByUri(keyuri);
             MUSAPSigner signer = new MUSAPSigner(key);

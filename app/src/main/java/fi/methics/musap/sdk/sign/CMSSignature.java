@@ -1,20 +1,12 @@
 package fi.methics.musap.sdk.sign;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
-import fi.methics.musap.sdk.api.MBase64;
 import fi.methics.musap.sdk.api.MUSAPException;
 import fi.methics.musap.sdk.keyuri.MUSAPCertificate;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;

@@ -9,15 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import fi.methics.musap.MUSAPClientHolder;
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.api.MBase64;
-import fi.methics.musap.sdk.api.MUSAPException;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.sign.MUSAPSigner;
-import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.util.MBase64;
+import fi.methics.musap.sdk.util.StringUtil;
 
 @Deprecated
 public class AksSignFragment extends Fragment {
@@ -63,7 +58,7 @@ public class AksSignFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String dtbs = v.findViewById(R.id.text_aks_dtbs).toString();
-                byte[] data = MBase64.toBytes(dtbs);
+                byte[] data = StringUtil.toUTF8Bytes(dtbs);
 
                 //MUSAPKey key = MUSAPClientHolder.getClient().getKeyByName(alias);
                 //MUSAPSigner signer = new MUSAPSigner(key);

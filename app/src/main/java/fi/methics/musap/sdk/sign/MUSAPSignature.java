@@ -1,6 +1,6 @@
 package fi.methics.musap.sdk.sign;
 
-import fi.methics.musap.sdk.api.MBase64;
+import fi.methics.musap.sdk.util.MBase64;
 
 public class MUSAPSignature {
 

@@ -1,25 +1,17 @@
 package fi.methics.musap.sdk.sscd.methicsdemo;
 
 import android.content.Context;
-import android.util.Base64;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
-import fi.methics.musap.sdk.api.MBase64;
-import fi.methics.musap.sdk.api.MUSAPConstants;
+import fi.methics.musap.sdk.util.MBase64;
 import fi.methics.musap.sdk.api.MUSAPException;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.KeyURI;
-import fi.methics.musap.sdk.keyuri.MUSAPCertificate;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPLoa;
-import fi.methics.musap.sdk.keyuri.MUSAPPublicKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.sign.CMSSignature;
 import fi.methics.musap.sdk.sign.MUSAPSignature;
@@ -31,10 +23,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import com.google.gson.Gson;
-
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cms.CMSSignedData;
 
 public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> {
 
