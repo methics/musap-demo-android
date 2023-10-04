@@ -142,7 +142,7 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
         View v = LayoutInflater.from(activity).inflate(R.layout.dialog_insert_yubikey, null);
 
         activity.runOnUiThread(() -> {
-            currentPrompt = new AlertDialog.Builder(c)
+            currentPrompt = new AlertDialog.Builder(activity)
                     .setTitle("Insert YubiKey")
                     .setView(v)
                     .create();
