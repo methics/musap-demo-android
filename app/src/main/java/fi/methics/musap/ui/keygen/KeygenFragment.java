@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +59,7 @@ public class KeygenFragment extends Fragment {
             MLog.d("Alias=" + alias);
 
             KeyGenReq req = new KeyGenReqBuilder()
-                    .setActivity(this.getActivity())
+                    .setActivity(KeygenFragment.this.getActivity())
                     .setAlias(alias)
                     .createKeyGenReq();
 
@@ -72,7 +73,14 @@ public class KeygenFragment extends Fragment {
                 MLog.d("Generating key");
 
                 if (sscd instanceof YubiKeyExtension) {
-                    GenerateKeyCallback callback = key -> Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
+                    MLog.d("Yubi keygen");
+//                    GenerateKeyCallback callback = key -> Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
+                    GenerateKeyCallback callback = new GenerateKeyCallback() {
+                        @Override
+                        public void callback(MUSAPKey key) {
+
+                        }
+                    };
                     ((YubiKeyExtension) sscd).genKeyAsync(req, callback);
                 } else {
                     MUSAPKey key = sscd.generateKey(req);
@@ -81,6 +89,7 @@ public class KeygenFragment extends Fragment {
 //                new KeyMetaDataStorage(KeygenFragment.this.getContext()).storeKey(key);
             } catch (Exception e) {
 //                throw new RuntimeException(e);
+                MLog.e("Failed to generate key", e);
             }
 
             Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
