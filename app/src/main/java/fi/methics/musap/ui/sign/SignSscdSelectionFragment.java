@@ -31,7 +31,6 @@ public class SignSscdSelectionFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View v = inflater.inflate(R.layout.fragment_sign, container, false);
-
         Button b = v.findViewById(R.id.button_sign_next);
 
         b.setOnClickListener(view -> {

@@ -49,6 +49,7 @@ public class KeygenFragment extends Fragment {
 
             KeyGenReq req = new KeyGenReqBuilder()
                     .setActivity(this.getActivity())
+                    .setView(this.getView())
                     .setAlias(alias)
                     .createKeyGenReq();
 
@@ -63,6 +64,7 @@ public class KeygenFragment extends Fragment {
                 MUSAPClient.generateKey(sscd, req, new MusapCallback<MUSAPKey>() {
                     @Override
                     public void onSuccess(MUSAPKey result) {
+                        MLog.d("Successfully generated key " + alias);
                         Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
                         binding.edittextAlias.getText().clear();
                     }
@@ -71,7 +73,7 @@ public class KeygenFragment extends Fragment {
                     public void onException(MUSAPException e) {
                         Toast.makeText(KeygenFragment.this.getContext(), "Failed to generate key " + alias + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         binding.edittextAlias.getText().clear();
-                        MLog.e("Failed to generate", e);
+                        MLog.e("Failed to generate key " + alias, e);
                     }
                 });
             } catch (Exception e) {

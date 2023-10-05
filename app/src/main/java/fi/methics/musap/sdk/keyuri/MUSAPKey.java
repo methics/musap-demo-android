@@ -1,6 +1,7 @@
 package fi.methics.musap.sdk.keyuri;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import fi.methics.musap.sdk.api.MUSAPClient;
@@ -17,6 +18,7 @@ public class MUSAPKey {
     private MUSAPPublicKey publicKey;
     private MUSAPCertificate certificate;
     private List<MUSAPCertificate> certificateChain;
+    private List<MUSAPKeyAttribute> attributes;
     private List<String> keyUsages;
     private List<MUSAPLoa> loa;
     private String keyAlgorithm;
@@ -37,6 +39,7 @@ public class MUSAPKey {
         this.keyAlgorithm     = builder.keyAlgorithm;
         this.keyUri           = builder.keyUri;
         this.attestation      = builder.attestation;
+        this.attributes       = builder.attributes;
         this.createdDate      = Instant.now();
     }
 
@@ -88,6 +91,21 @@ public class MUSAPKey {
         return new KeyURI(this.keyUri);
     }
 
+    public List<MUSAPKeyAttribute> getAttributes() {
+        return this.attributes;
+    }
+
+    public MUSAPKeyAttribute getAttribute(String name) {
+        if (name == null) return null;
+        return this.attributes.stream().filter(n -> name.equals(n.name)).findFirst().orElse(null);
+    }
+
+    public String getAttributeValue(String name) {
+        MUSAPKeyAttribute attr = this.getAttribute(name);
+        if (attr == null) return null;
+        return attr.value;
+    }
+
     /**
      * Get a handle to the SSCD that created this MUSAP key
      * @return SSCD
@@ -115,6 +133,7 @@ public class MUSAPKey {
         private MUSAPPublicKey publicKey;
         private MUSAPCertificate certificate;
         private List<MUSAPCertificate> certificateChain;
+        private List<MUSAPKeyAttribute> attributes = new ArrayList<>();
         private List<String> keyUsages;
         private List<MUSAPLoa> loa;
         private String keyAlgorithm;
@@ -129,6 +148,11 @@ public class MUSAPKey {
 
         public Builder setKeyType(String keyType) {
             this.keyType = keyType;
+            return this;
+        }
+
+        public Builder setKeyAttribute(String name, String value) {
+            this.attributes.add(new MUSAPKeyAttribute(name, value));
             return this;
         }
 

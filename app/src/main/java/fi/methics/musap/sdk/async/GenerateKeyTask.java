@@ -9,6 +9,7 @@ import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.util.AsyncTaskResult;
+import fi.methics.musap.sdk.util.MLog;
 import fi.methics.musap.sdk.util.MusapAsyncTask;
 import fi.methics.musap.sdk.util.MusapCallback;
 
@@ -27,6 +28,7 @@ public class GenerateKeyTask extends MusapAsyncTask<MUSAPKey> {
     protected AsyncTaskResult<MUSAPKey> runOperation() throws MUSAPException {
         try {
             MUSAPKey key = sscd.generateKey(req);
+            MLog.d("GenerateKeyTask Got MUSAP key");
             MetadataStorage storage = new MetadataStorage(context.get());
             storage.storeKey(key, sscd.getSscdInfo());
             return new AsyncTaskResult<>(key);

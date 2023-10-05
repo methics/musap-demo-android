@@ -1,23 +1,16 @@
 package fi.methics.musap.sdk.keygeneration;
 
 import android.app.Activity;
-
-import fi.methics.musap.sdk.api.MUSAPSscd;
+import android.view.View;
 
 public class KeyGenReqBuilder {
     private KeyType type;
     private String keyAlias;
     private Activity activity;
-    private MUSAPSscd sscd;
+    private View view;
 
     public KeyGenReqBuilder setType(KeyType type) {
         this.type = type;
-        return this;
-    }
-
-    @Deprecated
-    public KeyGenReqBuilder setSscd(MUSAPSscd sscd) {
-        this.sscd = sscd;
         return this;
     }
 
@@ -31,11 +24,18 @@ public class KeyGenReqBuilder {
         return this;
     }
 
+    public KeyGenReqBuilder setView(View view) {
+        this.view = view;
+        return this;
+    }
+
     public KeyGenReq createKeyGenReq() {
         KeyGenReq req = new KeyGenReq();
         req.type     = type;
         req.keyAlias = keyAlias;
         req.activity = activity;
+        req.view     = view;
         return req;
     }
+
 }

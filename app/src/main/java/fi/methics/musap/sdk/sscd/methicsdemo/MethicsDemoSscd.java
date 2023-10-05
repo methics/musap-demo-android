@@ -1,8 +1,23 @@
 package fi.methics.musap.sdk.sscd.methicsdemo;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.os.AsyncTask;
+import android.text.InputType;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
+import android.widget.EditText;
 
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import fi.methics.musap.sdk.util.MBase64;
 import fi.methics.musap.sdk.api.MUSAPException;
@@ -27,15 +42,15 @@ import com.google.gson.Gson;
 public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> {
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    public static final String SSCD_TYPE = "demo";
-
+    public static final String SSCD_TYPE         = "demo";
     public static final String SETTINGS_DEMO_URL = "demourl";
+    public static final String ATTRIBUTE_MSISDN  = "msisdn";
+
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
 
-    private Context context;
-    private OkHttpClient client = new OkHttpClient();
-
-
+    private Context             context;
+    private OkHttpClient        client   = new OkHttpClient.Builder().readTimeout(Duration.ofMinutes(2)).build();
     private MethicsDemoSettings settings = new MethicsDemoSettings();
 
     {
@@ -60,46 +75,21 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
     @Override
     public MUSAPKey generateKey(KeyGenReq req) throws Exception {
 
-        Gson gson = new Gson();
-        DemoSigReq jReq = new DemoSigReq();
-        jReq.msisdn  = "35847001001";
-        jReq.message = "Activate MUSAP";
+        CompletableFuture<KeyGenerationResult> future = new CompletableFuture<>();
+        openKeygenPopup(req, future);
 
-        RequestBody body = RequestBody.create(gson.toJson(jReq), JSON);
-        Request request = new Request.Builder()
-                .url(this.getSettings().getSetting(SETTINGS_DEMO_URL) + jReq.msisdn)
-                .post(body)
-                .build();
-        try (Response response = client.newCall(request).execute()) {
+        KeyGenerationResult result = future.get();
+        if (result.key       != null) return result.key;
+        if (result.exception != null) throw result.exception;
 
-            MLog.d("Sending request " + gson.toJson(jReq));
-            String sResp = response.body().string();
-            MLog.d("Got response " + sResp);
-
-            DemoSigResp jResp = gson.fromJson(sResp, DemoSigResp.class);
-
-            if ("500".equals(jResp.statuscode)) {
-                MLog.d("Successfully bound Methics Demo SSCD");
-            }
-
-            CMSSignature signature = new CMSSignature(MBase64.toBytes(jResp.signature));
-            MUSAPKey.Builder builder = new MUSAPKey.Builder();
-            builder.setCertificate(signature.getSignerCertificate());
-            builder.setKeyName(req.getKeyAlias());
-            builder.setSscdType("Methics Demo");
-            builder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
-            builder.setSscdId(this.getSscdInfo().getSscdId());
-            builder.setLoa(Arrays.asList(MUSAPLoa.EIDAS_SUBSTANTIAL, MUSAPLoa.ISO_LOA3));
-            return builder.build();
-        }
-        //throw new java.lang.UnsupportedOperationException();
+        throw new MUSAPException("Keygen failed");
     }
 
     @Override
     public MUSAPSignature sign(SignatureReq req) throws Exception {
         Gson gson = new Gson();
         DemoSigReq jReq = new DemoSigReq();
-        jReq.msisdn  = "35847001001";
+        jReq.msisdn  = req.getKey().getAttributeValue(ATTRIBUTE_MSISDN);
         jReq.message = "Sign with MUSAP"; // TODO
         jReq.dtbs    = MBase64.toBase64String(req.getData());
 
@@ -108,6 +98,7 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
                 .url(this.getSettings().getSetting(SETTINGS_DEMO_URL) + jReq.msisdn)
                 .post(body)
                 .build();
+
         try (Response response = client.newCall(request).execute()) {
 
             MLog.d("Sending request " + gson.toJson(jReq));
@@ -142,6 +133,110 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
     @Override
     public MethicsDemoSettings getSettings() {
         return settings;
+    }
+
+    private void openKeygenPopup(KeyGenReq req, CompletableFuture<KeyGenerationResult> future) {
+
+        PopupWindow popupWindow = new PopupWindow(context);
+        TextView   popupContent = new TextView(context);
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        popupContent.setText("Please enter MSISDN");
+        popupContent.setBackgroundColor(Color.LTGRAY);
+        popupContent.setPadding(20, 20, 20, 20);
+
+        EditText msisdnEditText = new EditText(context);
+        msisdnEditText.setHint("Enter MSISDN");
+        msisdnEditText.setInputType(InputType.TYPE_CLASS_PHONE);
+
+        Button button = new Button(context);
+        button.setText("Generate Key");
+        button.setOnClickListener(v -> {
+            CompletableFuture.runAsync(() -> {
+                try {
+                    MUSAPKey key = _generateKey(req, msisdnEditText.getText().toString());
+                    future.complete(new KeyGenerationResult(key));
+                } catch (MUSAPException e) {
+                    MLog.e("Failed to generate key", e);
+                    future.complete(new KeyGenerationResult(e));
+                }
+            });
+            popupWindow.dismiss();
+        });
+
+        layout.addView(popupContent);
+        layout.addView(msisdnEditText);
+        layout.addView(button);
+
+        GradientDrawable backgroundDrawable = new GradientDrawable();
+        backgroundDrawable.setColor(Color.LTGRAY);
+        backgroundDrawable.setCornerRadius(16);
+
+        popupWindow.setBackgroundDrawable(backgroundDrawable);
+
+        popupWindow.setContentView(layout);
+        popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        popupWindow.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
+        popupWindow.setFocusable(true);
+        req.getActivity().runOnUiThread(() -> popupWindow.showAtLocation(req.getView(), Gravity.CENTER, 0, 0));
+    }
+
+    private MUSAPKey _generateKey(KeyGenReq req, String msisdn) throws MUSAPException {
+
+        MLog.d("Sending keygen request to Methics demo for MSISDN " + msisdn);
+
+        DemoSigReq jReq = new DemoSigReq();
+        jReq.msisdn  = msisdn;
+        jReq.message = "Activate MUSAP";
+
+        try {
+            Gson gson = new Gson();
+            RequestBody body = RequestBody.create(gson.toJson(jReq), JSON);
+            Request request = new Request.Builder()
+                    .url(this.getSettings().getSetting(SETTINGS_DEMO_URL) + jReq.msisdn)
+                    .post(body)
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+
+                MLog.d("Sending request " + gson.toJson(jReq));
+                String sResp = response.body().string();
+                MLog.d("Got response " + sResp);
+
+                DemoSigResp jResp = gson.fromJson(sResp, DemoSigResp.class);
+
+                if ("500".equals(jResp.statuscode)) {
+                    MLog.d("Successfully bound Methics Demo SSCD");
+                }
+
+                CMSSignature signature = new CMSSignature(MBase64.toBytes(jResp.signature));
+                MUSAPKey.Builder builder = new MUSAPKey.Builder();
+                builder.setCertificate(signature.getSignerCertificate());
+                builder.setKeyName(req.getKeyAlias());
+                builder.setSscdType("Methics Demo");
+                builder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
+                builder.setSscdId(this.getSscdInfo().getSscdId());
+                builder.setLoa(Arrays.asList(MUSAPLoa.EIDAS_SUBSTANTIAL, MUSAPLoa.ISO_LOA3));
+                builder.setKeyAttribute(ATTRIBUTE_MSISDN, msisdn);
+                return builder.build();
+            }
+        } catch (Exception e) {
+            throw new MUSAPException(e);
+        }
+    }
+
+    private static class KeyGenerationResult {
+
+        public MUSAPKey key;
+        public MUSAPException exception;
+
+        public KeyGenerationResult(MUSAPKey key) {
+            this.key = key;
+        }
+
+        public KeyGenerationResult(MUSAPException e) {
+            this.exception = e;
+        }
+
     }
 
     private static class DemoSigReq {
