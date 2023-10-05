@@ -1,4 +1,4 @@
-package fi.methics.musap.sdk.api;
+package fi.methics.musap.sdk.util;
 
 import android.util.Base64;
 
@@ -12,7 +12,7 @@ public class MBase64 {
     private static final int FLAGS = Base64.NO_WRAP;
 
     /**
-     * Convert a string to a base 64 string.
+     * Encode a string to a base 64 string.
      * @param s
      * @return
      */
@@ -24,7 +24,7 @@ public class MBase64 {
     }
 
     /**
-     * Convert a string into a byte array.
+     * Decode a Base64 string into a byte array.
      * @param s
      * @return
      */
@@ -32,8 +32,7 @@ public class MBase64 {
         if (s == null) {
             return null;
         }
-
-        return s.getBytes(StandardCharsets.UTF_8);
+        return Base64.decode(s, FLAGS);
     }
 
     /**

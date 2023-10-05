@@ -1,6 +1,7 @@
 package fi.methics.musap.sdk.extension;
 
-import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
+import fi.methics.musap.sdk.api.MUSAPException;
+import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;

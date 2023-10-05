@@ -1,4 +1,4 @@
-package fi.methics.musap.sdk.keydiscovery;
+package fi.methics.musap.sdk.discovery;
 
 public class KeyBindReqBuilder {
     private String sscd;

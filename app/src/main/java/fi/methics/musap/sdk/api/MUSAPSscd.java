@@ -2,6 +2,7 @@ package fi.methics.musap.sdk.api;
 
 import fi.methics.musap.sdk.MUSAPSscdType;
 
+@Deprecated
 public class MUSAPSscd {
 
     private MUSAPSscdType sscdType;

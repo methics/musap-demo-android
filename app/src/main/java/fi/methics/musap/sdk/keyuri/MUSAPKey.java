@@ -1,12 +1,11 @@
 package fi.methics.musap.sdk.keyuri;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import fi.methics.musap.sdk.api.MUSAPClient;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keydiscovery.KeyMetaDataStorage;
-import fi.methics.musap.sdk.sign.MUSAPSigner;
 import fi.methics.musap.sdk.util.MLog;
 
 public class MUSAPKey {
@@ -19,6 +18,7 @@ public class MUSAPKey {
     private MUSAPPublicKey publicKey;
     private MUSAPCertificate certificate;
     private List<MUSAPCertificate> certificateChain;
+    private List<MUSAPKeyAttribute> attributes;
     private List<String> keyUsages;
     private List<MUSAPLoa> loa;
     private String keyAlgorithm;
@@ -39,6 +39,7 @@ public class MUSAPKey {
         this.keyAlgorithm     = builder.keyAlgorithm;
         this.keyUri           = builder.keyUri;
         this.attestation      = builder.attestation;
+        this.attributes       = builder.attributes;
         this.createdDate      = Instant.now();
     }
 
@@ -90,6 +91,21 @@ public class MUSAPKey {
         return new KeyURI(this.keyUri);
     }
 
+    public List<MUSAPKeyAttribute> getAttributes() {
+        return this.attributes;
+    }
+
+    public MUSAPKeyAttribute getAttribute(String name) {
+        if (name == null) return null;
+        return this.attributes.stream().filter(n -> name.equals(n.name)).findFirst().orElse(null);
+    }
+
+    public String getAttributeValue(String name) {
+        MUSAPKeyAttribute attr = this.getAttribute(name);
+        if (attr == null) return null;
+        return attr.value;
+    }
+
     /**
      * Get a handle to the SSCD that created this MUSAP key
      * @return SSCD
@@ -100,7 +116,7 @@ public class MUSAPKey {
             return null;
         }
         MLog.d("Looking for an SSCD with id " + this.sscdId);
-        for (MUSAPSscdInterface sscd : MUSAPClient.listSSCDS()) {
+        for (MUSAPSscdInterface sscd : MUSAPClient.listEnabledSSCDS()) {
             if (this.sscdId.equals(sscd.getSscdInfo().getSscdId())) {
                 MLog.d("Found SSCD with id " + this.sscdId);
                 return sscd;
@@ -117,6 +133,7 @@ public class MUSAPKey {
         private MUSAPPublicKey publicKey;
         private MUSAPCertificate certificate;
         private List<MUSAPCertificate> certificateChain;
+        private List<MUSAPKeyAttribute> attributes = new ArrayList<>();
         private List<String> keyUsages;
         private List<MUSAPLoa> loa;
         private String keyAlgorithm;
@@ -131,6 +148,11 @@ public class MUSAPKey {
 
         public Builder setKeyType(String keyType) {
             this.keyType = keyType;
+            return this;
+        }
+
+        public Builder setKeyAttribute(String name, String value) {
+            this.attributes.add(new MUSAPKeyAttribute(name, value));
             return this;
         }
 
@@ -151,6 +173,9 @@ public class MUSAPKey {
 
         public Builder setCertificate(MUSAPCertificate certificate) {
             this.certificate = certificate;
+            if (this.certificate != null && this.publicKey == null) {
+                this.publicKey = this.certificate.getPublicKey();
+            }
             return this;
         }
 
