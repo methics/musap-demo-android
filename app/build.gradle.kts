@@ -51,6 +51,7 @@ dependencies {
     implementation("com.github.tony19:logback-android:3.0.0")
     implementation("com.yubico.yubikit:piv:2.3.0")
     implementation("org.bouncycastle:bcpkix-jdk15to18:1.71")
+    implementation (files("libs/nimbus-jose-jwt-9.21.jar"))
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.google.code.gson:gson:2.8.8")
 
