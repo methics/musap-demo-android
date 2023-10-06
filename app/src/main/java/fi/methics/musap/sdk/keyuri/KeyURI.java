@@ -3,13 +3,11 @@ package fi.methics.musap.sdk.keyuri;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import fi.methics.musap.sdk.keydiscovery.KeyDiscoveryCriteria;
+import fi.methics.musap.sdk.discovery.KeyDiscoveryCriteria;
 import fi.methics.musap.sdk.util.LoA;
 import fi.methics.musap.sdk.util.MLog;
 
@@ -60,8 +58,10 @@ public class KeyURI {
 
         for (String attribute : parts) {
             if (attribute.contains("=")) {
-                String key   = attribute.split("=")[0];
-                String value = attribute.split("=")[1];
+                String[] split = attribute.split("=");
+                if (split.length < 2) continue;
+                String key   = split[0];
+                String value = split[1];
                 MLog.d("Parsed " + key + "=" + value);
                 keyUriMap.put(key, value);
             } else {

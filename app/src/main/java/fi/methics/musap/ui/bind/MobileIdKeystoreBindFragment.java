@@ -10,11 +10,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import fi.methics.musap.MUSAPClientHolder;
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MUSAPClient;
-import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
-import fi.methics.musap.sdk.keydiscovery.KeyBindReqBuilder;
+import fi.methics.musap.sdk.discovery.KeyBindReq;
+import fi.methics.musap.sdk.discovery.KeyBindReqBuilder;
 
 /**
  *

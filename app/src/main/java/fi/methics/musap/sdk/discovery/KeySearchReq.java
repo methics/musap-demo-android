@@ -1,21 +1,22 @@
-package fi.methics.musap.sdk.keydiscovery;
+package fi.methics.musap.sdk.discovery;
 
 import fi.methics.musap.sdk.keyuri.KeyURI;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 
-public class SscdSearchReq {
+public class KeySearchReq {
 
     private String sscdType;
     private String country;
     private String provider;
     private String keyAlgorithm;
+    private String keyUri;
 
-    public SscdSearchReq(Builder builder) {
+    public KeySearchReq(Builder builder) {
         this.sscdType     = builder.sscdType;
         this.country      = builder.country;
         this.provider     = builder.provider;
         this.keyAlgorithm = builder.keyAlgorithm;
+        this.keyUri       = builder.keyUri;
     }
 
     public String getSscdType() {
@@ -34,8 +35,9 @@ public class SscdSearchReq {
         return keyAlgorithm;
     }
 
-    public boolean matches(MUSAPSscd sscd) {
-        if (this.keyAlgorithm != null && !sscd.getSupportedKeyAlgorithms().contains(this.keyAlgorithm)) return false;
+    public boolean matches(MUSAPKey key) {
+        if (this.keyAlgorithm != null && !this.keyAlgorithm.equals(key.getKeyAlgorithm())) return false;
+        if (this.keyUri       != null && !new KeyURI(this.keyUri).matches(key.getKeyUri())) return false;
         return true;
     }
 
@@ -44,6 +46,7 @@ public class SscdSearchReq {
         private String country;
         private String provider;
         private String keyAlgorithm;
+        private String keyUri;
 
         public Builder setSscdType(String sscdType) {
             this.sscdType = sscdType;
@@ -65,8 +68,13 @@ public class SscdSearchReq {
             return this;
         }
 
-        public SscdSearchReq build() {
-            return new SscdSearchReq(this);
+        public Builder setKeyUri(String keyUri) {
+            this.keyUri = keyUri;
+            return this;
+        }
+
+        public KeySearchReq build() {
+            return new KeySearchReq(this);
         }
     }
 

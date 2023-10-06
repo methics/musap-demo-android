@@ -3,9 +3,8 @@ package fi.methics.musap.ui;
 import android.app.Application;
 
 import fi.methics.musap.sdk.api.MUSAPClient;
-import fi.methics.musap.sdk.keydiscovery.KeyDiscoveryAPI;
-import fi.methics.musap.sdk.sscd.AndroidKeystoreSscd;
-import fi.methics.musap.sdk.sscd.MethicsDemoSscd;
+import fi.methics.musap.sdk.sscd.android.AndroidKeystoreSscd;
+import fi.methics.musap.sdk.sscd.methicsdemo.MethicsDemoSscd;
 import fi.methics.musap.sdk.yubikey.YubiKeyExtension;
 
 public class MUSAPApplication extends Application {

@@ -3,6 +3,7 @@ package fi.methics.musap.sdk.yubikey;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +50,7 @@ import java.util.Date;
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.GenerateKeyCallback;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keydiscovery.KeyBindReq;
+import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;

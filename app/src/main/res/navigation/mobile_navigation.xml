@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/navigation_keystore_list"
-        android:name="fi.methics.musap.ui.list.KeystoreListFragment"
+        android:name="fi.methics.musap.ui.list.SscdListFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_keystore" >
+        tools:layout="@layout/fragment_sscd" >
         <action
             android:id="@+id/action_keystoreFragment_to_keystoreDetailsFragment"
             app:destination="@id/keystore_details_fragment" />
@@ -53,6 +53,6 @@
     <fragment
         android:id="@+id/keystore_details_fragment"
         android:label="@string/title_keystore_details"
-        android:name="fi.methics.musap.ui.list.KeystoreDetailsFragment"/>
+        android:name="fi.methics.musap.ui.list.EnabledSscdDetailsFragment"/>
 
 </navigation>
