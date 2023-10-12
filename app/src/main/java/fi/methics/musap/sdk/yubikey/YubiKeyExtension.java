@@ -192,6 +192,7 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
                         dialogInterface.cancel();
                     })
                     .create();
+
             currentPrompt.show();
         });
 
