@@ -47,7 +47,7 @@ public class SigningFragment extends Fragment {
 
         Button sign = v.findViewById(R.id.button_aks_sign);
         TextView text = v.findViewById(R.id.text_aks_dtbs);
-
+        TextView sigResult = v.findViewById(R.id.text_signature_result);
         final Bundle args = getArguments();
 
         final String keyuri = args.getString(SignMethodRecyclerViewAdapter.KEY_URI);
@@ -75,7 +75,9 @@ public class SigningFragment extends Fragment {
                     public void onSuccess(MUSAPSignature mSig) {
                         String signatureStr = mSig.getB64Signature();
                         MLog.d("Signature successful: " + signatureStr);
-                        Toast.makeText(SigningFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(SigningFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
+                        sigResult.setText(signatureStr);
+                        sign.setVisibility(View.INVISIBLE);
                     }
 
                     @Override
