@@ -11,6 +11,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jwt.JWTClaimsSet;
+
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MUSAPClient;
 import fi.methics.musap.sdk.api.MUSAPException;
@@ -40,17 +46,25 @@ public class SigningFragment extends Fragment {
         final View v = inflater.inflate(R.layout.fragment_sign, container, false);
 
         Button sign = v.findViewById(R.id.button_aks_sign);
+        TextView text = v.findViewById(R.id.text_aks_dtbs);
+
         final Bundle args = getArguments();
 
-        final String dtbs   = args.getString(SignMethodRecyclerViewAdapter.DTBS);
         final String keyuri = args.getString(SignMethodRecyclerViewAdapter.KEY_URI);
+        final String dtbsType = args.getString("dtbstype");
 
-        TextView text = v.findViewById(R.id.text_aks_dtbs);
-        text.setText(dtbs);
+        byte[] data;
+        if ("jws".equalsIgnoreCase(dtbsType)) {
+            JWSObject jws = this.buildSampleJws();
+            text.setText(jws.getPayload().toString());
+            data = jws.getSigningInput();
+        } else {
+            final String dtbs   = args.getString(SignMethodRecyclerViewAdapter.DTBS);
+            text.setText(dtbs);
+            data = StringUtil.toUTF8Bytes(dtbs);
+        }
 
         sign.setOnClickListener(view -> {
-            String dtbs1 = v.findViewById(R.id.text_aks_dtbs).toString();
-            byte[] data  = StringUtil.toUTF8Bytes(dtbs);
 
             MUSAPKey key = MUSAPClient.getKeyByUri(keyuri);
             MUSAPSigner signer = new MUSAPSigner(key, this.getActivity());
@@ -76,5 +90,16 @@ public class SigningFragment extends Fragment {
         });
 
         return v;
+    }
+
+    private JWSObject buildSampleJws() {
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                .subject("Sample user")
+                .issuer("Sample issuer")
+                .build();
+
+        return new JWSObject(
+                new JWSHeader.Builder(JWSAlgorithm.ES256).keyID("ID123").build(),
+                claims.toPayload());
     }
 }

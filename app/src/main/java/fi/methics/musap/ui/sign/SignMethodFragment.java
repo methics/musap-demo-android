@@ -63,6 +63,8 @@ public class SignMethodFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sign_method_list, container, false);
 
+        final Bundle args = getArguments();
+
         MLog.d("SignMethodFragment created");
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -83,7 +85,7 @@ public class SignMethodFragment extends Fragment {
             }
 
             NavController navController = Navigation.findNavController(SignMethodFragment.this.getActivity(), R.id.nav_host_fragment_activity_main);
-            recyclerView.setAdapter(new SignMethodRecyclerViewAdapter(keys, navController));
+            recyclerView.setAdapter(new SignMethodRecyclerViewAdapter(keys, navController, args));
         }
         return view;
     }
