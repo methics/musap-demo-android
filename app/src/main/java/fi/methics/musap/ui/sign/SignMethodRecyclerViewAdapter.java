@@ -24,20 +24,19 @@ public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMeth
     protected static final String DTBS      = "dtbs";
 
     private final NavController controller;
+    // Arguments of parent class
+    private final Bundle args;
 
 
-    public SignMethodRecyclerViewAdapter(List<String> items, NavController navController) {
+    public SignMethodRecyclerViewAdapter(List<String> items, NavController navController, Bundle args) {
         mValues = items;
-
         this.controller = navController;
-
+        this.args = args;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         return new ViewHolder(FragmentSignMethodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-
     }
 
     @Override
@@ -62,15 +61,13 @@ public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMeth
             mIdView      = binding.itemNumber;
             mContentView = binding.content;
 
-            final String dtbs = "Sample text to sign";
 
             mIdView.setOnClickListener(view -> {
                 String keyUri = mItem;
 
                 Bundle args = new Bundle();
                 args.putString(KEY_URI, keyUri);
-                args.putString(DTBS,    dtbs);
-
+                args.putAll(SignMethodRecyclerViewAdapter.this.args);
                 controller.navigate(R.id.action_signMethodFragment_to_androidKeystoreSignFragment, args);
             });
         }

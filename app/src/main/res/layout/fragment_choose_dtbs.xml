@@ -42,6 +42,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <RadioGroup
+            android:id="@+id/radio_group_dtbs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
@@ -52,6 +53,12 @@
                 android:layout_marginTop="32dp"
                 android:checked="true"
                 android:text="Sample text" />
+
+            <RadioButton
+                android:id="@+id/radio_sample_jwt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sample JWT" />
 
         </RadioGroup>
 
