@@ -73,8 +73,8 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
     private YubiKeySettings settings = new YubiKeySettings();
 
     private AlertDialog currentPrompt;
-    private CompletableFuture<KeyGenerationResult> keygenFuture = new CompletableFuture<>();
-    private CompletableFuture<SigningResult> signFuture = new CompletableFuture<>();
+    private CompletableFuture<KeyGenerationResult> keygenFuture;
+    private CompletableFuture<SigningResult> signFuture;
 
     private final ManagementKeyType type;
 
@@ -108,7 +108,7 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
         // Save request type
         this.keyGenReq = req;
         this.sigReq = null;
-
+        this.keygenFuture = new CompletableFuture<>();
 
         Context c = req.getActivity();
         View v = LayoutInflater.from(c).inflate(R.layout.dialog_pin, null);
@@ -133,6 +133,7 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
     @Override
     public MUSAPSignature sign(SignatureReq req) throws Exception {
 
+        this.signFuture = new CompletableFuture<>();
         this.sigReq = req;
         this.keyGenReq = null;
         this.showInsertPinDialog();
@@ -151,6 +152,11 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
         this.showInsertPinDialog();
     }
 
+    private Activity getActivity() {
+        if (this.sigReq != null) return this.sigReq.getActivity();
+        if (this.keyGenReq != null) return this.keyGenReq.getActivity();
+        return null;
+    }
 
     private void showInsertYubiKeyDialog(String pin, Activity activity, GenerateKeyCallback callback) {
 
@@ -220,21 +226,20 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
 
     }
 
-    public void showRemoveYubiKeyDialog(KeyGenReq req) {
+    public void showRemoveYubiKeyDialog(Activity activity) {
 
         // Dismiss old dialog if it it showing
-        req.getActivity().runOnUiThread(() -> {
+        activity.runOnUiThread(() -> {
             if (currentPrompt != null) {
                 currentPrompt.dismiss();
                 currentPrompt.cancel();
             }
         });
 
-        Context c = req.getActivity();
-        View v = LayoutInflater.from(c).inflate(R.layout.dialog_remove_yubikey, null);
+        View v = LayoutInflater.from(activity).inflate(R.layout.dialog_remove_yubikey, null);
 
-        req.getActivity().runOnUiThread(() -> {
-            currentPrompt = new AlertDialog.Builder(c)
+        activity.runOnUiThread(() -> {
+            currentPrompt = new AlertDialog.Builder(activity)
                     .setTitle("Remove YubiKey")
                     .setView(v)
                     .create();
@@ -474,43 +479,59 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
 
         MLog.d("Put certificate to slot");
 
-        showRemoveYubiKeyDialog(req);
+        showRemoveYubiKeyDialog(req.getActivity());
     }
 
     private void signOnDevice(String pin, SmartCardConnection connection) throws Exception {
 
         String msg = "Test string";
 
-        PivSession pivSession = new PivSession(connection);
-        pivSession.authenticate(this.type, this.managementKey);
+        try {
+            PivSession pivSession = new PivSession(connection);
+            pivSession.authenticate(this.type, this.managementKey);
 
-        Slot slot = Slot.SIGNATURE;
+            Slot slot = Slot.SIGNATURE;
 
-        PivProvider pivProvider = new PivProvider(pivSession);
-        Security.insertProviderAt(pivProvider, 1); // JCA Security providers are indexed from 1
+            PivProvider pivProvider = new PivProvider(pivSession);
+            Security.insertProviderAt(pivProvider, 1); // JCA Security providers are indexed from 1
 
-        KeyStore keyStore = KeyStore.getInstance("YKPiv", pivProvider);
+            KeyStore keyStore = KeyStore.getInstance("YKPiv", pivProvider);
 
-        keyStore.load(null);
+            keyStore.load(null);
 
-        PublicKey publicKey = keyStore.getCertificate(slot.getStringAlias()).getPublicKey();
-        PrivateKey privateKey = (PrivateKey) keyStore.getKey(slot.getStringAlias(), pin.toCharArray());
+            PublicKey publicKey = keyStore.getCertificate(slot.getStringAlias()).getPublicKey();
+            PrivateKey privateKey = (PrivateKey) keyStore.getKey(slot.getStringAlias(), pin.toCharArray());
 
-        String algorithm = "SHA256withECDSA";
+            String algorithm = "SHA256withECDSA";
 
-        Signature signature = Signature.getInstance(algorithm, pivProvider);
-        signature.initSign(privateKey);
-        signature.update(msg.getBytes(StandardCharsets.UTF_8));
-        byte[] sigResult = signature.sign();
+            Signature signature = Signature.getInstance(algorithm, pivProvider);
+            signature.initSign(privateKey);
+            signature.update(msg.getBytes(StandardCharsets.UTF_8));
+            byte[] sigResult = signature.sign();
 
-        MLog.d("Signed");
+            MLog.d("Signed");
 
-        Signature verify = Signature.getInstance(algorithm);
-        verify.initVerify(publicKey);
-        verify.update(msg.getBytes(StandardCharsets.UTF_8));
-        boolean valid = verify.verify(sigResult);
+            Signature verify = Signature.getInstance(algorithm);
+            verify.initVerify(publicKey);
+            verify.update(msg.getBytes(StandardCharsets.UTF_8));
+            boolean valid = verify.verify(sigResult);
 
-        MLog.d("Valid signature=" + valid);
+            MLog.d("Valid signature=" + valid);
+
+            // Dismiss old dialog if it it showing
+            getActivity().runOnUiThread(() -> {
+                if (currentPrompt != null) {
+                    currentPrompt.dismiss();
+                    currentPrompt.cancel();
+                }
+            });
+
+            signFuture.complete(new SigningResult(new MUSAPSignature(sigResult)));
+
+        } catch (Exception e) {
+            signFuture.complete(new SigningResult(new MUSAPException(e)));
+            throw new MUSAPException(e);
+        }
     }
 
     /**

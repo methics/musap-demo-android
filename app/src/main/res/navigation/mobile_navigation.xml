@@ -30,7 +30,7 @@
         android:id="@+id/navigation_sign"
         android:name="fi.methics.musap.ui.sign.SignSscdSelectionFragment"
         android:label="@string/title_sign"
-        tools:layout="@layout/fragment_sign" >
+        tools:layout="@layout/fragment_choose_dtbs" >
         <action
             android:id="@+id/action_navigation_sign_to_signMethodFragment"
             app:destination="@id/sign_sign_method_fragment" />
@@ -47,8 +47,8 @@
     <fragment
         android:id="@+id/signingFragment"
         android:name="fi.methics.musap.ui.sign.SigningFragment"
-        android:label="fragment_android_keystore_sign"
-        tools:layout="@layout/fragment_android_keystore_sign" />
+        android:label="@string/title_sign"
+        tools:layout="@layout/fragment_sign" />
 
     <fragment
         android:id="@+id/keystore_details_fragment"

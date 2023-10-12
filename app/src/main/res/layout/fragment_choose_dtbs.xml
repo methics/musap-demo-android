@@ -2,50 +2,66 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layout_aks_sign"
+    android:id="@+id/layout_sign"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.sign.SigningFragment">
+    tools:context=".ui.sign.SignSscdSelectionFragment" >
 
     <TextView
-        android:id="@+id/text_aks_sign"
+        android:id="@+id/text_sign"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
-        android:text="Android Keystore Sign"
+        android:layout_marginEnd="32dp"
+        android:text="Sign"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_aks_sign"
+        app:layout_constraintTop_toBottomOf="@+id/text_sign"
         app:layout_constraintVertical_bias="0.25">
 
         <TextView
-            android:id="@+id/text_aks_dtbs"
+            android:id="@+id/text_choose_sign"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="32dp"
+            android:layout_marginTop="32dp"
+            android:text="Choose what to sign"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/radio_sample_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:checked="true"
+                android:text="Sample text" />
+
+        </RadioGroup>
+
         <Button
-            android:id="@+id/button_aks_sign"
+            android:id="@+id/button_sign_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="32dp"
-            android:text="Sign" />
+            android:layout_marginTop="32dp"
+            android:text="Next" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

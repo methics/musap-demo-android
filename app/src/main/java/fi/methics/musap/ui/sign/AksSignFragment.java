@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.util.MBase64;
 import fi.methics.musap.sdk.util.StringUtil;
 
 @Deprecated
@@ -43,7 +42,7 @@ public class AksSignFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View v = inflater.inflate(R.layout.fragment_android_keystore_sign, container, false);
+        final View v = inflater.inflate(R.layout.fragment_sign, container, false);
 
         Button sign = v.findViewById(R.id.button_aks_sign);
         final Bundle args = getArguments();
