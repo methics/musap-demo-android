@@ -196,9 +196,9 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
                     .url(this.getSettings().getSetting(SETTINGS_DEMO_URL) + jReq.msisdn)
                     .post(body)
                     .build();
+            MLog.d("Sending request " + gson.toJson(jReq));
             try (Response response = client.newCall(request).execute()) {
 
-                MLog.d("Sending request " + gson.toJson(jReq));
                 String sResp = response.body().string();
                 MLog.d("Got response " + sResp);
 

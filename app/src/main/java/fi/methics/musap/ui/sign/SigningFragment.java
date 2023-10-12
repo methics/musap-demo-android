@@ -54,14 +54,14 @@ public class SigningFragment extends Fragment {
             byte[] data  = StringUtil.toUTF8Bytes(dtbs);
 
             MUSAPKey key = MUSAPClient.getKeyByUri(keyuri);
-            MUSAPSigner signer = new MUSAPSigner(key);
+            MUSAPSigner signer = new MUSAPSigner(key, this.getActivity());
 
             try {
                 signer.sign(data, new MusapCallback<MUSAPSignature>() {
                     @Override
                     public void onSuccess(MUSAPSignature mSig) {
-                        byte[] signature = mSig.getRawSignature();
-                        String signatureStr = MBase64.toBase64String(signature);
+                        String signatureStr = mSig.getB64Signature();
+                        MLog.d("Signature successful: " + signatureStr);
                         Toast.makeText(SigningFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
                     }
 

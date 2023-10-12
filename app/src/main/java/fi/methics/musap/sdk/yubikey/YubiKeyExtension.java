@@ -2,7 +2,6 @@ package fi.methics.musap.sdk.yubikey;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -46,17 +45,24 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.CompletableFuture;
 
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.GenerateKeyCallback;
+import fi.methics.musap.sdk.api.MUSAPException;
 import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
 import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
+import fi.methics.musap.sdk.keyuri.KeyURI;
+import fi.methics.musap.sdk.keyuri.MUSAPCertificate;
 import fi.methics.musap.sdk.keyuri.MUSAPKey;
+import fi.methics.musap.sdk.keyuri.MUSAPLoa;
 import fi.methics.musap.sdk.keyuri.MUSAPSscd;
 import fi.methics.musap.sdk.sign.MUSAPSignature;
 import fi.methics.musap.sdk.sign.SignatureReq;
+import fi.methics.musap.sdk.util.KeyGenerationResult;
 import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.util.SigningResult;
 
 public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
 
@@ -67,6 +73,8 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
     private YubiKeySettings settings = new YubiKeySettings();
 
     private AlertDialog currentPrompt;
+    private CompletableFuture<KeyGenerationResult> keygenFuture = new CompletableFuture<>();
+    private CompletableFuture<SigningResult> signFuture = new CompletableFuture<>();
 
     private final ManagementKeyType type;
 
@@ -101,29 +109,43 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
         this.keyGenReq = req;
         this.sigReq = null;
 
+
         Context c = req.getActivity();
         View v = LayoutInflater.from(c).inflate(R.layout.dialog_pin, null);
-        Dialog d = new AlertDialog.Builder(c)
-                .setTitle("PIN")
-                .setView(v)
-                .setPositiveButton("OK", (dialogInterface, i) -> {
-                    String pin = ((TextView) v.findViewById(R.id.dialog_pin_edittext)).getText().toString();
-                    MLog.d("PIN=" + pin);
-                })
-                .setNeutralButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel())
-                .show();
+        showInsertPinDialog();
+        //req.getActivity().runOnUiThread(() -> new AlertDialog.Builder(c)
+        //        .setTitle("PIN")
+        //        .setView(v)
+        //        .setPositiveButton("OK", (dialogInterface, i) -> {
+        //            String pin = ((TextView) v.findViewById(R.id.dialog_pin_edittext)).getText().toString();
+        //            MLog.d("PIN=" + pin);
+        //        })
+        //        .setNeutralButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel())
+        //        .show());
 
-        throw new UnsupportedOperationException(); // TODO: Return MUSAPKey
+        KeyGenerationResult result = keygenFuture.get();
+        if (result.key       != null) return result.key;
+        if (result.exception != null) throw  result.exception;
+
+        throw new MUSAPException("Keygen failed");
     }
 
     @Override
     public MUSAPSignature sign(SignatureReq req) throws Exception {
 
-        throw new UnsupportedOperationException(); // TODO: Return MUSAPKey
+        this.sigReq = req;
+        this.keyGenReq = null;
+        this.showInsertPinDialog();
+
+        SigningResult result = signFuture.get();
+        if (result.signature != null) return result.signature;
+        if (result.exception != null) throw  result.exception;
+
+        throw new MUSAPException("Signing failed");
     }
 
     public void signAsync(SignatureReq req) {
-        this.sigReq = req;
+        this.sigReq    = req;
         this.keyGenReq = null;
 
         this.showInsertPinDialog();
@@ -437,6 +459,18 @@ public class YubiKeyExtension implements MUSAPSscdInterface<YubiKeySettings> {
                 .generateCertificate(new ByteArrayInputStream(certBytes));
 
         pivSession.putCertificate(usedSlot, builtCert);
+        MUSAPCertificate cert = new MUSAPCertificate(builtCert);
+
+        MUSAPKey.Builder keyBuilder = new MUSAPKey.Builder();
+        keyBuilder.setCertificate(cert);
+        keyBuilder.setKeyName(req.getKeyAlias());
+        keyBuilder.setSscdType(this.getSscdInfo().getSscdType());
+        keyBuilder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
+        keyBuilder.setSscdId(this.getSscdInfo().getSscdId());
+        keyBuilder.setLoa(Arrays.asList(MUSAPLoa.EIDAS_SUBSTANTIAL, MUSAPLoa.ISO_LOA3));
+        // TODO: Find out Yubikey serial number
+
+        this.keygenFuture.complete(new KeyGenerationResult(keyBuilder.build()));
 
         MLog.d("Put certificate to slot");
 
