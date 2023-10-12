@@ -61,15 +61,17 @@ public class SignMethodFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_sign_method_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_new_key_list, container, false);
+
+        View list = view.findViewById(R.id.list_sign_keys);
 
         final Bundle args = getArguments();
 
         MLog.d("SignMethodFragment created");
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+        if (list instanceof RecyclerView) {
+            Context context = list.getContext();
+            RecyclerView recyclerView = (RecyclerView) list;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
