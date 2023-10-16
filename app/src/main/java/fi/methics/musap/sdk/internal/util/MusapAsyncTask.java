@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 
 import java.lang.ref.WeakReference;
 
+import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.api.MusapException;
 
 public abstract class MusapAsyncTask<T> extends AsyncTask<Void, Void, AsyncTaskResult<T>> {

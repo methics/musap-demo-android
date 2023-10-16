@@ -10,7 +10,7 @@ import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.util.AsyncTaskResult;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.internal.util.MusapAsyncTask;
-import fi.methics.musap.sdk.internal.util.MusapCallback;
+import fi.methics.musap.sdk.api.MusapCallback;
 
 public class GenerateKeyTask extends MusapAsyncTask<MusapKey> {
 

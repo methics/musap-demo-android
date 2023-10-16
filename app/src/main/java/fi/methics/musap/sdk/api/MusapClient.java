@@ -25,7 +25,6 @@ import fi.methics.musap.sdk.internal.datatype.MusapLink;
 import fi.methics.musap.sdk.internal.sign.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MLog;
-import fi.methics.musap.sdk.internal.util.MusapCallback;
 
 public class MusapClient {
 

@@ -23,7 +23,7 @@ import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReqBuilder;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.util.MLog;
-import fi.methics.musap.sdk.internal.util.MusapCallback;
+import fi.methics.musap.sdk.api.MusapCallback;
 
 public class KeygenFragment extends Fragment {
 

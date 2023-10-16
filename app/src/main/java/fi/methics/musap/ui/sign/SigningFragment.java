@@ -22,7 +22,7 @@ import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.sign.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.MusapSigner;
 import fi.methics.musap.sdk.internal.util.MLog;
-import fi.methics.musap.sdk.internal.util.MusapCallback;
+import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.internal.util.StringUtil;
 
 

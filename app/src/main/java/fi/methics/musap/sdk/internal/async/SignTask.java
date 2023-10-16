@@ -8,7 +8,7 @@ import fi.methics.musap.sdk.internal.sign.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.AsyncTaskResult;
 import fi.methics.musap.sdk.internal.util.MusapAsyncTask;
-import fi.methics.musap.sdk.internal.util.MusapCallback;
+import fi.methics.musap.sdk.api.MusapCallback;
 
 public class SignTask extends MusapAsyncTask<MusapSignature> {
 

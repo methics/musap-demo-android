@@ -2,12 +2,12 @@
  * (c) Copyright 2003-2020 Methics Oy. All rights reserved.
  */
 
-package fi.methics.musap.sdk.internal.util;
+package fi.methics.musap.sdk.api;
 
 import fi.methics.musap.sdk.api.MusapException;
 
 /**
- * Handles callbacks from AlaudaCore SDK. The callback happens on the thread that
+ * Handles callbacks from MusapClient.
  * @param <T> Type of the success result
  */
 public interface MusapCallback<T> {
@@ -19,8 +19,7 @@ public interface MusapCallback<T> {
     void onSuccess(T result);
 
     /**
-     * Called when the operation fails. The exception contains an error code with
-     * more information.
+     * Called when the operation fails. The exception contains an error code with more information.
      * @param e The exception that caused the operation to fail.
      */
     void onException(MusapException e);
