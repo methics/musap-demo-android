@@ -3,9 +3,6 @@ package fi.methics.musap.sdk.keygeneration;
 import android.app.Activity;
 import android.view.View;
 
-import fi.methics.musap.sdk.api.MUSAPSscd;
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-
 public class KeyGenReq {
 
     protected KeyType type;
