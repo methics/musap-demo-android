@@ -8,20 +8,18 @@ import java.security.KeyStore;
 import java.security.Signature;
 import java.util.Arrays;
 
-import fi.methics.musap.sdk.api.MUSAPException;
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.discovery.KeyBindReq;
-import fi.methics.musap.sdk.discovery.MetadataStorage;
-import fi.methics.musap.sdk.keygeneration.AndroidKeyGenerator;
-import fi.methics.musap.sdk.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
-import fi.methics.musap.sdk.sign.MUSAPSignature;
-import fi.methics.musap.sdk.sign.SignatureReq;
-import fi.methics.musap.sdk.sscd.android.AndroidKeystoreSettings;
-import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
+import fi.methics.musap.sdk.internal.discovery.MetadataStorage;
+import fi.methics.musap.sdk.internal.keygeneration.AndroidKeyGenerator;
+import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
+import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.util.MLog;
 
-public class AndroidKeystoreSscd implements MUSAPSscdInterface<AndroidKeystoreSettings> {
+public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSettings> {
 
     private Context context;
 
@@ -33,28 +31,28 @@ public class AndroidKeystoreSscd implements MUSAPSscdInterface<AndroidKeystoreSe
 
     public static final String SSCD_TYPE = "aks";
     @Override
-    public MUSAPKey bindKey(KeyBindReq req) {
+    public MusapKey bindKey(KeyBindReq req) {
         // "Old" keys cannot be bound to MUSAP.
         // Use generateKey instead.
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public MUSAPKey generateKey(KeyGenReq req) throws Exception {
+    public MusapKey generateKey(KeyGenReq req) throws Exception {
 
         // 1. Call Android API to generate a keypair
         // 2. Create a MUSAPKey from the keypair
         // 3. Store the MUSAPKey into fi.methics.musap.keydiscovery.KeyMetaDataStorage
         // 4. Return the MUSAPKey
         MLog.d("Generating a key in Android keystore");
-        MUSAPKey key = new AndroidKeyGenerator().generateKey(req, this.getSscdInfo());
+        MusapKey key = new AndroidKeyGenerator().generateKey(req, this.getSscdInfo());
         MetadataStorage storage = new MetadataStorage(this.context);
         storage.storeKey(key, this.getSscdInfo());
         return key;
     }
 
     @Override
-    public MUSAPSignature sign(SignatureReq req) throws GeneralSecurityException, IOException {
+    public MusapSignature sign(SignatureReq req) throws GeneralSecurityException, IOException {
         String alias = req.getKey().getKeyName();
 
         KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
@@ -69,12 +67,12 @@ public class AndroidKeystoreSscd implements MUSAPSscdInterface<AndroidKeystoreSe
         s.update(req.getData());
         byte[] signature = s.sign();
 
-        return new MUSAPSignature(signature);
+        return new MusapSignature(signature);
     }
 
     @Override
-    public MUSAPSscd getSscdInfo() {
-        return new MUSAPSscd.Builder()
+    public MusapSscd getSscdInfo() {
+        return new MusapSscd.Builder()
                 .setSscdName("Android KeyStore")
                 .setSscdType(SSCD_TYPE)
                 .setCountry("FI")

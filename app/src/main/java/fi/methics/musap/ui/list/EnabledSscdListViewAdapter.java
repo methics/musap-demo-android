@@ -13,18 +13,18 @@ import java.util.List;
 
 import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentSscdBinding;
-import fi.methics.musap.sdk.api.MUSAPConstants;
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
+import fi.methics.musap.sdk.api.MusapConstants;
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
 
 public class EnabledSscdListViewAdapter extends RecyclerView.Adapter<EnabledSscdListViewAdapter.ViewHolder> {
 
-    private final List<MUSAPSscdInterface> mValues;
+    private final List<MusapSscdInterface> mValues;
 
     private final Context context;
 
     private final NavController controller;
 
-    public EnabledSscdListViewAdapter(List<MUSAPSscdInterface> items, Context context, NavController navController) {
+    public EnabledSscdListViewAdapter(List<MusapSscdInterface> items, Context context, NavController navController) {
         this.mValues     = items;
         this.controller  = navController;
         this.context     = context;
@@ -49,7 +49,7 @@ public class EnabledSscdListViewAdapter extends RecyclerView.Adapter<EnabledSscd
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mIdView;
         public final TextView mContentView;
-        public MUSAPSscdInterface mItem;
+        public MusapSscdInterface mItem;
 
         public ViewHolder(FragmentSscdBinding binding) {
             super(binding.getRoot());
@@ -58,7 +58,7 @@ public class EnabledSscdListViewAdapter extends RecyclerView.Adapter<EnabledSscd
 
             mIdView.setOnClickListener(view -> {
                 Bundle args = new Bundle();
-                args.putString(MUSAPConstants.SSCD_ID, mItem.getSscdInfo().getSscdId());
+                args.putString(MusapConstants.SSCD_ID, mItem.getSscdInfo().getSscdId());
                 controller.navigate(R.id.action_keystoreFragment_to_keystoreDetailsFragment, args);
             });
         }

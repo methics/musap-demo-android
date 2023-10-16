@@ -11,9 +11,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.api.MUSAPClient;
-import fi.methics.musap.sdk.discovery.KeyBindReq;
-import fi.methics.musap.sdk.discovery.KeyBindReqBuilder;
+import fi.methics.musap.sdk.api.MusapClient;
+import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
+import fi.methics.musap.sdk.internal.discovery.KeyBindReqBuilder;
 
 /**
  *
@@ -52,7 +52,7 @@ public class MobileIdKeystoreBindFragment extends Fragment {
                             .setSscd("MobileID")
                                     .createKeyBindReq();
 
-                    MUSAPClient.bindKey(req);
+                    MusapClient.bindKey(req);
                 }
             });
         }

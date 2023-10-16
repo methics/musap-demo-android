@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentEnabledSscdDetailsBinding;
-import fi.methics.musap.sdk.api.MUSAPClient;
-import fi.methics.musap.sdk.api.MUSAPConstants;
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.api.MusapClient;
+import fi.methics.musap.sdk.api.MusapConstants;
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.internal.util.MLog;
 
 public class EnabledSscdDetailsFragment extends Fragment {
 
@@ -32,13 +32,13 @@ public class EnabledSscdDetailsFragment extends Fragment {
 
         final Bundle args = getArguments();
 
-        final String sscdid = args.getString(MUSAPConstants.SSCD_ID);
+        final String sscdid = args.getString(MusapConstants.SSCD_ID);
         if (sscdid == null) {
             MLog.d("Cannot handle null SSCD ID");
             return root;
         }
-        MUSAPSscdInterface sscd = null;
-        for (MUSAPSscdInterface s : MUSAPClient.listEnabledSSCDS()) {
+        MusapSscdInterface sscd = null;
+        for (MusapSscdInterface s : MusapClient.listEnabledSSCDS()) {
             if (sscdid.equals(s.getSscdInfo().getSscdId())) {
                 MLog.d("Found SSCD " + s.getSscdInfo().getSscdName());
                 sscd = s;

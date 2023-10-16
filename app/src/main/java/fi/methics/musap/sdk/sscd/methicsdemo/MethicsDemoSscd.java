@@ -3,7 +3,6 @@ package fi.methics.musap.sdk.sscd.methicsdemo;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.AsyncTask;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -19,19 +18,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import fi.methics.musap.sdk.util.MBase64;
-import fi.methics.musap.sdk.api.MUSAPException;
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.discovery.KeyBindReq;
-import fi.methics.musap.sdk.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.keyuri.KeyURI;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.keyuri.MUSAPLoa;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
-import fi.methics.musap.sdk.sign.CMSSignature;
-import fi.methics.musap.sdk.sign.MUSAPSignature;
-import fi.methics.musap.sdk.sign.SignatureReq;
-import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.internal.util.MBase64;
+import fi.methics.musap.sdk.api.MusapException;
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
+import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
+import fi.methics.musap.sdk.internal.datatype.KeyURI;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapLoA;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
+import fi.methics.musap.sdk.internal.sign.CmsSignature;
+import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.util.MLog;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,7 +38,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import com.google.gson.Gson;
 
-public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> {
+public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> {
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     public static final String SSCD_TYPE         = "demo";
@@ -62,7 +61,7 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
     }
 
     @Override
-    public MUSAPKey bindKey(KeyBindReq req) {
+    public MusapKey bindKey(KeyBindReq req) {
         throw new java.lang.UnsupportedOperationException(); // TODO: This should actually bind
         // TODO:
         // 1. Call https://demo.methics.fi/appactivation/appactivation/sign?msisdn=35847004112
@@ -73,7 +72,7 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
     }
 
     @Override
-    public MUSAPKey generateKey(KeyGenReq req) throws Exception {
+    public MusapKey generateKey(KeyGenReq req) throws Exception {
 
         CompletableFuture<KeyGenerationResult> future = new CompletableFuture<>();
         openKeygenPopup(req, future);
@@ -82,11 +81,11 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
         if (result.key       != null) return result.key;
         if (result.exception != null) throw result.exception;
 
-        throw new MUSAPException("Keygen failed");
+        throw new MusapException("Keygen failed");
     }
 
     @Override
-    public MUSAPSignature sign(SignatureReq req) throws Exception {
+    public MusapSignature sign(SignatureReq req) throws Exception {
         Gson gson = new Gson();
         DemoSigReq jReq = new DemoSigReq();
         jReq.msisdn  = req.getKey().getAttributeValue(ATTRIBUTE_MSISDN);
@@ -110,16 +109,16 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
             if ("500".equals(jResp.statuscode)) {
                 MLog.d("Successfully signed");
             } else {
-                throw new MUSAPException("Failed to sign: " + jResp.statuscode);
+                throw new MusapException("Failed to sign: " + jResp.statuscode);
             }
 
-            return new CMSSignature(MBase64.toBytes(jResp.signature));
+            return new CmsSignature(MBase64.toBytes(jResp.signature));
         }
     }
 
     @Override
-    public MUSAPSscd getSscdInfo() {
-        return new MUSAPSscd.Builder()
+    public MusapSscd getSscdInfo() {
+        return new MusapSscd.Builder()
                 .setSscdName("Methics Demo")
                 .setSscdType(SSCD_TYPE)
                 .setCountry("FI")
@@ -154,9 +153,9 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
         button.setOnClickListener(v -> {
             CompletableFuture.runAsync(() -> {
                 try {
-                    MUSAPKey key = _generateKey(req, msisdnEditText.getText().toString());
+                    MusapKey key = _generateKey(req, msisdnEditText.getText().toString());
                     future.complete(new KeyGenerationResult(key));
-                } catch (MUSAPException e) {
+                } catch (MusapException e) {
                     MLog.e("Failed to generate key", e);
                     future.complete(new KeyGenerationResult(e));
                 }
@@ -181,7 +180,7 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
         req.getActivity().runOnUiThread(() -> popupWindow.showAtLocation(req.getView(), Gravity.CENTER, 0, 0));
     }
 
-    private MUSAPKey _generateKey(KeyGenReq req, String msisdn) throws MUSAPException {
+    private MusapKey _generateKey(KeyGenReq req, String msisdn) throws MusapException {
 
         MLog.d("Sending keygen request to Methics demo for MSISDN " + msisdn);
 
@@ -208,32 +207,32 @@ public class MethicsDemoSscd implements MUSAPSscdInterface<MethicsDemoSettings> 
                     MLog.d("Successfully bound Methics Demo SSCD");
                 }
 
-                CMSSignature signature = new CMSSignature(MBase64.toBytes(jResp.signature));
-                MUSAPKey.Builder builder = new MUSAPKey.Builder();
+                CmsSignature signature = new CmsSignature(MBase64.toBytes(jResp.signature));
+                MusapKey.Builder builder = new MusapKey.Builder();
                 builder.setCertificate(signature.getSignerCertificate());
                 builder.setKeyName(req.getKeyAlias());
                 builder.setSscdType("Methics Demo");
                 builder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
                 builder.setSscdId(this.getSscdInfo().getSscdId());
-                builder.setLoa(Arrays.asList(MUSAPLoa.EIDAS_SUBSTANTIAL, MUSAPLoa.ISO_LOA3));
+                builder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
                 builder.setKeyAttribute(ATTRIBUTE_MSISDN, msisdn);
                 return builder.build();
             }
         } catch (Exception e) {
-            throw new MUSAPException(e);
+            throw new MusapException(e);
         }
     }
 
     private static class KeyGenerationResult {
 
-        public MUSAPKey key;
-        public MUSAPException exception;
+        public MusapKey key;
+        public MusapException exception;
 
-        public KeyGenerationResult(MUSAPKey key) {
+        public KeyGenerationResult(MusapKey key) {
             this.key = key;
         }
 
-        public KeyGenerationResult(MUSAPException e) {
+        public KeyGenerationResult(MusapException e) {
             this.exception = e;
         }
 

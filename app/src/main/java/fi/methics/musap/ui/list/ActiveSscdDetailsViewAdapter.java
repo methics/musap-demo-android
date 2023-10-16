@@ -7,14 +7,14 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import fi.methics.musap.databinding.FragmentSscdBinding;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 
 public class ActiveSscdDetailsViewAdapter extends RecyclerView.Adapter<ActiveSscdDetailsViewAdapter.ViewHolder> {
 
-    private final MUSAPSscd sscd;
+    private final MusapSscd sscd;
 
 
-    public ActiveSscdDetailsViewAdapter(MUSAPSscd sscd) {
+    public ActiveSscdDetailsViewAdapter(MusapSscd sscd) {
         this.sscd = sscd;
     }
 

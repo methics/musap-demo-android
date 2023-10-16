@@ -9,23 +9,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.Payload;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.api.MUSAPClient;
-import fi.methics.musap.sdk.api.MUSAPException;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.sign.MUSAPSignature;
-import fi.methics.musap.sdk.sign.MUSAPSigner;
-import fi.methics.musap.sdk.util.MLog;
-import fi.methics.musap.sdk.util.MusapCallback;
-import fi.methics.musap.sdk.util.StringUtil;
+import fi.methics.musap.sdk.api.MusapClient;
+import fi.methics.musap.sdk.api.MusapException;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.sign.MusapSigner;
+import fi.methics.musap.sdk.internal.util.MLog;
+import fi.methics.musap.sdk.api.MusapCallback;
+import fi.methics.musap.sdk.internal.util.StringUtil;
 
 
 public class SigningFragment extends Fragment {
@@ -66,13 +64,13 @@ public class SigningFragment extends Fragment {
 
         sign.setOnClickListener(view -> {
 
-            MUSAPKey key = MUSAPClient.getKeyByUri(keyuri);
-            MUSAPSigner signer = new MUSAPSigner(key, this.getActivity());
+            MusapKey key = MusapClient.getKeyByUri(keyuri);
+            MusapSigner signer = new MusapSigner(key, this.getActivity());
 
             try {
-                signer.sign(data, new MusapCallback<MUSAPSignature>() {
+                signer.sign(data, new MusapCallback<MusapSignature>() {
                     @Override
-                    public void onSuccess(MUSAPSignature mSig) {
+                    public void onSuccess(MusapSignature mSig) {
                         String signatureStr = mSig.getB64Signature();
                         MLog.d("Signature successful: " + signatureStr);
 //                        Toast.makeText(SigningFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
@@ -81,11 +79,11 @@ public class SigningFragment extends Fragment {
                     }
 
                     @Override
-                    public void onException(MUSAPException e) {
+                    public void onException(MusapException e) {
                         MLog.e("Failed to sign", e.getCause());
                     }
                 });
-            } catch (MUSAPException e) {
+            } catch (MusapException e) {
                 MLog.e("Failed to sign", e.getCause());
             }
 
