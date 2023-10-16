@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import fi.methics.musap.databinding.FragmentSscdBinding;
-import fi.methics.musap.sdk.keyuri.MusapSscd;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 
 public class ActiveSscdDetailsViewAdapter extends RecyclerView.Adapter<ActiveSscdDetailsViewAdapter.ViewHolder> {
 

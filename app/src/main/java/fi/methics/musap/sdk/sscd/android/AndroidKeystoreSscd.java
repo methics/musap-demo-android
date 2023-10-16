@@ -9,15 +9,15 @@ import java.security.Signature;
 import java.util.Arrays;
 
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
-import fi.methics.musap.sdk.discovery.KeyBindReq;
-import fi.methics.musap.sdk.discovery.MetadataStorage;
-import fi.methics.musap.sdk.keygeneration.AndroidKeyGenerator;
-import fi.methics.musap.sdk.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.keyuri.MusapKey;
-import fi.methics.musap.sdk.keyuri.MusapSscd;
-import fi.methics.musap.sdk.sign.MusapSignature;
-import fi.methics.musap.sdk.sign.SignatureReq;
-import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
+import fi.methics.musap.sdk.internal.discovery.MetadataStorage;
+import fi.methics.musap.sdk.internal.keygeneration.AndroidKeyGenerator;
+import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
+import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.util.MLog;
 
 public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSettings> {
 

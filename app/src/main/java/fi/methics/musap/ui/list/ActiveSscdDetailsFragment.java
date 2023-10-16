@@ -17,8 +17,8 @@ import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentEnabledSscdDetailsBinding;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapConstants;
-import fi.methics.musap.sdk.keyuri.MusapSscd;
-import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
+import fi.methics.musap.sdk.internal.util.MLog;
 
 public class ActiveSscdDetailsFragment extends Fragment {
 

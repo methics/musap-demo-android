@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.util.StringUtil;
+import fi.methics.musap.sdk.internal.util.StringUtil;
 
 @Deprecated
 public class AksSignFragment extends Fragment {

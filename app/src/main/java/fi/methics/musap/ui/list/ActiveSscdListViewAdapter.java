@@ -14,8 +14,8 @@ import java.util.List;
 import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentSscdBinding;
 import fi.methics.musap.sdk.api.MusapConstants;
-import fi.methics.musap.sdk.keyuri.MusapSscd;
-import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
+import fi.methics.musap.sdk.internal.util.MLog;
 
 public class ActiveSscdListViewAdapter extends RecyclerView.Adapter<ActiveSscdListViewAdapter.ViewHolder> {
 

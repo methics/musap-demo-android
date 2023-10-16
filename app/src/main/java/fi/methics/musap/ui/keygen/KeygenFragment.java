@@ -19,11 +19,11 @@ import fi.methics.musap.databinding.FragmentKeygenBinding;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
-import fi.methics.musap.sdk.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.keygeneration.KeyGenReqBuilder;
-import fi.methics.musap.sdk.keyuri.MusapKey;
-import fi.methics.musap.sdk.util.MLog;
-import fi.methics.musap.sdk.util.MusapCallback;
+import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
+import fi.methics.musap.sdk.internal.keygeneration.KeyGenReqBuilder;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.util.MLog;
+import fi.methics.musap.sdk.internal.util.MusapCallback;
 
 public class KeygenFragment extends Fragment {
 

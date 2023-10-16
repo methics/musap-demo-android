@@ -5,27 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.Payload;
-import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.JWTClaimsSet;
-
-import java.nio.charset.StandardCharsets;
-
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.sign.SignatureReq;
-import fi.methics.musap.sdk.sign.SignatureReqBuilder;
-import fi.methics.musap.sdk.util.MBase64;
-import fi.methics.musap.sdk.yubikey.YubiKeyExtension;
 
 public class SignSscdSelectionFragment extends Fragment {
 

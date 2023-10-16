@@ -1,11 +1,11 @@
 package fi.methics.musap.sdk.extension;
 
-import fi.methics.musap.sdk.discovery.KeyBindReq;
-import fi.methics.musap.sdk.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.keyuri.MusapKey;
-import fi.methics.musap.sdk.keyuri.MusapSscd;
-import fi.methics.musap.sdk.sign.MusapSignature;
-import fi.methics.musap.sdk.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
+import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
+import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.sign.SignatureReq;
 
 /**
  * MUSAP SSCD extension interface. Every SSCD should implement this.

@@ -18,12 +18,12 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
-import fi.methics.musap.sdk.keyuri.MusapKey;
-import fi.methics.musap.sdk.sign.MusapSignature;
-import fi.methics.musap.sdk.sign.MusapSigner;
-import fi.methics.musap.sdk.util.MLog;
-import fi.methics.musap.sdk.util.MusapCallback;
-import fi.methics.musap.sdk.util.StringUtil;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.sign.MusapSigner;
+import fi.methics.musap.sdk.internal.util.MLog;
+import fi.methics.musap.sdk.internal.util.MusapCallback;
+import fi.methics.musap.sdk.internal.util.StringUtil;
 
 
 public class SigningFragment extends Fragment {

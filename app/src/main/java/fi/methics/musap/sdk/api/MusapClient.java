@@ -9,23 +9,23 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import fi.methics.musap.sdk.async.GenerateKeyTask;
-import fi.methics.musap.sdk.async.SignTask;
-import fi.methics.musap.sdk.discovery.KeySearchReq;
-import fi.methics.musap.sdk.discovery.SscdSearchReq;
+import fi.methics.musap.sdk.internal.async.GenerateKeyTask;
+import fi.methics.musap.sdk.internal.async.SignTask;
+import fi.methics.musap.sdk.internal.discovery.KeySearchReq;
+import fi.methics.musap.sdk.internal.discovery.SscdSearchReq;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
-import fi.methics.musap.sdk.discovery.KeyBindReq;
-import fi.methics.musap.sdk.discovery.KeyDiscoveryAPI;
-import fi.methics.musap.sdk.discovery.MetadataStorage;
-import fi.methics.musap.sdk.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.keyuri.KeyURI;
-import fi.methics.musap.sdk.keyuri.MusapKey;
-import fi.methics.musap.sdk.keyuri.MusapSscd;
-import fi.methics.musap.sdk.keyuri.MusapLink;
-import fi.methics.musap.sdk.sign.MusapSignature;
-import fi.methics.musap.sdk.sign.SignatureReq;
-import fi.methics.musap.sdk.util.MLog;
-import fi.methics.musap.sdk.util.MusapCallback;
+import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
+import fi.methics.musap.sdk.internal.discovery.KeyDiscoveryAPI;
+import fi.methics.musap.sdk.internal.discovery.MetadataStorage;
+import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
+import fi.methics.musap.sdk.internal.datatype.KeyURI;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
+import fi.methics.musap.sdk.internal.datatype.MusapLink;
+import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.util.MLog;
+import fi.methics.musap.sdk.internal.util.MusapCallback;
 
 public class MusapClient {
 

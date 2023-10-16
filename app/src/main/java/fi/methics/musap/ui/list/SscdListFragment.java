@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MusapClient;
-import fi.methics.musap.sdk.util.MLog;
+import fi.methics.musap.sdk.internal.util.MLog;
 
 /**
  * A fragment representing a list of Items.
