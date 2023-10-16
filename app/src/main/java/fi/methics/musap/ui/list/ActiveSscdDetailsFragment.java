@@ -38,7 +38,7 @@ public class ActiveSscdDetailsFragment extends Fragment {
             return root;
         }
         MusapSscd sscd = null;
-        for (MusapSscd s : MusapClient.listActiveSSCDS()) {
+        for (MusapSscd s : MusapClient.listActiveSscds()) {
             if (sscdid.equals(s.getSscdId())) {
                 MLog.d("Found SSCD " + s.getSscdName());
                 sscd = s;

@@ -21,7 +21,7 @@ public class MusapKey {
     private List<MusapKeyAttribute> attributes;
     private List<String> keyUsages;
     private List<MusapLoA> loa;
-    private String keyAlgorithm;
+    private MusapAlgorithm algorithm;
     private String keyUri;
 
     private MusapKeyAttestation attestation;
@@ -36,7 +36,7 @@ public class MusapKey {
         this.certificateChain = builder.certificateChain;
         this.keyUsages        = builder.keyUsages;
         this.loa              = builder.loa;
-        this.keyAlgorithm     = builder.keyAlgorithm;
+        this.algorithm        = builder.algorithm;
         this.keyUri           = builder.keyUri;
         this.attestation      = builder.attestation;
         this.attributes       = builder.attributes;
@@ -83,8 +83,8 @@ public class MusapKey {
         return loa;
     }
 
-    public String getKeyAlgorithm() {
-        return this.keyAlgorithm;
+    public MusapAlgorithm getAlgorithm() {
+        return this.algorithm;
     }
 
     public KeyURI getKeyUri() {
@@ -116,7 +116,7 @@ public class MusapKey {
             return null;
         }
         MLog.d("Looking for an SSCD with id " + this.sscdId);
-        for (MusapSscdInterface sscd : MusapClient.listEnabledSSCDS()) {
+        for (MusapSscdInterface sscd : MusapClient.listEnabledSscds()) {
             if (this.sscdId.equals(sscd.getSscdInfo().getSscdId())) {
                 MLog.d("Found SSCD with id " + this.sscdId);
                 return sscd;
@@ -136,7 +136,7 @@ public class MusapKey {
         private List<MusapKeyAttribute> attributes = new ArrayList<>();
         private List<String> keyUsages;
         private List<MusapLoA> loa;
-        private String keyAlgorithm;
+        private MusapAlgorithm algorithm;
         private String keyUri;
 
         private MusapKeyAttestation attestation;
@@ -194,8 +194,8 @@ public class MusapKey {
             return this;
         }
 
-        public Builder setKeyAlgorithm(String keyAlgorithm) {
-            this.keyAlgorithm = keyAlgorithm;
+        public Builder setAlgorithm(MusapAlgorithm algorithm) {
+            this.algorithm = algorithm;
             return this;
         }
 

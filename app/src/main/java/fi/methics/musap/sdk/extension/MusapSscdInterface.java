@@ -9,7 +9,6 @@ import fi.methics.musap.sdk.internal.sign.SignatureReq;
 
 /**
  * MUSAP SSCD extension interface. Every SSCD should implement this.
- * TODO: The API here should be changed to be asynchronous with some sort of callbacks
  */
 public interface MusapSscdInterface<T extends SscdSettings> {
 
@@ -20,7 +19,7 @@ public interface MusapSscdInterface<T extends SscdSettings> {
     /**
      * Bind an existing key to this MUSAP library
      * @param req Key bind request
-     * @throws Exception TODO: Make new MUSAPException class?
+     * @throws Exception if binding failed
      * @return
      */
     public MusapKey bindKey(KeyBindReq req) throws Exception;
@@ -28,7 +27,7 @@ public interface MusapSscdInterface<T extends SscdSettings> {
     /**
      * Generate a new key with this SSCD. Note that this SSCD must support
      * @param req Key generation request
-     * @throws Exception TODO: Make new MUSAPException class?
+     * @throws Exception if key generation failed
      * @return Recently generated MUSAPKey
      */
     public MusapKey generateKey(KeyGenReq req) throws Exception;
@@ -37,7 +36,7 @@ public interface MusapSscdInterface<T extends SscdSettings> {
      * Sign with the SSCD
      * @param req Signature request
      * @return Signature response
-     * @throws Exception
+     * @throws Exception if signature failed
      */
     public MusapSignature sign(SignatureReq req) throws Exception;
 
