@@ -2,15 +2,15 @@ package fi.methics.musap.sdk.keyuri;
 
 import java.util.List;
 
-public class MUSAPKeyAttestation {
+public class MusapKeyAttestation {
 
     private String attestationType;
     private byte[] signature;
-    private MUSAPCertificate certificate;
-    private List<MUSAPCertificate> certificateChain;
+    private MusapCertificate certificate;
+    private List<MusapCertificate> certificateChain;
     private String aaguid;
 
-    private MUSAPKeyAttestation(Builder builder) {
+    private MusapKeyAttestation(Builder builder) {
         this.attestationType = builder.attestationType;
         this.signature = builder.signature;
         this.certificate = builder.certificate;
@@ -22,8 +22,8 @@ public class MUSAPKeyAttestation {
 
         private String attestationType;
         private byte[] signature;
-        private MUSAPCertificate certificate;
-        private List<MUSAPCertificate> certificateChain;
+        private MusapCertificate certificate;
+        private List<MusapCertificate> certificateChain;
         private String aaguid;
 
         public Builder setAttestationType(String attestationType) {
@@ -34,11 +34,11 @@ public class MUSAPKeyAttestation {
             this.signature = signature;
             return this;
         }
-        public Builder setCertificate(MUSAPCertificate certificate) {
+        public Builder setCertificate(MusapCertificate certificate) {
             this.certificate = certificate;
             return this;
         }
-        public Builder setSignature(List<MUSAPCertificate> certificateChain) {
+        public Builder setSignature(List<MusapCertificate> certificateChain) {
             this.certificateChain = certificateChain;
             return this;
         }
@@ -46,8 +46,8 @@ public class MUSAPKeyAttestation {
             this.aaguid = aaguid;
             return this;
         }
-        public MUSAPKeyAttestation build() {
-            return new MUSAPKeyAttestation(this);
+        public MusapKeyAttestation build() {
+            return new MusapKeyAttestation(this);
         }
 
     }

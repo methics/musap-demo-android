@@ -13,23 +13,21 @@ import fi.methics.musap.sdk.async.GenerateKeyTask;
 import fi.methics.musap.sdk.async.SignTask;
 import fi.methics.musap.sdk.discovery.KeySearchReq;
 import fi.methics.musap.sdk.discovery.SscdSearchReq;
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.discovery.KeyDiscoveryAPI;
 import fi.methics.musap.sdk.discovery.MetadataStorage;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.keyuri.KeyURI;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.keyuri.MusapKey;
+import fi.methics.musap.sdk.keyuri.MusapSscd;
 import fi.methics.musap.sdk.keyuri.MusapLink;
-import fi.methics.musap.sdk.keyuri.MusapMessage;
-import fi.methics.musap.sdk.sign.MUSAPSignature;
+import fi.methics.musap.sdk.sign.MusapSignature;
 import fi.methics.musap.sdk.sign.SignatureReq;
 import fi.methics.musap.sdk.util.MLog;
-import fi.methics.musap.sdk.util.MusapAsyncTask;
 import fi.methics.musap.sdk.util.MusapCallback;
 
-public class MUSAPClient {
+public class MusapClient {
 
     private static WeakReference<Context> context;
     private static KeyDiscoveryAPI keyDiscovery;
@@ -49,7 +47,7 @@ public class MUSAPClient {
      * @param req  Key Generation Request
      * @param callback Callback that will deliver success or failure
      */
-    public static void generateKey(MUSAPSscdInterface sscd, KeyGenReq req, MusapCallback<MUSAPKey> callback) {
+    public static void generateKey(MusapSscdInterface sscd, KeyGenReq req, MusapCallback<MusapKey> callback) {
         new GenerateKeyTask(callback, context.get(), sscd, req).executeOnExecutor(executor);
     }
 
@@ -59,7 +57,7 @@ public class MUSAPClient {
      * @param req  Key Bind Request
      * @param callback Callback that will deliver success or failure
      */
-    public static void bindKey(MUSAPSscdInterface sscd, KeyGenReq req, MusapCallback<MUSAPKey> callback) {
+    public static void bindKey(MusapSscdInterface sscd, KeyGenReq req, MusapCallback<MusapKey> callback) {
         // TODO: Change to KeyBindTask, etc
         new GenerateKeyTask(callback, context.get(), sscd, req).executeOnExecutor(executor);
     }
@@ -70,25 +68,25 @@ public class MUSAPClient {
      * @param req  Request containing the data to sign
      * @param callback Callback that will deliver success or failure
      */
-    public static void sign(MUSAPSscdInterface sscd, SignatureReq req, MusapCallback<MUSAPSignature> callback) {
+    public static void sign(MusapSscdInterface sscd, SignatureReq req, MusapCallback<MusapSignature> callback) {
         new SignTask(callback, context.get(), sscd, req).executeOnExecutor(executor);
     }
 
 
     /**
-     * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSSCD(MUSAPSscdInterface)} first.
+     * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSSCD(MusapSscdInterface)} first.
      * @return List of SSCDs that can be used to generate or bind keys
      */
-    public static List<MUSAPSscdInterface> listEnabledSSCDS() {
+    public static List<MusapSscdInterface> listEnabledSSCDS() {
         return keyDiscovery.listEnabledSscds();
     }
 
     /**
-     * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSSCD(MUSAPSscdInterface)} first.
+     * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSSCD(MusapSscdInterface)} first.
      * @param req Search request that filters the output
      * @return List of SSCDs that can be used to generate or bind keys
      */
-    public static List<MUSAPSscdInterface> listEnabledSSCDS(SscdSearchReq req) {
+    public static List<MusapSscdInterface> listEnabledSSCDS(SscdSearchReq req) {
         // TODO: Filter based on the req
         return keyDiscovery.listEnabledSscds();
     }
@@ -97,7 +95,7 @@ public class MUSAPClient {
      * List active SSCDs that have user keys generated or bound
      * @return List of active SSCDs
      */
-    public static List<MUSAPSscd> listActiveSSCDS() {
+    public static List<MusapSscd> listActiveSSCDS() {
         return storage.listActiveSscds();
     }
 
@@ -105,9 +103,9 @@ public class MUSAPClient {
      * List all available keys
      * @return List of keys
      */
-    public static List<MUSAPKey> listKeys() {
+    public static List<MusapKey> listKeys() {
         MetadataStorage storage = new MetadataStorage(context.get());
-        List<MUSAPKey> keys = storage.listKeys();
+        List<MusapKey> keys = storage.listKeys();
         MLog.d("Found " + keys.size() + " keys");
         return keys;
     }
@@ -117,7 +115,7 @@ public class MUSAPClient {
      * @param req Search request that filters the output
      * @return matching keys
      */
-    public static List<MUSAPKey> listKeys(KeySearchReq req) {
+    public static List<MusapKey> listKeys(KeySearchReq req) {
         // TODO: Filter keys by req
         return listKeys();
     }
@@ -128,7 +126,7 @@ public class MUSAPClient {
      * to support. These will be searchable with {@link #listEnabledSSCDS()}}.
      * @param sscd SSCD to enable
      */
-    public static void enableSSCD(MUSAPSscdInterface sscd) {
+    public static void enableSSCD(MusapSscdInterface sscd) {
         keyDiscovery.enableSSCD(sscd);
     }
 
@@ -143,10 +141,10 @@ public class MUSAPClient {
      * @param keyUri KeyURI as String
      * @return Key or null if none found
      */
-    public static MUSAPKey getKeyByUri(String keyUri) {
+    public static MusapKey getKeyByUri(String keyUri) {
         MLog.d("Searching for key with KeyURI " + keyUri);
         MetadataStorage storage = new MetadataStorage(context.get());
-        for (MUSAPKey key : storage.listKeys()) {
+        for (MusapKey key : storage.listKeys()) {
             if (key.getKeyUri().matches(new KeyURI(keyUri))) {
                 MLog.d("Found key " + key.getKeyName());
                 return key;
@@ -161,9 +159,9 @@ public class MUSAPClient {
      * @param keyUri KeyURI as {@link KeyURI} object
      * @return Key or null if none found
      */
-    public static MUSAPKey getKeyByUri(KeyURI keyUri) {
+    public static MusapKey getKeyByUri(KeyURI keyUri) {
         MetadataStorage storage = new MetadataStorage(context.get());
-        for (MUSAPKey key : storage.listKeys()) {
+        for (MusapKey key : storage.listKeys()) {
             if (key.getKeyUri().matches(keyUri)) {
                 return key;
             }
@@ -191,7 +189,7 @@ public class MUSAPClient {
      * Remove a key from MUSAP.
      * @param key key to remove
      */
-    public static void removeKey(MUSAPKey key) {
+    public static void removeKey(MusapKey key) {
         // TODO
     }
 
@@ -199,7 +197,7 @@ public class MUSAPClient {
      * Remove an active SSCD from MUSAP.
      * @param sscd SSCD to remove
      */
-    public static void removeSscd(MUSAPSscd sscd) {
+    public static void removeSscd(MusapSscd sscd) {
         // TODO
     }
 
@@ -232,7 +230,7 @@ public class MUSAPClient {
      * Poll MUSAP Link for an incoming signature request. This should be called periodically and/or
      * when a notification wakes up the application.
      * @return SignatureReq or null if no request available
-     * @throws MUSAPException if polling failed (e.g. a network issue)
+     * @throws MusapException if polling failed (e.g. a network issue)
      */
     public static SignatureReq pollForSignatureRequest() {
         return null;

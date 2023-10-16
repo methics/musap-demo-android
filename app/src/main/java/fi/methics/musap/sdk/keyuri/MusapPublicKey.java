@@ -2,15 +2,15 @@ package fi.methics.musap.sdk.keyuri;
 
 import java.security.KeyPair;
 
-public class MUSAPPublicKey {
+public class MusapPublicKey {
 
     private byte[] publickeyDer;
 
-    public MUSAPPublicKey(byte[] publicKey) {
+    public MusapPublicKey(byte[] publicKey) {
         this.publickeyDer = publicKey;
     }
 
-    public MUSAPPublicKey(KeyPair keyPair) {
+    public MusapPublicKey(KeyPair keyPair) {
         this.publickeyDer = keyPair.getPublic().getEncoded();
     }
 

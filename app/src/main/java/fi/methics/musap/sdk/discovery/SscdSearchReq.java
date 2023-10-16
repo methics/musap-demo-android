@@ -1,6 +1,6 @@
 package fi.methics.musap.sdk.discovery;
 
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.keyuri.MusapSscd;
 
 public class SscdSearchReq {
 
@@ -32,7 +32,7 @@ public class SscdSearchReq {
         return keyAlgorithm;
     }
 
-    public boolean matches(MUSAPSscd sscd) {
+    public boolean matches(MusapSscd sscd) {
         if (this.keyAlgorithm != null && !sscd.getSupportedKeyAlgorithms().contains(this.keyAlgorithm)) return false;
         return true;
     }

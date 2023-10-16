@@ -4,29 +4,29 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import fi.methics.musap.sdk.api.MUSAPClient;
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
+import fi.methics.musap.sdk.api.MusapClient;
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.util.MLog;
 
-public class MUSAPKey {
+public class MusapKey {
 
     private String keyName;
     private String keyType;
     private String sscdId;
     private String sscdType;
     private Instant createdDate;
-    private MUSAPPublicKey publicKey;
-    private MUSAPCertificate certificate;
-    private List<MUSAPCertificate> certificateChain;
-    private List<MUSAPKeyAttribute> attributes;
+    private MusapPublicKey publicKey;
+    private MusapCertificate certificate;
+    private List<MusapCertificate> certificateChain;
+    private List<MusapKeyAttribute> attributes;
     private List<String> keyUsages;
-    private List<MUSAPLoa> loa;
+    private List<MusapLoA> loa;
     private String keyAlgorithm;
     private String keyUri;
 
-    private MUSAPKeyAttestation attestation;
+    private MusapKeyAttestation attestation;
 
-    private MUSAPKey(Builder builder) {
+    private MusapKey(Builder builder) {
         this.keyName          = builder.keyName;
         this.keyType          = builder.keyType;
         this.sscdId           = builder.sscdId;
@@ -63,15 +63,15 @@ public class MUSAPKey {
         return createdDate;
     }
 
-    public MUSAPPublicKey getPublicKey() {
+    public MusapPublicKey getPublicKey() {
         return publicKey;
     }
 
-    public MUSAPCertificate getCertificate() {
+    public MusapCertificate getCertificate() {
         return certificate;
     }
 
-    public List<MUSAPCertificate> getCertificateChain() {
+    public List<MusapCertificate> getCertificateChain() {
         return certificateChain;
     }
 
@@ -79,7 +79,7 @@ public class MUSAPKey {
         return keyUsages;
     }
 
-    public List<MUSAPLoa> getLoa() {
+    public List<MusapLoA> getLoa() {
         return loa;
     }
 
@@ -91,17 +91,17 @@ public class MUSAPKey {
         return new KeyURI(this.keyUri);
     }
 
-    public List<MUSAPKeyAttribute> getAttributes() {
+    public List<MusapKeyAttribute> getAttributes() {
         return this.attributes;
     }
 
-    public MUSAPKeyAttribute getAttribute(String name) {
+    public MusapKeyAttribute getAttribute(String name) {
         if (name == null) return null;
         return this.attributes.stream().filter(n -> name.equals(n.name)).findFirst().orElse(null);
     }
 
     public String getAttributeValue(String name) {
-        MUSAPKeyAttribute attr = this.getAttribute(name);
+        MusapKeyAttribute attr = this.getAttribute(name);
         if (attr == null) return null;
         return attr.value;
     }
@@ -110,13 +110,13 @@ public class MUSAPKey {
      * Get a handle to the SSCD that created this MUSAP key
      * @return SSCD
      */
-    public MUSAPSscdInterface getSscd() {
+    public MusapSscdInterface getSscd() {
         if (this.sscdId == null) {
             MLog.d("No sscdid found");
             return null;
         }
         MLog.d("Looking for an SSCD with id " + this.sscdId);
-        for (MUSAPSscdInterface sscd : MUSAPClient.listEnabledSSCDS()) {
+        for (MusapSscdInterface sscd : MusapClient.listEnabledSSCDS()) {
             if (this.sscdId.equals(sscd.getSscdInfo().getSscdId())) {
                 MLog.d("Found SSCD with id " + this.sscdId);
                 return sscd;
@@ -130,16 +130,16 @@ public class MUSAPKey {
         private String keyType;
         private String sscdId;
         private String sscdType;
-        private MUSAPPublicKey publicKey;
-        private MUSAPCertificate certificate;
-        private List<MUSAPCertificate> certificateChain;
-        private List<MUSAPKeyAttribute> attributes = new ArrayList<>();
+        private MusapPublicKey publicKey;
+        private MusapCertificate certificate;
+        private List<MusapCertificate> certificateChain;
+        private List<MusapKeyAttribute> attributes = new ArrayList<>();
         private List<String> keyUsages;
-        private List<MUSAPLoa> loa;
+        private List<MusapLoA> loa;
         private String keyAlgorithm;
         private String keyUri;
 
-        private MUSAPKeyAttestation attestation;
+        private MusapKeyAttestation attestation;
 
         public Builder setKeyName(String keyName) {
             this.keyName = keyName;
@@ -152,7 +152,7 @@ public class MUSAPKey {
         }
 
         public Builder setKeyAttribute(String name, String value) {
-            this.attributes.add(new MUSAPKeyAttribute(name, value));
+            this.attributes.add(new MusapKeyAttribute(name, value));
             return this;
         }
 
@@ -166,12 +166,12 @@ public class MUSAPKey {
             return this;
         }
 
-        public Builder setPublicKey(MUSAPPublicKey publicKey) {
+        public Builder setPublicKey(MusapPublicKey publicKey) {
             this.publicKey = publicKey;
             return this;
         }
 
-        public Builder setCertificate(MUSAPCertificate certificate) {
+        public Builder setCertificate(MusapCertificate certificate) {
             this.certificate = certificate;
             if (this.certificate != null && this.publicKey == null) {
                 this.publicKey = this.certificate.getPublicKey();
@@ -179,7 +179,7 @@ public class MUSAPKey {
             return this;
         }
 
-        public Builder setCertificateChain(List<MUSAPCertificate> certificateChain) {
+        public Builder setCertificateChain(List<MusapCertificate> certificateChain) {
             this.certificateChain = certificateChain;
             return this;
         }
@@ -189,7 +189,7 @@ public class MUSAPKey {
             return this;
         }
 
-        public Builder setLoa(List<MUSAPLoa> loa) {
+        public Builder setLoa(List<MusapLoA> loa) {
             this.loa = loa;
             return this;
         }
@@ -204,13 +204,13 @@ public class MUSAPKey {
             return this;
         }
 
-        public Builder setAttestation(MUSAPKeyAttestation attestation) {
+        public Builder setAttestation(MusapKeyAttestation attestation) {
             this.attestation = attestation;
             return this;
         }
 
-        public MUSAPKey build() {
-            return new MUSAPKey(this);
+        public MusapKey build() {
+            return new MusapKey(this);
         }
     }
 }

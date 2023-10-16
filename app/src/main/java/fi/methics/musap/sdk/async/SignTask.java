@@ -2,35 +2,32 @@ package fi.methics.musap.sdk.async;
 
 import android.content.Context;
 
-import fi.methics.musap.sdk.api.MUSAPException;
-import fi.methics.musap.sdk.discovery.MetadataStorage;
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.sign.MUSAPSignature;
+import fi.methics.musap.sdk.api.MusapException;
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.sign.MusapSignature;
 import fi.methics.musap.sdk.sign.SignatureReq;
 import fi.methics.musap.sdk.util.AsyncTaskResult;
 import fi.methics.musap.sdk.util.MusapAsyncTask;
 import fi.methics.musap.sdk.util.MusapCallback;
 
-public class SignTask extends MusapAsyncTask<MUSAPSignature> {
+public class SignTask extends MusapAsyncTask<MusapSignature> {
 
-    private final MUSAPSscdInterface sscd;
+    private final MusapSscdInterface sscd;
     private final SignatureReq req;
 
-    public SignTask(MusapCallback<MUSAPSignature> callback, Context context, MUSAPSscdInterface sscd, SignatureReq req) {
+    public SignTask(MusapCallback<MusapSignature> callback, Context context, MusapSscdInterface sscd, SignatureReq req) {
         super(callback, context);
         this.sscd = sscd;
         this.req  = req;
     }
 
     @Override
-    protected AsyncTaskResult<MUSAPSignature> runOperation() throws MUSAPException {
+    protected AsyncTaskResult<MusapSignature> runOperation() throws MusapException {
         try {
-            MUSAPSignature signature = sscd.sign(req);
+            MusapSignature signature = sscd.sign(req);
             return new AsyncTaskResult<>(signature);
         } catch (Exception e) {
-            throw new MUSAPException(e);
+            throw new MusapException(e);
         }
     }
 }

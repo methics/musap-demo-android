@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import java.util.stream.Collectors;
 
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.api.MUSAPClient;
+import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.util.MLog;
 
 /**
@@ -73,14 +73,14 @@ public class SscdListFragment extends Fragment {
             MLog.d("Listing Enabled SSCDs");
             RecyclerView enabledList = layout.findViewById(R.id.listEnabled);
             enabledList.setLayoutManager(new GridLayoutManager(enabledList.getContext(), mColumnCount));
-            enabledList.setAdapter(new EnabledSscdListViewAdapter(MUSAPClient.listEnabledSSCDS(), this.getContext(), navController));
+            enabledList.setAdapter(new EnabledSscdListViewAdapter(MusapClient.listEnabledSSCDS(), this.getContext(), navController));
 
             MLog.d("Listing Active SSCDs");
             RecyclerView activeList = layout.findViewById(R.id.listActive);
             activeList.setLayoutManager(new GridLayoutManager(activeList.getContext(), mColumnCount));
-            activeList.setAdapter(new ActiveSscdListViewAdapter(MUSAPClient.listActiveSSCDS(), this.getContext(), navController));
+            activeList.setAdapter(new ActiveSscdListViewAdapter(MusapClient.listActiveSSCDS(), this.getContext(), navController));
 
-            MLog.d("ACTIVE SSCDs: " + String.join(",", MUSAPClient.listActiveSSCDS().stream().map(s -> s.getSscdId()).collect(Collectors.toList()).toArray(new String[0])));
+            MLog.d("ACTIVE SSCDs: " + String.join(",", MusapClient.listActiveSSCDS().stream().map(s -> s.getSscdId()).collect(Collectors.toList()).toArray(new String[0])));
 
         }
         return layout;

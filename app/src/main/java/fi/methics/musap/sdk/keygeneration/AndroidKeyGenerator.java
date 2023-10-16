@@ -7,17 +7,17 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Arrays;
 
-import fi.methics.musap.sdk.api.MUSAPConstants;
+import fi.methics.musap.sdk.api.MusapConstants;
 import fi.methics.musap.sdk.keyuri.KeyURI;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.keyuri.MUSAPLoa;
-import fi.methics.musap.sdk.keyuri.MUSAPPublicKey;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.keyuri.MusapKey;
+import fi.methics.musap.sdk.keyuri.MusapLoA;
+import fi.methics.musap.sdk.keyuri.MusapPublicKey;
+import fi.methics.musap.sdk.keyuri.MusapSscd;
 import fi.methics.musap.sdk.util.MLog;
 
 public class AndroidKeyGenerator {
 
-    public MUSAPKey generateKey(KeyGenReq req, MUSAPSscd sscd) throws Exception {
+    public MusapKey generateKey(KeyGenReq req, MusapSscd sscd) throws Exception {
         String algorithm = this.resolveAlgorithm(req);
 
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(
@@ -33,13 +33,13 @@ public class AndroidKeyGenerator {
 
         MLog.d("Key generation successful");
 
-        MUSAPKey generatedKey = new MUSAPKey.Builder()
-                .setSscdType(MUSAPConstants.ANDROID_KS_TYPE)
+        MusapKey generatedKey = new MusapKey.Builder()
+                .setSscdType(MusapConstants.ANDROID_KS_TYPE)
                 .setKeyName(req.getKeyAlias())
                 .setKeyUri(new KeyURI(req.getKeyAlias(), sscd.getSscdType(), "loa3").getUri())
                 .setSscdId(sscd.getSscdId())
-                .setLoa(Arrays.asList(MUSAPLoa.EIDAS_SUBSTANTIAL, MUSAPLoa.ISO_LOA3))
-                .setPublicKey(new MUSAPPublicKey(keyPair))
+                .setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3))
+                .setPublicKey(new MusapPublicKey(keyPair))
                 .build();
         MLog.d("Generated key with KeyURI " + generatedKey.getKeyUri());
 

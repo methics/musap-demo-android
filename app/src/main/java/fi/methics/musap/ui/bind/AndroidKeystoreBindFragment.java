@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.api.MUSAPClient;
+import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.discovery.KeyBindReqBuilder;
 
@@ -43,7 +43,7 @@ public class AndroidKeystoreBindFragment extends Fragment {
                             .setGenerateNewKey(true)
                             .createKeyBindReq();
 
-                    MUSAPClient.bindKey(req);
+                    MusapClient.bindKey(req);
                 }
             });
         }

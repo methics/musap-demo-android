@@ -1,18 +1,17 @@
 package fi.methics.musap.sdk.extension;
 
-import fi.methics.musap.sdk.api.MUSAPException;
 import fi.methics.musap.sdk.discovery.KeyBindReq;
 import fi.methics.musap.sdk.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
-import fi.methics.musap.sdk.sign.MUSAPSignature;
+import fi.methics.musap.sdk.keyuri.MusapKey;
+import fi.methics.musap.sdk.keyuri.MusapSscd;
+import fi.methics.musap.sdk.sign.MusapSignature;
 import fi.methics.musap.sdk.sign.SignatureReq;
 
 /**
  * MUSAP SSCD extension interface. Every SSCD should implement this.
  * TODO: The API here should be changed to be asynchronous with some sort of callbacks
  */
-public interface MUSAPSscdInterface<T extends SscdSettings> {
+public interface MusapSscdInterface<T extends SscdSettings> {
 
     // TODO: Should the bindKey and generateKey be the same API?
     //       Each SSCD basically supports either binding or generating.
@@ -24,7 +23,7 @@ public interface MUSAPSscdInterface<T extends SscdSettings> {
      * @throws Exception TODO: Make new MUSAPException class?
      * @return
      */
-    public MUSAPKey bindKey(KeyBindReq req) throws Exception;
+    public MusapKey bindKey(KeyBindReq req) throws Exception;
 
     /**
      * Generate a new key with this SSCD. Note that this SSCD must support
@@ -32,7 +31,7 @@ public interface MUSAPSscdInterface<T extends SscdSettings> {
      * @throws Exception TODO: Make new MUSAPException class?
      * @return Recently generated MUSAPKey
      */
-    public MUSAPKey generateKey(KeyGenReq req) throws Exception;
+    public MusapKey generateKey(KeyGenReq req) throws Exception;
 
     /**
      * Sign with the SSCD
@@ -40,13 +39,13 @@ public interface MUSAPSscdInterface<T extends SscdSettings> {
      * @return Signature response
      * @throws Exception
      */
-    public MUSAPSignature sign(SignatureReq req) throws Exception;
+    public MusapSignature sign(SignatureReq req) throws Exception;
 
     /**
      * Get SSCD info. Must not return null.
      * @return SSCD info
      */
-    public MUSAPSscd getSscdInfo();
+    public MusapSscd getSscdInfo();
 
     /**
      * Does this SSCD support key generation?

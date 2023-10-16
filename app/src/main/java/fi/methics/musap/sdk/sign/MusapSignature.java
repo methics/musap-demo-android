@@ -2,11 +2,11 @@ package fi.methics.musap.sdk.sign;
 
 import fi.methics.musap.sdk.util.MBase64;
 
-public class MUSAPSignature {
+public class MusapSignature {
 
     private byte[] rawSignature;
 
-    public MUSAPSignature(byte[] rawSignature) {
+    public MusapSignature(byte[] rawSignature) {
         this.rawSignature = rawSignature;
     }
 

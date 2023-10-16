@@ -1,11 +1,11 @@
 package fi.methics.musap.sdk.keyuri;
 
-public class MUSAPKeyAttribute {
+public class MusapKeyAttribute {
 
     public String name;
     public String value;
 
-    public MUSAPKeyAttribute(String name, String value) {
+    public MusapKeyAttribute(String name, String value) {
         this.name  = name;
         this.value = value;
     }

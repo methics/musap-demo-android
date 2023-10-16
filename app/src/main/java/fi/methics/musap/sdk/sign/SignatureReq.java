@@ -2,23 +2,23 @@ package fi.methics.musap.sdk.sign;
 
 import android.app.Activity;
 
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
+import fi.methics.musap.sdk.keyuri.MusapKey;
 
 public class SignatureReq {
 
-    protected MUSAPKey key;
+    protected MusapKey key;
     protected byte[]  data;
     protected String algorithm;
     protected Activity activity;
 
-    public SignatureReq(MUSAPKey key, byte[] data, String algorithm, Activity activity) {
+    public SignatureReq(MusapKey key, byte[] data, String algorithm, Activity activity) {
         this.key = key;
         this.data = data;
         this.algorithm = algorithm;
         this.activity = activity;
     }
 
-    public MUSAPKey getKey() {
+    public MusapKey getKey() {
         return key;
     }
 

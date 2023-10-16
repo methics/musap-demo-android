@@ -7,21 +7,21 @@ import org.bouncycastle.cms.CMSSignedData;
 import java.io.IOException;
 import java.util.Collection;
 
-import fi.methics.musap.sdk.api.MUSAPException;
-import fi.methics.musap.sdk.keyuri.MUSAPCertificate;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
+import fi.methics.musap.sdk.api.MusapException;
+import fi.methics.musap.sdk.keyuri.MusapCertificate;
+import fi.methics.musap.sdk.keyuri.MusapKey;
 
-public class CMSSignature extends MUSAPSignature {
+public class CmsSignature extends MusapSignature {
 
     private CMSSignedData signedData;
 
-    public CMSSignature(byte[] cms) throws MUSAPException {
+    public CmsSignature(byte[] cms) throws MusapException {
         super(cms);
         try {
             final ContentInfo ci = ContentInfo.getInstance(cms);
             this.signedData = new CMSSignedData(ci);
         } catch (Exception e) {
-            throw new MUSAPException(e);
+            throw new MusapException(e);
         }
     }
 
@@ -47,10 +47,10 @@ public class CMSSignature extends MUSAPSignature {
      * @return certificate
      * @throws IOException
      */
-    public MUSAPCertificate getSignerCertificate() throws IOException {
+    public MusapCertificate getSignerCertificate() throws IOException {
         Collection<X509CertificateHolder> certs = this.getCertificates();
         X509CertificateHolder cert = certs.stream().findFirst().orElse(null);
-        return new MUSAPCertificate(cert);
+        return new MusapCertificate(cert);
     }
 
     /**
@@ -58,8 +58,8 @@ public class CMSSignature extends MUSAPSignature {
      * @return signer key
      * @throws IOException
      */
-    public MUSAPKey getSignerKey() throws IOException {
-        MUSAPKey.Builder builder = new MUSAPKey.Builder();
+    public MusapKey getSignerKey() throws IOException {
+        MusapKey.Builder builder = new MusapKey.Builder();
         builder.setCertificate(this.getSignerCertificate());
         return builder.build();
     }

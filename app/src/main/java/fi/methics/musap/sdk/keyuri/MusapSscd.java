@@ -2,9 +2,7 @@ package fi.methics.musap.sdk.keyuri;
 
 import java.util.List;
 
-import fi.methics.musap.sdk.MUSAPSscdType;
-
-public class MUSAPSscd {
+public class MusapSscd {
 
     private String sscdName;
     private String sscdType;
@@ -14,7 +12,7 @@ public class MUSAPSscd {
     private boolean keygenSupported;
     private List<String> supportedKeyAlgorithms;
 
-    private MUSAPSscd(Builder builder) {
+    private MusapSscd(Builder builder) {
         this.sscdName = builder.sscdName;
         this.sscdType = builder.sscdType;
         this.sscdId   = builder.sscdId;
@@ -96,8 +94,8 @@ public class MUSAPSscd {
             return this;
         }
 
-        public MUSAPSscd build() {
-            return new MUSAPSscd(this);
+        public MusapSscd build() {
+            return new MusapSscd(this);
         }
     }
 

@@ -1,19 +1,18 @@
 package fi.methics.musap.sdk.util;
 
-import fi.methics.musap.sdk.api.MUSAPException;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.sign.MUSAPSignature;
+import fi.methics.musap.sdk.api.MusapException;
+import fi.methics.musap.sdk.sign.MusapSignature;
 
 public class SigningResult {
 
-    public MUSAPSignature signature;
-    public MUSAPException exception;
+    public MusapSignature signature;
+    public MusapException exception;
 
-    public SigningResult(MUSAPSignature signature) {
+    public SigningResult(MusapSignature signature) {
         this.signature = signature;
     }
 
-    public SigningResult(MUSAPException e) {
+    public SigningResult(MusapException e) {
         this.exception = e;
     }
 

@@ -1,6 +1,6 @@
 package fi.methics.musap.sdk.api;
 
-public class MUSAPConstants {
+public class MusapConstants {
 
     public static final String LoA = "LoA";
     public static final String SSCD_ID = "SSCD_ID";

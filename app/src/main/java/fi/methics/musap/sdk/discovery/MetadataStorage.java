@@ -10,8 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.keyuri.MusapKey;
+import fi.methics.musap.sdk.keyuri.MusapSscd;
 import fi.methics.musap.sdk.util.MLog;
 
 /**
@@ -50,7 +50,7 @@ public class MetadataStorage {
      * @param key  MUSAP key
      * @param sscd MUSAP SSCD that holds the key
      */
-    public void storeKey(MUSAPKey key, MUSAPSscd sscd) {
+    public void storeKey(MusapKey key, MusapSscd sscd) {
         if (key == null) {
             MLog.e("Cannot store null MUSAP key");
             throw new IllegalArgumentException("Cannot store null MUSAP key");
@@ -84,15 +84,15 @@ public class MetadataStorage {
      * List available MUSAP keys
      * @return MUSAP keys
      */
-    public List<MUSAPKey> listKeys() {
+    public List<MusapKey> listKeys() {
         Set<String> keyNames = this.getKeyNameSet();
-        List<MUSAPKey> keyList = new ArrayList<>();
+        List<MusapKey> keyList = new ArrayList<>();
         for (String keyName: keyNames) {
             String keyJson = this.getKeyJson(keyName);
             if (keyJson == null) {
                 MLog.e("Missing key metadata JSON for key name " + keyName);
             } else {
-                MUSAPKey key = new Gson().fromJson(keyJson, MUSAPKey.class);
+                MusapKey key = new Gson().fromJson(keyJson, MusapKey.class);
                 keyList.add(key);
             }
         }
@@ -104,7 +104,7 @@ public class MetadataStorage {
      * Store metadata of an active MUSAP SSCD
      * @param sscd SSCD (that has keys bound or generated)
      */
-    public void storeSscd(MUSAPSscd sscd) {
+    public void storeSscd(MusapSscd sscd) {
         if (sscd == null) {
             MLog.e("Cannot store null MUSAP SSCD");
             throw new IllegalArgumentException("Cannot store null MUSAP SSCD");
@@ -139,15 +139,15 @@ public class MetadataStorage {
      * List available active MUSAP SSCDs
      * @return active MUSAP SSCDs (that have keys bound or generated)
      */
-    public List<MUSAPSscd> listActiveSscds() {
+    public List<MusapSscd> listActiveSscds() {
         Set<String> sscdIds = this.getSscdIdSet();
-        List<MUSAPSscd> sscdList = new ArrayList<>();
+        List<MusapSscd> sscdList = new ArrayList<>();
         for (String sscdid : sscdIds) {
             String sscdJson = this.getSscdJson(sscdid);
             if (sscdJson == null) {
                 MLog.e("Missing SSCD metadata JSON for SSCD ID " + sscdid);
             } else {
-                MUSAPSscd sscd = new Gson().fromJson(sscdJson, MUSAPSscd.class);
+                MusapSscd sscd = new Gson().fromJson(sscdJson, MusapSscd.class);
                 sscdList.add(sscd);
             }
         }
@@ -167,10 +167,10 @@ public class MetadataStorage {
                 .apply();
     }
 
-    private String makeStoreName(MUSAPKey key) {
+    private String makeStoreName(MusapKey key) {
         return KEY_JSON_PREFIX + key.getKeyName();
     }
-    private String makeStoreName(MUSAPSscd sscd) {
+    private String makeStoreName(MusapSscd sscd) {
         return SSCD_JSON_PREFIX + sscd.getSscdId();
     }
     private String makeStoreName(String keyName) {

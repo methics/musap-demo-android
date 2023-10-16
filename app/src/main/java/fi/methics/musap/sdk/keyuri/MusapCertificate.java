@@ -6,28 +6,28 @@ import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-public class MUSAPCertificate {
+public class MusapCertificate {
 
     private String subject;
     private byte[] certificate;
-    private MUSAPPublicKey publicKey;
+    private MusapPublicKey publicKey;
 
-    public MUSAPCertificate(String subject, byte[] cert, MUSAPPublicKey publicKey) {
+    public MusapCertificate(String subject, byte[] cert, MusapPublicKey publicKey) {
         this.subject     = subject;
         this.certificate = cert;
         this.publicKey   = publicKey;
     }
 
-    public MUSAPCertificate(X509CertificateHolder cert) throws IOException {
+    public MusapCertificate(X509CertificateHolder cert) throws IOException {
         this.subject     = cert.getSubject().toString();
         this.certificate = cert.getEncoded();
-        this.publicKey   = new MUSAPPublicKey(cert.getSubjectPublicKeyInfo().getEncoded());
+        this.publicKey   = new MusapPublicKey(cert.getSubjectPublicKeyInfo().getEncoded());
     }
 
-    public MUSAPCertificate(X509Certificate cert) throws CertificateEncodingException {
+    public MusapCertificate(X509Certificate cert) throws CertificateEncodingException {
         this.subject     = cert.getSubjectDN().toString();
         this.certificate = cert.getEncoded();
-        this.publicKey   = new MUSAPPublicKey(cert.getPublicKey().getEncoded());
+        this.publicKey   = new MusapPublicKey(cert.getPublicKey().getEncoded());
     }
 
     public String getSubject() {
@@ -38,7 +38,7 @@ public class MUSAPCertificate {
         return this.certificate;
     }
 
-    public MUSAPPublicKey getPublicKey() {
+    public MusapPublicKey getPublicKey() {
         return this.publicKey;
     }
 

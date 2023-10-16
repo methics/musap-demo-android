@@ -1,7 +1,7 @@
 package fi.methics.musap.sdk.discovery;
 
 import fi.methics.musap.sdk.keyuri.KeyURI;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
+import fi.methics.musap.sdk.keyuri.MusapKey;
 
 public class KeySearchReq {
 
@@ -35,7 +35,7 @@ public class KeySearchReq {
         return keyAlgorithm;
     }
 
-    public boolean matches(MUSAPKey key) {
+    public boolean matches(MusapKey key) {
         if (this.keyAlgorithm != null && !this.keyAlgorithm.equals(key.getKeyAlgorithm())) return false;
         if (this.keyUri       != null && !new KeyURI(this.keyUri).matches(key.getKeyUri())) return false;
         return true;

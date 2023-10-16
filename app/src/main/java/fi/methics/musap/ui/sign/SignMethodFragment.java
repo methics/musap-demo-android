@@ -19,9 +19,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import fi.methics.musap.MUSAPClientHolder;
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.api.MUSAPClient;
+import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.util.MLog;
 
 /**
@@ -78,7 +77,7 @@ public class SignMethodFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            Set<String> keyNames = MUSAPClient.listKeys().stream().map(key -> key.getKeyUri()).map(uri -> uri.toString()).collect(Collectors.toSet());
+            Set<String> keyNames = MusapClient.listKeys().stream().map(key -> key.getKeyUri()).map(uri -> uri.toString()).collect(Collectors.toSet());
             List<String> keys = new ArrayList<>(keyNames);
 
             MLog.d("Found keys: ");

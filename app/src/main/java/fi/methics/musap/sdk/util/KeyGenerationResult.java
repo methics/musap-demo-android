@@ -1,18 +1,18 @@
 package fi.methics.musap.sdk.util;
 
-import fi.methics.musap.sdk.api.MUSAPException;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
+import fi.methics.musap.sdk.api.MusapException;
+import fi.methics.musap.sdk.keyuri.MusapKey;
 
 public class KeyGenerationResult {
 
-    public MUSAPKey key;
-    public MUSAPException exception;
+    public MusapKey key;
+    public MusapException exception;
 
-    public KeyGenerationResult(MUSAPKey key) {
+    public KeyGenerationResult(MusapKey key) {
         this.key = key;
     }
 
-    public KeyGenerationResult(MUSAPException e) {
+    public KeyGenerationResult(MusapException e) {
         this.exception = e;
     }
 

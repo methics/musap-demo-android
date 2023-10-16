@@ -4,7 +4,7 @@
 
 package fi.methics.musap.sdk.util;
 
-import fi.methics.musap.sdk.api.MUSAPException;
+import fi.methics.musap.sdk.api.MusapException;
 
 /**
  * Handles callbacks from AlaudaCore SDK. The callback happens on the thread that
@@ -23,6 +23,6 @@ public interface MusapCallback<T> {
      * more information.
      * @param e The exception that caused the operation to fail.
      */
-    void onException(MUSAPException e);
+    void onException(MusapException e);
 
 }

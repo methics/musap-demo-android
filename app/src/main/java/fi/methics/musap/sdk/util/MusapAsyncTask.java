@@ -9,7 +9,7 @@ import android.os.AsyncTask;
 
 import java.lang.ref.WeakReference;
 
-import fi.methics.musap.sdk.api.MUSAPException;
+import fi.methics.musap.sdk.api.MusapException;
 
 public abstract class MusapAsyncTask<T> extends AsyncTask<Void, Void, AsyncTaskResult<T>> {
 
@@ -26,10 +26,10 @@ public abstract class MusapAsyncTask<T> extends AsyncTask<Void, Void, AsyncTaskR
         AsyncTaskResult<T> asyncTaskResult;
         try {
             asyncTaskResult = this.runOperation();
-        } catch (MUSAPException e) {
+        } catch (MusapException e) {
             asyncTaskResult = new AsyncTaskResult<>(e);
         } catch (Exception e) {
-            asyncTaskResult = new AsyncTaskResult<>(new MUSAPException(e));
+            asyncTaskResult = new AsyncTaskResult<>(new MusapException(e));
         }
 
         return asyncTaskResult;
@@ -43,10 +43,10 @@ public abstract class MusapAsyncTask<T> extends AsyncTask<Void, Void, AsyncTaskR
         }
 
         if (result.getError() != null) {
-            if (result.getError() instanceof MUSAPException) {
-                this.callback.onException((MUSAPException) result.getError());
+            if (result.getError() instanceof MusapException) {
+                this.callback.onException((MusapException) result.getError());
             } else {
-                this.callback.onException(new MUSAPException(result.getError()));
+                this.callback.onException(new MusapException(result.getError()));
             }
         } else {
             this.callback.onSuccess(result.getResult());
@@ -54,6 +54,6 @@ public abstract class MusapAsyncTask<T> extends AsyncTask<Void, Void, AsyncTaskR
     }
 
 
-    protected abstract AsyncTaskResult<T> runOperation() throws MUSAPException;
+    protected abstract AsyncTaskResult<T> runOperation() throws MusapException;
 
 }

@@ -5,14 +5,14 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
-import fi.methics.musap.sdk.extension.MUSAPSscdInterface;
-import fi.methics.musap.sdk.keyuri.MUSAPKey;
-import fi.methics.musap.sdk.keyuri.MUSAPSscd;
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.keyuri.MusapKey;
+import fi.methics.musap.sdk.keyuri.MusapSscd;
 
 public class KeyDiscoveryAPI {
 
     private Context context;
-    private static List<MUSAPSscdInterface> enabledSscds = new ArrayList<>();
+    private static List<MusapSscdInterface> enabledSscds = new ArrayList<>();
     private MetadataStorage storage;
 
     public KeyDiscoveryAPI(Context context) {
@@ -24,7 +24,7 @@ public class KeyDiscoveryAPI {
      * List all SSCDs integrated to this MUSAP Library
      * @return SSCD list
      */
-    public List<MUSAPSscdInterface> listEnabledSscds() {
+    public List<MusapSscdInterface> listEnabledSscds() {
         return enabledSscds;
     }
 
@@ -33,7 +33,7 @@ public class KeyDiscoveryAPI {
      * @param req SSCD search request
      * @return MUSAP SSCDs
      */
-    public List<MUSAPSscdInterface> listMatchingSscds(SscdSearchReq req) {
+    public List<MusapSscdInterface> listMatchingSscds(SscdSearchReq req) {
         return enabledSscds;
     }
 
@@ -41,7 +41,7 @@ public class KeyDiscoveryAPI {
      * List active SSCDs. This returns all SSCDs that have either a generated or a bound key.
      * @return Active SSCDs
      */
-    public List<MUSAPSscd> listActiveSSCDs() {
+    public List<MusapSscd> listActiveSSCDs() {
         return storage.listActiveSscds();
     }
 
@@ -50,7 +50,7 @@ public class KeyDiscoveryAPI {
      * Get the list of available SSCDs with {@link #listEnabledSscds()}.
      * @param sscd SSCD
      */
-    public void enableSSCD(MUSAPSscdInterface sscd) {
+    public void enableSSCD(MusapSscdInterface sscd) {
         enabledSscds.add(sscd);
     }
 
@@ -59,11 +59,11 @@ public class KeyDiscoveryAPI {
      * @param req Key search request
      * @return Matching MUSAP keys
      */
-    public List<MUSAPKey> findKey(KeySearchReq req) {
+    public List<MusapKey> findKey(KeySearchReq req) {
 
-        List<MUSAPKey> keys = this.listKeys();
-        List<MUSAPKey> result = new ArrayList<>();
-        for (MUSAPKey key : keys) {
+        List<MusapKey> keys = this.listKeys();
+        List<MusapKey> result = new ArrayList<>();
+        for (MusapKey key : keys) {
             if (req.matches(key)) {
                 result.add(key);
             }
@@ -75,7 +75,7 @@ public class KeyDiscoveryAPI {
      * List available MUSAP keys
      * @return List of available keys
      */
-    public List<MUSAPKey> listKeys() {
+    public List<MusapKey> listKeys() {
         return new MetadataStorage(context).listKeys();
     }
 
