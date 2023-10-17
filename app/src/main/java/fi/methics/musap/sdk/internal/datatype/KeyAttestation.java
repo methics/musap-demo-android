@@ -2,7 +2,7 @@ package fi.methics.musap.sdk.internal.datatype;
 
 import java.util.List;
 
-public class MusapKeyAttestation {
+public class KeyAttestation {
 
     private String attestationType;
     private byte[] signature;
@@ -10,7 +10,7 @@ public class MusapKeyAttestation {
     private List<MusapCertificate> certificateChain;
     private String aaguid;
 
-    private MusapKeyAttestation(Builder builder) {
+    private KeyAttestation(Builder builder) {
         this.attestationType = builder.attestationType;
         this.signature = builder.signature;
         this.certificate = builder.certificate;
@@ -46,8 +46,8 @@ public class MusapKeyAttestation {
             this.aaguid = aaguid;
             return this;
         }
-        public MusapKeyAttestation build() {
-            return new MusapKeyAttestation(this);
+        public KeyAttestation build() {
+            return new KeyAttestation(this);
         }
 
     }

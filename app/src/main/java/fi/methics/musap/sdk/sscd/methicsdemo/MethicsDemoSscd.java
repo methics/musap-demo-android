@@ -12,13 +12,13 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.EditText;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.SignatureFormat;
 import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
@@ -28,7 +28,7 @@ import fi.methics.musap.sdk.internal.datatype.KeyURI;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapLoA;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
-import fi.methics.musap.sdk.internal.sign.CmsSignature;
+import fi.methics.musap.sdk.internal.datatype.CmsSignature;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MLog;
@@ -43,22 +43,19 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     public static final String SSCD_TYPE         = "demo";
-    public static final String SETTINGS_DEMO_URL = "demourl";
     public static final String ATTRIBUTE_MSISDN  = "msisdn";
 
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
 
     private Context             context;
-    private OkHttpClient        client   = new OkHttpClient.Builder().readTimeout(Duration.ofMinutes(2)).build();
-    private MethicsDemoSettings settings = new MethicsDemoSettings();
+    private MethicsDemoSettings settings;
+    private OkHttpClient        client;
 
-    {
-        settings.getSettings().put(SETTINGS_DEMO_URL, "https://demo.methics.fi/appactivation/appactivation/sign?msisdn=");
-    }
-
-    public MethicsDemoSscd(Context context) {
-        this.context = context;
+    public MethicsDemoSscd(Context context, MethicsDemoSettings settings) {
+        this.context  = context;
+        this.settings = settings;
+        this.client   = new OkHttpClient.Builder().readTimeout(settings.getTimeout()).build();
     }
 
     @Override
@@ -95,7 +92,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
 
         RequestBody body = RequestBody.create(gson.toJson(jReq), JSON);
         Request request = new Request.Builder()
-                .url(this.getSettings().getSetting(SETTINGS_DEMO_URL) + jReq.msisdn)
+                .url(this.settings.getDemoUrl() + jReq.msisdn)
                 .post(body)
                 .build();
 
@@ -125,7 +122,8 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 .setCountry("FI")
                 .setProvider("Methics")
                 .setKeygenSupported(true /* TODO: This should be false */)
-                .setSupportedAlgorithms(Arrays.asList(MusapKeyAlgorithm.RSA_2K))
+                .setSupportedAlgorithms(Arrays.asList(KeyAlgorithm.RSA_2K))
+                .setSupportedFormats(Arrays.asList(SignatureFormat.RAW, SignatureFormat.CMS))
                 .setSscdId("METHICS_DEMO") // TODO: This needs to be SSCD instance specific
                 .build();
     }
@@ -193,7 +191,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
             Gson gson = new Gson();
             RequestBody body = RequestBody.create(gson.toJson(jReq), JSON);
             Request request = new Request.Builder()
-                    .url(this.getSettings().getSetting(SETTINGS_DEMO_URL) + jReq.msisdn)
+                    .url(this.getSettings().getDemoUrl() + jReq.msisdn)
                     .post(body)
                     .build();
             MLog.d("Sending request " + gson.toJson(jReq));

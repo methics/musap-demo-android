@@ -5,17 +5,22 @@ import java.util.Objects;
 /**
  * Key algorithm definition class
  */
-public class MusapKeyAlgorithm {
+public class KeyAlgorithm {
 
     public static final String PRIMITIVE_RSA = "RSA";
     public static final String PRIMITIVE_EC  = "EC";
 
-    public static final MusapKeyAlgorithm RSA_2K      = new MusapKeyAlgorithm(PRIMITIVE_RSA, 2048);
-    public static final MusapKeyAlgorithm RSA_4K      = new MusapKeyAlgorithm(PRIMITIVE_RSA, 4096);
-    public static final MusapKeyAlgorithm ECC_P256_K1 = new MusapKeyAlgorithm(PRIMITIVE_EC, "secp256k1", 256);
-    public static final MusapKeyAlgorithm ECC_P384_K1 = new MusapKeyAlgorithm(PRIMITIVE_EC, "secp384k1", 384);
-    public static final MusapKeyAlgorithm ECC_P256_R1 = new MusapKeyAlgorithm(PRIMITIVE_EC, "secp256r1", 256);
-    public static final MusapKeyAlgorithm ECC_P384_R1 = new MusapKeyAlgorithm(PRIMITIVE_EC, "secp384r1", 384);
+    public static final String CURVE_SECP256K1 = "secp256k1";
+    public static final String CURVE_SECP384K1 = "secp384k1";
+    public static final String CURVE_SECP256R1 = "secp256r1";
+    public static final String CURVE_SECP384R1 = "secp384r1";
+
+    public static final KeyAlgorithm RSA_2K      = new KeyAlgorithm(PRIMITIVE_RSA, 2048);
+    public static final KeyAlgorithm RSA_4K      = new KeyAlgorithm(PRIMITIVE_RSA, 4096);
+    public static final KeyAlgorithm ECC_P256_K1 = new KeyAlgorithm(PRIMITIVE_EC, CURVE_SECP256K1, 256);
+    public static final KeyAlgorithm ECC_P384_K1 = new KeyAlgorithm(PRIMITIVE_EC, CURVE_SECP384K1, 384);
+    public static final KeyAlgorithm ECC_P256_R1 = new KeyAlgorithm(PRIMITIVE_EC, CURVE_SECP256R1, 256);
+    public static final KeyAlgorithm ECC_P384_R1 = new KeyAlgorithm(PRIMITIVE_EC, CURVE_SECP384R1, 384);
 
     public String primitive;
     public String curve;
@@ -26,7 +31,7 @@ public class MusapKeyAlgorithm {
      * @param primitive Primitive (usually RSA or EC)
      * @param bits      Bits (often same as key length)
      */
-    public MusapKeyAlgorithm(String primitive, int bits) {
+    public KeyAlgorithm(String primitive, int bits) {
         this.primitive  = primitive;
         this.bits       = bits;
     }
@@ -37,7 +42,7 @@ public class MusapKeyAlgorithm {
      * @param curve     Curve (e.g. secp256r1)
      * @param bits      Bits (often same as key length)
      */
-    public MusapKeyAlgorithm(String primitive, String curve, int bits) {
+    public KeyAlgorithm(String primitive, String curve, int bits) {
         this.primitive  = primitive;
         this.curve      = curve;
         this.bits       = bits;
@@ -72,7 +77,7 @@ public class MusapKeyAlgorithm {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MusapKeyAlgorithm that = (MusapKeyAlgorithm) o;
+        KeyAlgorithm that = (KeyAlgorithm) o;
         if (bits != that.bits) return false;
         if (!Objects.equals(primitive, that.primitive))  return false;
         return Objects.equals(curve, that.curve);

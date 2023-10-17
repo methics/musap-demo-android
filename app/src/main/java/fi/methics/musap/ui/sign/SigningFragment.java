@@ -13,13 +13,17 @@ import android.widget.TextView;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
+import fi.methics.musap.sdk.internal.datatype.SignatureAlgorithm;
 import fi.methics.musap.sdk.internal.sign.MusapSigner;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.sign.SignatureReqBuilder;
@@ -50,31 +54,52 @@ public class SigningFragment extends Fragment {
         TextView sigResult = v.findViewById(R.id.text_signature_result);
         final Bundle args = getArguments();
 
-        final String keyuri = args.getString(SignMethodRecyclerViewAdapter.KEY_URI);
+        final String keyuri   = args.getString(SignMethodRecyclerViewAdapter.KEY_URI);
         final String dtbsType = args.getString("dtbstype");
 
+        MusapKey     key = MusapClient.getKeyByUri(keyuri);
+
+        KeyAlgorithm keyAlgo = key.getAlgorithm();
+        if (keyAlgo == null) {
+            keyAlgo = KeyAlgorithm.ECC_P256_R1;
+        }
+        SignatureAlgorithm algorithm = keyAlgo.isEc() ? SignatureAlgorithm.SHA256_WITH_ECDSA :
+                                                        SignatureAlgorithm.SHA256_WITH_RSA;
+
+        final JWSObject jws;
         byte[] data;
         if ("jws".equalsIgnoreCase(dtbsType)) {
-            JWSObject jws = this.buildSampleJws();
+            jws = this.buildSampleJws(algorithm);
             text.setText(jws.getPayload().toString());
             data = jws.getSigningInput();
         } else {
-            final String dtbs   = args.getString(SignMethodRecyclerViewAdapter.DTBS);
+            jws = null;
+            final String dtbs = args.getString(SignMethodRecyclerViewAdapter.DTBS);
             text.setText(dtbs);
             data = StringUtil.toUTF8Bytes(dtbs);
         }
 
+        final SignatureReq req = new SignatureReqBuilder()
+                .setKey(key)
+                .setData(data, algorithm)
+                .setActivity(this.getActivity())
+                .createSignatureReq();
+
         sign.setOnClickListener(view -> {
 
-            MusapKey       key = MusapClient.getKeyByUri(keyuri);
-            SignatureReq   req = new SignatureReqBuilder().setKey(key).setData(data).setActivity(this.getActivity()).createSignatureReq();
             MusapSigner signer = new MusapSigner(key, this.getActivity());
-
             try {
                 signer.sign(req, new MusapCallback<MusapSignature>() {
                     @Override
                     public void onSuccess(MusapSignature mSig) {
-                        String signatureStr = mSig.getB64Signature();
+
+                        String signatureStr;
+                        if ("jws".equalsIgnoreCase(dtbsType)) {
+                            signatureStr = attachSignature(jws, mSig).serialize();
+                            MLog.d("Public key: " + mSig.getKey().getPublicKey().getPEM());
+                        } else {
+                            signatureStr = mSig.getB64Signature();
+                        }
                         MLog.d("Signature successful: " + signatureStr);
                         sigResult.setText(signatureStr);
                         sign.setVisibility(View.INVISIBLE);
@@ -94,14 +119,35 @@ public class SigningFragment extends Fragment {
         return v;
     }
 
-    private JWSObject buildSampleJws() {
+    /**
+     * Attach signature to the JWSObject
+     * @param orig Original JWSObject
+     * @param sig  Signature
+     * @return JWSObject with signature attached
+     */
+    private JWSObject attachSignature(JWSObject orig, MusapSignature sig) {
+        try {
+            Base64URL header    = orig.getHeader().toBase64URL();
+            Base64URL payload   = orig.getPayload().toBase64URL();
+            Base64URL signature = Base64URL.encode(sig.getRawSignature());
+            return new JWSObject(header, payload, signature);
+        } catch (Exception e) {
+            MLog.e("Failed to parse JWS", e);
+            return orig;
+        }
+    }
+
+    private JWSObject buildSampleJws(SignatureAlgorithm algorithm) {
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
                 .subject("Sample user")
                 .issuer("Sample issuer")
                 .build();
 
-        return new JWSObject(
-                new JWSHeader.Builder(JWSAlgorithm.ES256).keyID("ID123").build(),
-                claims.toPayload());
+        JWSHeader.Builder builder = new JWSHeader.Builder(JWSAlgorithm.parse(algorithm.getJwsAlgorithm()));
+        builder.keyID("ID123");
+
+        final JWSHeader header = builder.build();
+        final Payload  payload = claims.toPayload();
+        return new JWSObject(header, payload);
     }
 }
