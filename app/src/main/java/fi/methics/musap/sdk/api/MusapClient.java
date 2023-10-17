@@ -75,7 +75,7 @@ public class MusapClient {
 
 
     /**
-     * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSSCD(MusapSscdInterface)} first.
+     * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSscd(MusapSscdInterface)} first.
      * @return List of SSCDs that can be used to generate or bind keys
      */
     public static List<MusapSscdInterface> listEnabledSscds() {
@@ -83,7 +83,7 @@ public class MusapClient {
     }
 
     /**
-     * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSSCD(MusapSscdInterface)} first.
+     * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSscd(MusapSscdInterface)} first.
      * @param req Search request that filters the output
      * @return List of SSCDs that can be used to generate or bind keys
      */
@@ -135,8 +135,8 @@ public class MusapClient {
      * to support. These will be searchable with {@link #listEnabledSscds()}}.
      * @param sscd SSCD to enable
      */
-    public static void enableSSCD(MusapSscdInterface sscd) {
-        keyDiscovery.enableSSCD(sscd);
+    public static void enableSscd(MusapSscdInterface sscd) {
+        keyDiscovery.enableSscd(sscd);
     }
 
     @Deprecated // Remove this and use bindKey(sscd, req, callback)

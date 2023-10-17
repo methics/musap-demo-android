@@ -15,9 +15,9 @@ public class MusapApplication extends Application {
         super.onCreate();
         MusapClient.init(this);
 
-        MusapClient.enableSSCD(new AndroidKeystoreSscd(this));
-        MusapClient.enableSSCD(new MethicsDemoSscd(this));
-        MusapClient.enableSSCD(new YubiKeySscd(this));
+        MusapClient.enableSscd(new AndroidKeystoreSscd(this));
+        MusapClient.enableSscd(new MethicsDemoSscd(this));
+        MusapClient.enableSscd(new YubiKeySscd(this));
 
     }
 }

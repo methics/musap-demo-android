@@ -20,8 +20,8 @@ public class MusapSigner {
         this.activity = activity;
     }
 
-    public void sign(byte[] data, MusapCallback<MusapSignature> callback) throws MusapException {
-        if (this.key == null || data == null) {
+    public void sign(SignatureReq req, MusapCallback<MusapSignature> callback) throws MusapException {
+        if (this.key == null || req == null) {
             MLog.e("Missing key or data");
             throw new MusapException("Missing key or data");
         }
@@ -35,7 +35,7 @@ public class MusapSigner {
             if (sscd == null) {
                 throw new MusapException("No SSCD found for key " + this.key.getKeyUri());
             }
-            MusapClient.sign(sscd, new SignatureReqBuilder().setKey(this.key).setData(data).setActivity(this.activity).createSignatureReq(), callback);
+            MusapClient.sign(sscd, req, callback);
         } catch (Exception e) {
             throw new MusapException(e);
         }
