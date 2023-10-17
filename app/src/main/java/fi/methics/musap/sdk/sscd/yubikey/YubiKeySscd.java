@@ -50,6 +50,7 @@ import java.util.concurrent.CompletableFuture;
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.datatype.KeyURI;
@@ -57,14 +58,13 @@ import fi.methics.musap.sdk.internal.datatype.MusapCertificate;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapLoA;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
-import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.KeyGenerationResult;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.internal.util.SigningResult;
 
-public class YubiKeyExtension implements MusapSscdInterface<YubiKeySettings> {
-
+public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
 
     private static final byte[] MANAGEMENT_KEY = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     private static final ManagementKeyType TYPE = ManagementKeyType.TDES;
@@ -87,7 +87,7 @@ public class YubiKeyExtension implements MusapSscdInterface<YubiKeySettings> {
 
     private final Context c;
 
-    public YubiKeyExtension(Context context) {
+    public YubiKeySscd(Context context) {
         this.managementKey = MANAGEMENT_KEY;
         this.type = TYPE;
         this.c = context;
@@ -329,7 +329,7 @@ public class YubiKeyExtension implements MusapSscdInterface<YubiKeySettings> {
                 .setCountry("FI")
                 .setProvider("Yubico")
                 .setKeygenSupported(true)
-                .setSupportedKeyAlgorithms(Arrays.asList("ECCP384"))
+                .setSupportedAlgorithms(Arrays.asList(MusapKeyAlgorithm.ECC_P256_K1, MusapKeyAlgorithm.ECC_P384_K1))
                 .setSscdId("YUBI") // TODO: This needs to be SSCD instance specific
                 .build();
     }
@@ -383,7 +383,7 @@ public class YubiKeyExtension implements MusapSscdInterface<YubiKeySettings> {
                     yubiKitManager.stopNfcDiscovery(req.getActivity());
                 } else {
                     MLog.d("PIN=" + pin);
-                    signOnDevice(pin, result.getValue());
+                    signOnDevice(pin, req, result.getValue());
                 }
             } catch (Exception e) {
                 MLog.e("Failed to connect", e);
@@ -481,7 +481,7 @@ public class YubiKeyExtension implements MusapSscdInterface<YubiKeySettings> {
         showRemoveYubiKeyDialog(req.getActivity());
     }
 
-    private void signOnDevice(String pin, SmartCardConnection connection) throws Exception {
+    private void signOnDevice(String pin, SignatureReq req, SmartCardConnection connection) throws Exception {
 
         String msg = "Test string";
 
@@ -525,7 +525,7 @@ public class YubiKeyExtension implements MusapSscdInterface<YubiKeySettings> {
                 }
             });
 
-            signFuture.complete(new SigningResult(new MusapSignature(sigResult)));
+            signFuture.complete(new SigningResult(new MusapSignature(sigResult, req.getKey(), req.getAlgorithm())));
 
         } catch (Exception e) {
             signFuture.complete(new SigningResult(new MusapException(e)));
@@ -539,11 +539,17 @@ public class YubiKeyExtension implements MusapSscdInterface<YubiKeySettings> {
      * @return
      */
     private KeyType resolveKeyType(KeyGenReq req) {
-        // TODO: Implement
 
-//        switch (req.getType()) {
-//        }
-
+        MusapKeyAlgorithm algorithm = req.getAlgorithm();
+        if (algorithm == null) return KeyType.ECCP384;
+        if (algorithm.isEc()) {
+            if (algorithm.key_length == 256) return KeyType.ECCP256;
+            if (algorithm.key_length == 384) return KeyType.ECCP384;
+        } else if (algorithm.isRsa()) {
+            if (algorithm.key_length == 1024) return KeyType.RSA1024;
+            if (algorithm.key_length == 2048) return KeyType.RSA2048;
+        }
         return KeyType.ECCP384;
     }
+
 }

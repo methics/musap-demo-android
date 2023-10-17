@@ -3,9 +3,12 @@ package fi.methics.musap.sdk.internal.keygeneration;
 import android.app.Activity;
 import android.view.View;
 
+import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
+
 public class KeyGenReqBuilder {
     private KeyType type;
     private String keyAlias;
+    protected MusapKeyAlgorithm keyAlgorithm;
     private Activity activity;
     private View view;
 
@@ -21,6 +24,11 @@ public class KeyGenReqBuilder {
 
     public KeyGenReqBuilder setActivity(Activity activity) {
         this.activity = activity;
+        return this;
+    }
+
+    public KeyGenReqBuilder setKeyAlgorithm(MusapKeyAlgorithm keyAlgorithm) {
+        this.keyAlgorithm = keyAlgorithm;
         return this;
     }
 

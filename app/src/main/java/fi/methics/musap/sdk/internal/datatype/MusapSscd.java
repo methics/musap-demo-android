@@ -10,7 +10,7 @@ public class MusapSscd {
     private String country;
     private String provider;
     private boolean keygenSupported;
-    private List<MusapAlgorithm> algorithms;
+    private List<MusapKeyAlgorithm> algorithms;
 
     private MusapSscd(Builder builder) {
         this.sscdName = builder.sscdName;
@@ -46,7 +46,7 @@ public class MusapSscd {
         return keygenSupported;
     }
 
-    public List<MusapAlgorithm> getSupportedAlgorithms() {
+    public List<MusapKeyAlgorithm> getSupportedAlgorithms() {
         return this.algorithms;
     }
 
@@ -57,7 +57,7 @@ public class MusapSscd {
         private String country;
         private String provider;
         private boolean keygenSupported;
-        private List<MusapAlgorithm> algorithms;
+        private List<MusapKeyAlgorithm> algorithms;
 
         public Builder setSscdName(String sscdName) {
             this.sscdName = sscdName;
@@ -89,7 +89,7 @@ public class MusapSscd {
             return this;
         }
 
-        public Builder setSupportedAlgorithms(List<MusapAlgorithm> algorithms) {
+        public Builder setSupportedAlgorithms(List<MusapKeyAlgorithm> algorithms) {
             this.algorithms = algorithms;
             return this;
         }

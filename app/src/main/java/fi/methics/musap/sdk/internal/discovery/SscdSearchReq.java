@@ -1,6 +1,7 @@
 package fi.methics.musap.sdk.internal.discovery;
 
-import fi.methics.musap.sdk.internal.datatype.MusapAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.MusapSignatureAlgorithm;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 
 /**
@@ -11,7 +12,7 @@ public class SscdSearchReq {
     private String sscdType;
     private String country;
     private String provider;
-    private MusapAlgorithm algorithm;
+    private MusapKeyAlgorithm algorithm;
 
     public SscdSearchReq(Builder builder) {
         this.sscdType     = builder.sscdType;
@@ -32,7 +33,7 @@ public class SscdSearchReq {
         return provider;
     }
 
-    public MusapAlgorithm getAlgorithm() {
+    public MusapKeyAlgorithm getAlgorithm() {
         return algorithm;
     }
 
@@ -53,7 +54,7 @@ public class SscdSearchReq {
         private String sscdType;
         private String country;
         private String provider;
-        private MusapAlgorithm algorithm;
+        private MusapKeyAlgorithm algorithm;
 
         public Builder setSscdType(String sscdType) {
             this.sscdType = sscdType;
@@ -70,7 +71,7 @@ public class SscdSearchReq {
             return this;
         }
 
-        public Builder setAlgorithm(MusapAlgorithm algorithm) {
+        public Builder setAlgorithm(MusapKeyAlgorithm algorithm) {
             this.algorithm = algorithm;
             return this;
         }

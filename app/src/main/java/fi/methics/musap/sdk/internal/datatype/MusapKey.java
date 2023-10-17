@@ -21,7 +21,7 @@ public class MusapKey {
     private List<MusapKeyAttribute> attributes;
     private List<String> keyUsages;
     private List<MusapLoA> loa;
-    private MusapAlgorithm algorithm;
+    private MusapKeyAlgorithm algorithm;
     private String keyUri;
 
     private MusapKeyAttestation attestation;
@@ -83,7 +83,7 @@ public class MusapKey {
         return loa;
     }
 
-    public MusapAlgorithm getAlgorithm() {
+    public MusapKeyAlgorithm getAlgorithm() {
         return this.algorithm;
     }
 
@@ -136,7 +136,7 @@ public class MusapKey {
         private List<MusapKeyAttribute> attributes = new ArrayList<>();
         private List<String> keyUsages;
         private List<MusapLoA> loa;
-        private MusapAlgorithm algorithm;
+        private MusapKeyAlgorithm algorithm;
         private String keyUri;
 
         private MusapKeyAttestation attestation;
@@ -194,7 +194,7 @@ public class MusapKey {
             return this;
         }
 
-        public Builder setAlgorithm(MusapAlgorithm algorithm) {
+        public Builder setAlgorithm(MusapKeyAlgorithm algorithm) {
             this.algorithm = algorithm;
             return this;
         }

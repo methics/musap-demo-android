@@ -6,6 +6,8 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.stream.Collectors;
+
 import fi.methics.musap.databinding.FragmentSscdBinding;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 
@@ -35,7 +37,7 @@ public class ActiveSscdDetailsViewAdapter extends RecyclerView.Adapter<ActiveSsc
             case 6: holder.mIdView.setText("Country");break;
             case 7: holder.mIdView.setText(sscd.getCountry());break;
             case 8: holder.mIdView.setText("Algorithms");break;
-            case 9: holder.mIdView.setText(String.join(",", sscd.getSupportedKeyAlgorithms()));break;
+            case 9: holder.mIdView.setText(String.join(",", sscd.getSupportedAlgorithms().stream().map(a -> a.toString()).collect(Collectors.toList()))); break;
         }
 
     }

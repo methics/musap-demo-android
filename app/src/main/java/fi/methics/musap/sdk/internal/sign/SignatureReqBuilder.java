@@ -3,11 +3,12 @@ package fi.methics.musap.sdk.internal.sign;
 import android.app.Activity;
 
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapSignatureAlgorithm;
 
 public class SignatureReqBuilder {
     private MusapKey key;
     private byte[] data;
-    private String algorithm;
+    private MusapSignatureAlgorithm algorithm;
     private Activity activity;
 
     public SignatureReqBuilder setKey(MusapKey key) {
@@ -20,7 +21,7 @@ public class SignatureReqBuilder {
         return this;
     }
 
-    public SignatureReqBuilder setAlgorithm(String algorithm) {
+    public SignatureReqBuilder setAlgorithm(MusapSignatureAlgorithm algorithm) {
         this.algorithm = algorithm;
         return this;
     }

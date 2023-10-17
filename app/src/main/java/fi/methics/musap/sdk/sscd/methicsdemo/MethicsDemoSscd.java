@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
 import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
@@ -28,7 +29,7 @@ import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapLoA;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.sign.CmsSignature;
-import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MLog;
 import okhttp3.MediaType;
@@ -112,7 +113,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 throw new MusapException("Failed to sign: " + jResp.statuscode);
             }
 
-            return new CmsSignature(MBase64.toBytes(jResp.signature));
+            return new CmsSignature(MBase64.toBytes(jResp.signature), req.getKey(), req.getAlgorithm());
         }
     }
 
@@ -124,7 +125,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 .setCountry("FI")
                 .setProvider("Methics")
                 .setKeygenSupported(true /* TODO: This should be false */)
-                .setSupportedKeyAlgorithms(Arrays.asList("RSA2048"))
+                .setSupportedAlgorithms(Arrays.asList(MusapKeyAlgorithm.RSA_2K))
                 .setSscdId("METHICS_DEMO") // TODO: This needs to be SSCD instance specific
                 .build();
     }

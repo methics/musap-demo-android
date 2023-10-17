@@ -5,7 +5,7 @@ import android.app.Application;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.sscd.android.AndroidKeystoreSscd;
 import fi.methics.musap.sdk.sscd.methicsdemo.MethicsDemoSscd;
-import fi.methics.musap.sdk.sscd.yubikey.YubiKeyExtension;
+import fi.methics.musap.sdk.sscd.yubikey.YubiKeySscd;
 
 public class MusapApplication extends Application {
 
@@ -17,7 +17,7 @@ public class MusapApplication extends Application {
 
         MusapClient.enableSSCD(new AndroidKeystoreSscd(this));
         MusapClient.enableSSCD(new MethicsDemoSscd(this));
-        MusapClient.enableSSCD(new YubiKeyExtension(this));
+        MusapClient.enableSSCD(new YubiKeySscd(this));
 
     }
 }
