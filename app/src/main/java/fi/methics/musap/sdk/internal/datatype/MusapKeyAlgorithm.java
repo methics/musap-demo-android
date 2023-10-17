@@ -21,14 +21,25 @@ public class MusapKeyAlgorithm {
     public String curve;
     public int key_length;
 
-    public MusapKeyAlgorithm(String primitive, String curve, int keyLength) {
+    /**
+     * Create a new Key Algorithm
+     * @param primitive Primitive (usually RSA or EC)
+     * @param keyLength Key length
+     */
+    public MusapKeyAlgorithm(String primitive, int keyLength) {
         this.primitive  = primitive;
-        this.curve      = curve;
         this.key_length = keyLength;
     }
 
-    public MusapKeyAlgorithm(String primitive, int keyLength) {
+    /**
+     * Create a new Key Algorithm with a specific curve
+     * @param primitive Primitive (usually RSA or EC)
+     * @param curve     Curve (e.g. secp256r1)
+     * @param keyLength Key length
+     */
+    public MusapKeyAlgorithm(String primitive, String curve, int keyLength) {
         this.primitive  = primitive;
+        this.curve      = curve;
         this.key_length = keyLength;
     }
 
