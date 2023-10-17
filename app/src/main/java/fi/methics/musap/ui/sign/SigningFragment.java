@@ -19,7 +19,7 @@ import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
-import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.MusapSigner;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.api.MusapCallback;
@@ -73,7 +73,6 @@ public class SigningFragment extends Fragment {
                     public void onSuccess(MusapSignature mSig) {
                         String signatureStr = mSig.getB64Signature();
                         MLog.d("Signature successful: " + signatureStr);
-//                        Toast.makeText(SigningFragment.this.getContext(), signatureStr, Toast.LENGTH_SHORT).show();
                         sigResult.setText(signatureStr);
                         sign.setVisibility(View.INVISIBLE);
                     }

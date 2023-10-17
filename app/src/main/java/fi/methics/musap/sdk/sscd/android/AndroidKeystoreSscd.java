@@ -9,13 +9,15 @@ import java.security.Signature;
 import java.util.Arrays;
 
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.MusapSignatureAlgorithm;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.discovery.MetadataStorage;
 import fi.methics.musap.sdk.internal.keygeneration.AndroidKeyGenerator;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
-import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MLog;
 
@@ -30,6 +32,7 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
     }
 
     public static final String SSCD_TYPE = "aks";
+
     @Override
     public MusapKey bindKey(KeyBindReq req) {
         // "Old" keys cannot be bound to MUSAP.
@@ -62,12 +65,15 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
             MLog.d("Not an instance of a PrivateKeyEntry");
             return null;
         }
-        Signature s = Signature.getInstance("SHA256withECDSA");
+
+        MusapSignatureAlgorithm algorithm = req.getAlgorithm();
+
+        Signature s = Signature.getInstance("SHA256withECDSA"); // TODO: Use the algo
         s.initSign(((KeyStore.PrivateKeyEntry) entry).getPrivateKey());
         s.update(req.getData());
         byte[] signature = s.sign();
 
-        return new MusapSignature(signature);
+        return new MusapSignature(signature, req.getKey(), algorithm);
     }
 
     @Override
@@ -78,7 +84,7 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
                 .setCountry("FI")
                 .setProvider("Google")
                 .setKeygenSupported(true)
-                .setSupportedKeyAlgorithms(Arrays.asList("RSA2048"))
+                .setSupportedAlgorithms(Arrays.asList(MusapKeyAlgorithm.RSA_2K, MusapKeyAlgorithm.ECC_P256_K1))
                 .setSscdId("AKS") // TODO: This needs to be SSCD instance specific
                 .build();
     }

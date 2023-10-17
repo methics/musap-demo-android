@@ -1,7 +1,7 @@
 package fi.methics.musap.sdk.internal.util;
 
 import fi.methics.musap.sdk.api.MusapException;
-import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 
 public class SigningResult {
 

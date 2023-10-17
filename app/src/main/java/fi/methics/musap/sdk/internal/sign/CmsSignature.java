@@ -10,6 +10,8 @@ import java.util.Collection;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.internal.datatype.MusapCertificate;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapSignature;
+import fi.methics.musap.sdk.internal.datatype.MusapSignatureAlgorithm;
 
 public class CmsSignature extends MusapSignature {
 
@@ -17,6 +19,15 @@ public class CmsSignature extends MusapSignature {
 
     public CmsSignature(byte[] cms) throws MusapException {
         super(cms);
+        try {
+            final ContentInfo ci = ContentInfo.getInstance(cms);
+            this.signedData = new CMSSignedData(ci);
+        } catch (Exception e) {
+            throw new MusapException(e);
+        }
+    }
+    public CmsSignature(byte[] cms, MusapKey key, MusapSignatureAlgorithm algorithm) throws MusapException {
+        super(cms, key, algorithm);
         try {
             final ContentInfo ci = ContentInfo.getInstance(cms);
             this.signedData = new CMSSignedData(ci);

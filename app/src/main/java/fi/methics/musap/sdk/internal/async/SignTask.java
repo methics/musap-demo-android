@@ -4,7 +4,7 @@ import android.content.Context;
 
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
-import fi.methics.musap.sdk.internal.sign.MusapSignature;
+import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.AsyncTaskResult;
 import fi.methics.musap.sdk.internal.util.MusapAsyncTask;

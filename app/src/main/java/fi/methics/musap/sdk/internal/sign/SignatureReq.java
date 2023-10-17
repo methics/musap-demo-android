@@ -3,15 +3,16 @@ package fi.methics.musap.sdk.internal.sign;
 import android.app.Activity;
 
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapSignatureAlgorithm;
 
 public class SignatureReq {
 
     protected MusapKey key;
     protected byte[]  data;
-    protected String algorithm;
+    protected MusapSignatureAlgorithm algorithm;
     protected Activity activity;
 
-    public SignatureReq(MusapKey key, byte[] data, String algorithm, Activity activity) {
+    public SignatureReq(MusapKey key, byte[] data, MusapSignatureAlgorithm algorithm, Activity activity) {
         this.key = key;
         this.data = data;
         this.algorithm = algorithm;
@@ -26,7 +27,7 @@ public class SignatureReq {
         return data;
     }
 
-    public String getAlgorithm() {
+    public MusapSignatureAlgorithm getAlgorithm() {
         return algorithm;
     }
 
