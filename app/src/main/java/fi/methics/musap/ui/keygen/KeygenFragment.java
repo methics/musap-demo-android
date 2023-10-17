@@ -95,7 +95,7 @@ public class KeygenFragment extends Fragment {
         int i = 0;
         MLog.d("Found " + sscds.size() + " SSCDs");
 
-        for (MusapSscdInterface sscd : MusapClient.listEnabledSSCDS()) {
+        for (MusapSscdInterface sscd : MusapClient.listEnabledSscds()) {
             if (!sscd.isKeygenSupported()) continue;
             i++;
             RadioButton rb = new RadioButton(this.getContext());

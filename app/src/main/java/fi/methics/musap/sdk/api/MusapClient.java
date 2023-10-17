@@ -3,11 +3,13 @@ package fi.methics.musap.sdk.api;
 import android.content.Context;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import fi.methics.musap.sdk.internal.async.GenerateKeyTask;
 import fi.methics.musap.sdk.internal.async.SignTask;
@@ -76,7 +78,7 @@ public class MusapClient {
      * List SSCDs supported by this MUSAP library. To add an SSCD to this list, call {@link #enableSSCD(MusapSscdInterface)} first.
      * @return List of SSCDs that can be used to generate or bind keys
      */
-    public static List<MusapSscdInterface> listEnabledSSCDS() {
+    public static List<MusapSscdInterface> listEnabledSscds() {
         return keyDiscovery.listEnabledSscds();
     }
 
@@ -85,17 +87,26 @@ public class MusapClient {
      * @param req Search request that filters the output
      * @return List of SSCDs that can be used to generate or bind keys
      */
-    public static List<MusapSscdInterface> listEnabledSSCDS(SscdSearchReq req) {
-        // TODO: Filter based on the req
-        return keyDiscovery.listEnabledSscds();
+    public static List<MusapSscdInterface> listEnabledSscds(SscdSearchReq req) {
+        if (req == null) return Collections.emptyList();
+        return listEnabledSscds().stream().filter(sscd -> req.matches(sscd.getSscdInfo())).collect(Collectors.toList());
     }
 
     /**
      * List active SSCDs that have user keys generated or bound
      * @return List of active SSCDs
      */
-    public static List<MusapSscd> listActiveSSCDS() {
+    public static List<MusapSscd> listActiveSscds() {
         return storage.listActiveSscds();
+    }
+
+    /**
+     * List active SSCDs that have user keys generated or bound
+     * @return List of active SSCDs
+     */
+    public static List<MusapSscd> listActiveSscds(SscdSearchReq req) {
+        if (req == null) return Collections.emptyList();
+        return listActiveSscds().stream().filter(sscd -> req.matches(sscd)).collect(Collectors.toList());
     }
 
     /**
@@ -119,10 +130,9 @@ public class MusapClient {
         return listKeys();
     }
 
-
     /**
      * Enable an SSCD. This needs to be called for each SSCD that the application using MUSAP wants
-     * to support. These will be searchable with {@link #listEnabledSSCDS()}}.
+     * to support. These will be searchable with {@link #listEnabledSscds()}}.
      * @param sscd SSCD to enable
      */
     public static void enableSSCD(MusapSscdInterface sscd) {

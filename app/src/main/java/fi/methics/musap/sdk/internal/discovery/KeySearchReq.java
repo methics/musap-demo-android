@@ -1,8 +1,13 @@
 package fi.methics.musap.sdk.internal.discovery;
 
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.datatype.KeyURI;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 
+/**
+ * MUSAP Key Search request
+ */
 public class KeySearchReq {
 
     private String sscdType;
@@ -35,9 +40,23 @@ public class KeySearchReq {
         return keyAlgorithm;
     }
 
+    /**
+     * Check if the given key matches this search request
+     * @param key MusapKey to compare against
+     * @return true if key matches
+     */
     public boolean matches(MusapKey key) {
-        if (this.keyAlgorithm != null && !this.keyAlgorithm.equals(key.getKeyAlgorithm())) return false;
+        if (this.keyAlgorithm != null && !this.keyAlgorithm.equals(key.getAlgorithm())) return false;
         if (this.keyUri       != null && !new KeyURI(this.keyUri).matches(key.getKeyUri())) return false;
+        MusapSscdInterface iface = key.getSscd();
+        if (iface != null) {
+            MusapSscd sscd = iface.getSscdInfo();
+            if (sscd != null) {
+                if (this.provider != null && !this.provider.equals(sscd.getProvider())) return false;
+                if (this.country  != null && !this.country.equals(sscd.getCountry())) return false;
+                if (this.sscdType != null && !this.sscdType.equals(sscd.getSscdType())) return false;
+            }
+        }
         return true;
     }
 
