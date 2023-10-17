@@ -2,7 +2,7 @@
 
 ## Enabling an SSCD
 
-Call `MusapClient.init()` and MusapClient.enableSscd
+Call `MusapClient.init()` and `MusapClient.enableSscd()`
 
 ```java
 public class MyApplication extends Application {
@@ -19,6 +19,8 @@ public class MyApplication extends Application {
 ```
 
 ## Generating a key
+
+Create a key generation request and call `MusapClient.generateKey()`. The key generation result is delivered asynchronously through the given callback.
 
 ```java
 KeyGenReq req = new KeyGenReqBuilder()
@@ -44,8 +46,9 @@ MusapClient.generateKey(sscd, req, new MusapCallback<MusapKey>() {
 
 ## Signing
 
-```java
+Select a key, create a signature request and a `MusapSigner`. Finally call `MusapSigner.sign()`. The signature result is delivered asynchronously through the given callback.
 
+```java
 MusapKey       key = MusapClient.getKeyByUri(keyuri);
 SignatureReq   req = new SignatureReqBuilder().setKey(key).setData(data).setActivity(this.getActivity()).createSignatureReq();
 MusapSigner signer = new MusapSigner(key, this.getActivity());
