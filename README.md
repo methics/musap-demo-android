@@ -27,7 +27,7 @@ KeyGenReq req = new KeyGenReqBuilder()
         .setActivity(this.getActivity())
         .setView(this.getView())
         .setAlias("my key")
-        .setKeyAlgorithm(MusapKeyAlgorithm.RSA_2K)
+        .setKeyAlgorithm(KeyAlgorithm.RSA_2K)
         .createKeyGenReq();
 
 MusapClient.generateKey(sscd, req, new MusapCallback<MusapKey>() {
