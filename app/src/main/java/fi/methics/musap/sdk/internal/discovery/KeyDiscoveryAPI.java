@@ -3,6 +3,7 @@ package fi.methics.musap.sdk.internal.discovery;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
@@ -77,6 +78,15 @@ public class KeyDiscoveryAPI {
      */
     public List<MusapKey> listKeys() {
         return new MetadataStorage(context).listKeys();
+    }
+
+    /**
+     * Remove a key from MUSAP
+     * @param key
+     * @return
+     */
+    public boolean removeKey(MusapKey key) {
+        return new MetadataStorage(context).removeKey(key);
     }
 
 }

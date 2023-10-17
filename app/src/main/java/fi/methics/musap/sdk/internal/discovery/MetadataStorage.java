@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -98,6 +99,32 @@ public class MetadataStorage {
         }
 
         return keyList;
+    }
+
+    /**
+     * Remove key metadata from storage
+     * @param key Key to remove
+     * @return true if key was found and removed
+     */
+    public boolean removeKey(MusapKey key) {
+        // Update Key Name list without given Key Name
+        Set<String> newKeyNames = new HashSet<>(this.getKeyNameSet());
+        if (!this.getKeyNameSet().contains(key.getKeyName())) {
+            MLog.d("No key found with name " + key.getKeyName());
+            return false;
+        }
+        newKeyNames.remove(key.getKeyName());
+
+        String keyJson = new Gson().toJson(key);
+        MLog.d("KeyJson=" + keyJson);
+
+        this.getSharedPref()
+                .edit()
+                .putStringSet(KEY_NAME_SET, newKeyNames)
+                .putString(this.makeStoreName(key), keyJson)
+                .remove(this.makeStoreName(key.getKeyName()))
+                .apply();
+        return true;
     }
 
     /**

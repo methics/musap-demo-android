@@ -197,9 +197,10 @@ public class MusapClient {
     /**
      * Remove a key from MUSAP.
      * @param key key to remove
+     * @return true if key was found and removed
      */
-    public static void removeKey(MusapKey key) {
-        // TODO
+    public static boolean removeKey(MusapKey key) {
+        return keyDiscovery.removeKey(key);
     }
 
     /**
