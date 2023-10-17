@@ -106,6 +106,19 @@ public class MusapKey {
         return attr.value;
     }
 
+    public MusapSignatureAlgorithm getDefaultsignatureAlgorithm() {
+        if (this.algorithm == null) {
+            // TODO: What to do here?
+            MLog.d("Unable to determine algorithm for key " + this.keyName);
+            return new MusapSignatureAlgorithm(MusapSignatureAlgorithm.SCHEME_ECDSA, MusapSignatureAlgorithm.HASH_NONE, this);
+        }
+        if (this.algorithm.isRsa()) {
+            return new MusapSignatureAlgorithm(MusapSignatureAlgorithm.SCHEME_RSA_PSS, MusapSignatureAlgorithm.HASH_NONE, this);
+        } else {
+            return new MusapSignatureAlgorithm(MusapSignatureAlgorithm.SCHEME_ECDSA, MusapSignatureAlgorithm.HASH_NONE, this);
+        }
+    }
+
     /**
      * Get a handle to the SSCD that created this MUSAP key
      * @return SSCD

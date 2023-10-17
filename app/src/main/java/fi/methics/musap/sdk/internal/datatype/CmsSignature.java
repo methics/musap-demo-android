@@ -1,4 +1,4 @@
-package fi.methics.musap.sdk.internal.sign;
+package fi.methics.musap.sdk.internal.datatype;
 
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -18,7 +18,7 @@ public class CmsSignature extends MusapSignature {
     private CMSSignedData signedData;
 
     public CmsSignature(byte[] cms) throws MusapException {
-        super(cms);
+        super(cms, null, null, MusapSignatureFormat.CMS);
         try {
             final ContentInfo ci = ContentInfo.getInstance(cms);
             this.signedData = new CMSSignedData(ci);
@@ -27,7 +27,7 @@ public class CmsSignature extends MusapSignature {
         }
     }
     public CmsSignature(byte[] cms, MusapKey key, MusapSignatureAlgorithm algorithm) throws MusapException {
-        super(cms, key, algorithm);
+        super(cms, key, algorithm, MusapSignatureFormat.CMS);
         try {
             final ContentInfo ci = ContentInfo.getInstance(cms);
             this.signedData = new CMSSignedData(ci);

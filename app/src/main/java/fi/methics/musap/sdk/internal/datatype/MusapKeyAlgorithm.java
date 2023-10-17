@@ -10,12 +10,17 @@ public class MusapKeyAlgorithm {
     public static final String PRIMITIVE_RSA = "RSA";
     public static final String PRIMITIVE_EC  = "EC";
 
+    public static final String CURVE_SECP256K1 = "secp256k1";
+    public static final String CURVE_SECP384K1 = "secp384k1";
+    public static final String CURVE_SECP256R1 = "secp256r1";
+    public static final String CURVE_SECP384R1 = "secp384r1";
+
     public static final MusapKeyAlgorithm RSA_2K      = new MusapKeyAlgorithm(PRIMITIVE_RSA, 2048);
     public static final MusapKeyAlgorithm RSA_4K      = new MusapKeyAlgorithm(PRIMITIVE_RSA, 4096);
-    public static final MusapKeyAlgorithm ECC_P256_K1 = new MusapKeyAlgorithm(PRIMITIVE_EC, "secp256k1", 256);
-    public static final MusapKeyAlgorithm ECC_P384_K1 = new MusapKeyAlgorithm(PRIMITIVE_EC, "secp384k1", 384);
-    public static final MusapKeyAlgorithm ECC_P256_R1 = new MusapKeyAlgorithm(PRIMITIVE_EC, "secp256r1", 256);
-    public static final MusapKeyAlgorithm ECC_P384_R1 = new MusapKeyAlgorithm(PRIMITIVE_EC, "secp384r1", 384);
+    public static final MusapKeyAlgorithm ECC_P256_K1 = new MusapKeyAlgorithm(PRIMITIVE_EC, CURVE_SECP256K1, 256);
+    public static final MusapKeyAlgorithm ECC_P384_K1 = new MusapKeyAlgorithm(PRIMITIVE_EC, CURVE_SECP384K1, 384);
+    public static final MusapKeyAlgorithm ECC_P256_R1 = new MusapKeyAlgorithm(PRIMITIVE_EC, CURVE_SECP256R1, 256);
+    public static final MusapKeyAlgorithm ECC_P384_R1 = new MusapKeyAlgorithm(PRIMITIVE_EC, CURVE_SECP384R1, 384);
 
     public String primitive;
     public String curve;

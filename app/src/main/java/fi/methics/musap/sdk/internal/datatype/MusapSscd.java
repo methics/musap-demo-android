@@ -1,5 +1,6 @@
 package fi.methics.musap.sdk.internal.datatype;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class MusapSscd {
@@ -11,6 +12,7 @@ public class MusapSscd {
     private String provider;
     private boolean keygenSupported;
     private List<MusapKeyAlgorithm> algorithms;
+    private List<MusapSignatureFormat> formats;
 
     private MusapSscd(Builder builder) {
         this.sscdName = builder.sscdName;
@@ -20,6 +22,7 @@ public class MusapSscd {
         this.provider = builder.provider;
         this.keygenSupported = builder.keygenSupported;
         this.algorithms = builder.algorithms;
+        this.formats = builder.formats;
     }
 
     public String getSscdName() {
@@ -58,6 +61,7 @@ public class MusapSscd {
         private String provider;
         private boolean keygenSupported;
         private List<MusapKeyAlgorithm> algorithms;
+        private List<MusapSignatureFormat> formats = Arrays.asList(MusapSignatureFormat.RAW);
 
         public Builder setSscdName(String sscdName) {
             this.sscdName = sscdName;
@@ -91,6 +95,11 @@ public class MusapSscd {
 
         public Builder setSupportedAlgorithms(List<MusapKeyAlgorithm> algorithms) {
             this.algorithms = algorithms;
+            return this;
+        }
+
+        public Builder setSupportedFormats(List<MusapSignatureFormat> formats) {
+            this.formats = formats;
             return this;
         }
 

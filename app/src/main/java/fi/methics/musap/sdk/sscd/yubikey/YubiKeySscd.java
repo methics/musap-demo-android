@@ -51,6 +51,7 @@ import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.MusapSignatureFormat;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.datatype.KeyURI;
@@ -330,6 +331,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
                 .setProvider("Yubico")
                 .setKeygenSupported(true)
                 .setSupportedAlgorithms(Arrays.asList(MusapKeyAlgorithm.ECC_P256_K1, MusapKeyAlgorithm.ECC_P384_K1))
+                .setSupportedFormats(Arrays.asList(MusapSignatureFormat.RAW))
                 .setSscdId("YUBI") // TODO: This needs to be SSCD instance specific
                 .build();
     }
@@ -525,7 +527,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
                 }
             });
 
-            signFuture.complete(new SigningResult(new MusapSignature(sigResult, req.getKey(), req.getAlgorithm())));
+            signFuture.complete(new SigningResult(new MusapSignature(sigResult, req.getKey(), req.getAlgorithm(), req.getFormat())));
 
         } catch (Exception e) {
             signFuture.complete(new SigningResult(new MusapException(e)));

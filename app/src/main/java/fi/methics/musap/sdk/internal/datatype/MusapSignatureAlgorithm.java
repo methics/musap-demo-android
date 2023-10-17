@@ -17,7 +17,7 @@ public class MusapSignatureAlgorithm {
 
     public static final String HASH_SHA256 = "SHA256";
     public static final String HASH_SHA384 = "SHA384";
-    public static final String HASH_RAW    = "RAW";
+    public static final String HASH_NONE    = "NONE";
 
     private String scheme;
     private String hashAlgorithm;
@@ -31,7 +31,7 @@ public class MusapSignatureAlgorithm {
 
     public MusapSignatureAlgorithm(String scheme, MusapKeyAlgorithm keyAlgorithm) {
         this.scheme        = scheme;
-        this.hashAlgorithm = HASH_RAW;
+        this.hashAlgorithm = HASH_NONE;
         this.keyAlgorithm  = keyAlgorithm;
     }
 
@@ -50,7 +50,7 @@ public class MusapSignatureAlgorithm {
      * @return hash algorithm
      */
     public String getHashAlgorithm() {
-        if (this.hashAlgorithm == null) return HASH_RAW;
+        if (this.hashAlgorithm == null) return HASH_NONE;
         return this.hashAlgorithm;
     }
 
