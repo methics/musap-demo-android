@@ -15,16 +15,16 @@ public class MusapKey {
     private String sscdId;
     private String sscdType;
     private Instant createdDate;
-    private MusapPublicKey publicKey;
+    private PublicKey publicKey;
     private MusapCertificate certificate;
     private List<MusapCertificate> certificateChain;
-    private List<MusapKeyAttribute> attributes;
+    private List<KeyAttribute> attributes;
     private List<String> keyUsages;
     private List<MusapLoA> loa;
-    private MusapKeyAlgorithm algorithm;
+    private KeyAlgorithm algorithm;
     private String keyUri;
 
-    private MusapKeyAttestation attestation;
+    private KeyAttestation attestation;
 
     private MusapKey(Builder builder) {
         this.keyName          = builder.keyName;
@@ -63,7 +63,7 @@ public class MusapKey {
         return createdDate;
     }
 
-    public MusapPublicKey getPublicKey() {
+    public PublicKey getPublicKey() {
         return publicKey;
     }
 
@@ -83,7 +83,7 @@ public class MusapKey {
         return loa;
     }
 
-    public MusapKeyAlgorithm getAlgorithm() {
+    public KeyAlgorithm getAlgorithm() {
         return this.algorithm;
     }
 
@@ -91,31 +91,30 @@ public class MusapKey {
         return new KeyURI(this.keyUri);
     }
 
-    public List<MusapKeyAttribute> getAttributes() {
+    public List<KeyAttribute> getAttributes() {
         return this.attributes;
     }
 
-    public MusapKeyAttribute getAttribute(String name) {
+    public KeyAttribute getAttribute(String name) {
         if (name == null) return null;
         return this.attributes.stream().filter(n -> name.equals(n.name)).findFirst().orElse(null);
     }
 
     public String getAttributeValue(String name) {
-        MusapKeyAttribute attr = this.getAttribute(name);
+        KeyAttribute attr = this.getAttribute(name);
         if (attr == null) return null;
         return attr.value;
     }
 
-    public MusapSignatureAlgorithm getDefaultsignatureAlgorithm() {
+    public SignatureAlgorithm getDefaultsignatureAlgorithm() {
         if (this.algorithm == null) {
-            // TODO: What to do here?
             MLog.d("Unable to determine algorithm for key " + this.keyName);
-            return new MusapSignatureAlgorithm(MusapSignatureAlgorithm.SCHEME_ECDSA, MusapSignatureAlgorithm.HASH_NONE, this);
+            return SignatureAlgorithm.SHA256_WITH_ECDSA;
         }
         if (this.algorithm.isRsa()) {
-            return new MusapSignatureAlgorithm(MusapSignatureAlgorithm.SCHEME_RSA_PSS, MusapSignatureAlgorithm.HASH_NONE, this);
+            return SignatureAlgorithm.SHA256_WITH_RSA;
         } else {
-            return new MusapSignatureAlgorithm(MusapSignatureAlgorithm.SCHEME_ECDSA, MusapSignatureAlgorithm.HASH_NONE, this);
+            return SignatureAlgorithm.SHA256_WITH_ECDSA;
         }
     }
 
@@ -143,16 +142,16 @@ public class MusapKey {
         private String keyType;
         private String sscdId;
         private String sscdType;
-        private MusapPublicKey publicKey;
+        private PublicKey publicKey;
         private MusapCertificate certificate;
         private List<MusapCertificate> certificateChain;
-        private List<MusapKeyAttribute> attributes = new ArrayList<>();
+        private List<KeyAttribute> attributes = new ArrayList<>();
         private List<String> keyUsages;
         private List<MusapLoA> loa;
-        private MusapKeyAlgorithm algorithm;
+        private KeyAlgorithm algorithm;
         private String keyUri;
 
-        private MusapKeyAttestation attestation;
+        private KeyAttestation attestation;
 
         public Builder setKeyName(String keyName) {
             this.keyName = keyName;
@@ -165,7 +164,7 @@ public class MusapKey {
         }
 
         public Builder setKeyAttribute(String name, String value) {
-            this.attributes.add(new MusapKeyAttribute(name, value));
+            this.attributes.add(new KeyAttribute(name, value));
             return this;
         }
 
@@ -179,7 +178,7 @@ public class MusapKey {
             return this;
         }
 
-        public Builder setPublicKey(MusapPublicKey publicKey) {
+        public Builder setPublicKey(PublicKey publicKey) {
             this.publicKey = publicKey;
             return this;
         }
@@ -207,7 +206,7 @@ public class MusapKey {
             return this;
         }
 
-        public Builder setAlgorithm(MusapKeyAlgorithm algorithm) {
+        public Builder setAlgorithm(KeyAlgorithm algorithm) {
             this.algorithm = algorithm;
             return this;
         }
@@ -217,7 +216,7 @@ public class MusapKey {
             return this;
         }
 
-        public Builder setAttestation(MusapKeyAttestation attestation) {
+        public Builder setAttestation(KeyAttestation attestation) {
             this.attestation = attestation;
             return this;
         }

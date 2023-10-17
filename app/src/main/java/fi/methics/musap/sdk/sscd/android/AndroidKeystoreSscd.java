@@ -4,8 +4,6 @@ import android.content.Context;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -20,17 +18,18 @@ import java.util.Arrays;
 import fi.methics.musap.sdk.api.MusapConstants;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.datatype.KeyURI;
-import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
 import fi.methics.musap.sdk.internal.datatype.MusapLoA;
-import fi.methics.musap.sdk.internal.datatype.MusapPublicKey;
-import fi.methics.musap.sdk.internal.datatype.MusapSignatureAlgorithm;
-import fi.methics.musap.sdk.internal.datatype.MusapSignatureFormat;
+import fi.methics.musap.sdk.internal.datatype.PublicKey;
+import fi.methics.musap.sdk.internal.datatype.SignatureAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.SignatureFormat;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.internal.util.MLog;
 
 public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSettings> {
@@ -55,9 +54,16 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
     @Override
     public MusapKey generateKey(KeyGenReq req) throws Exception {
 
-        MusapSscd              sscd = this.getSscdInfo();
-        String            algorithm = this.resolveAlgorithm(req);
-        AlgorithmParameterSpec spec = this.resolveAlgorithmParameterSpec(req);
+        MusapSscd                  sscd = this.getSscdInfo();
+        String                algorithm = this.resolveAlgorithm(req);
+        AlgorithmParameterSpec algSspec = this.resolveAlgorithmParameterSpec(req);
+
+        KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(req.getKeyAlias(),
+                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
+                .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512);
+
+        if (algSspec != null) builder.setAlgorithmParameterSpec(algSspec);
+        KeyGenParameterSpec spec = builder.build();
 
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(algorithm, "AndroidKeyStore");
         kpg.initialize(spec);
@@ -71,7 +77,7 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
                 .setKeyUri(new KeyURI(req.getKeyAlias(), sscd.getSscdType(), "loa3").getUri())
                 .setSscdId(sscd.getSscdId())
                 .setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3))
-                .setPublicKey(new MusapPublicKey(keyPair))
+                .setPublicKey(new PublicKey(keyPair))
                 .build();
         MLog.d("Generated key with KeyURI " + generatedKey.getKeyUri());
 
@@ -90,9 +96,10 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
             return null;
         }
 
-        MusapSignatureAlgorithm algorithm = req.getAlgorithm();
+        SignatureAlgorithm algorithm = req.getAlgorithm();
 
-        Signature s = Signature.getInstance(algorithm.getJavaAlgorithm(), new BouncyCastleProvider());
+        MLog.d("Signing " + MBase64.toBase64String(req.getData()) + " with algorithm " + algorithm);
+        Signature s = Signature.getInstance(algorithm.getJavaAlgorithm());
         s.initSign(((KeyStore.PrivateKeyEntry) entry).getPrivateKey());
         s.update(req.getData());
         byte[] signature = s.sign();
@@ -108,8 +115,12 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
                 .setCountry("FI")
                 .setProvider("Google")
                 .setKeygenSupported(true)
-                .setSupportedAlgorithms(Arrays.asList(MusapKeyAlgorithm.RSA_2K, MusapKeyAlgorithm.ECC_P256_K1))
-                .setSupportedFormats(Arrays.asList(MusapSignatureFormat.RAW))
+                .setSupportedAlgorithms(Arrays.asList(
+                        KeyAlgorithm.RSA_2K,
+                        KeyAlgorithm.ECC_P256_R1,
+                        KeyAlgorithm.ECC_P256_K1,
+                        KeyAlgorithm.ECC_P384_K1))
+                .setSupportedFormats(Arrays.asList(SignatureFormat.RAW))
                 .setSscdId("AKS") // TODO: This needs to be SSCD instance specific
                 .build();
     }
@@ -125,11 +136,8 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
      * @return AlgorithmParameterSpec
      */
     private AlgorithmParameterSpec resolveAlgorithmParameterSpec(KeyGenReq req) {
-        MusapKeyAlgorithm algorithm = req.getAlgorithm();
-        if (algorithm == null) return new KeyGenParameterSpec.Builder(req.getKeyAlias(),
-                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
-                .build();
+        KeyAlgorithm algorithm = req.getAlgorithm();
+        if (algorithm == null) return null;
         if (algorithm.isRsa()) {
             return new RSAKeyGenParameterSpec(algorithm.bits, RSAKeyGenParameterSpec.F4);
         } else {
@@ -144,7 +152,7 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
      */
     private String resolveAlgorithm(KeyGenReq req) {
 
-        MusapKeyAlgorithm algorithm = req.getAlgorithm();
+        KeyAlgorithm algorithm = req.getAlgorithm();
         if (algorithm == null) return KeyProperties.KEY_ALGORITHM_EC;
         if (algorithm.isRsa()) {
             return KeyProperties.KEY_ALGORITHM_RSA;

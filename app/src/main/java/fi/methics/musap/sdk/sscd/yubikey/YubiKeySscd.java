@@ -50,8 +50,8 @@ import java.util.concurrent.CompletableFuture;
 import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
-import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
-import fi.methics.musap.sdk.internal.datatype.MusapSignatureFormat;
+import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.SignatureFormat;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.datatype.KeyURI;
@@ -330,8 +330,8 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
                 .setCountry("FI")
                 .setProvider("Yubico")
                 .setKeygenSupported(true)
-                .setSupportedAlgorithms(Arrays.asList(MusapKeyAlgorithm.ECC_P256_K1, MusapKeyAlgorithm.ECC_P384_K1))
-                .setSupportedFormats(Arrays.asList(MusapSignatureFormat.RAW))
+                .setSupportedAlgorithms(Arrays.asList(KeyAlgorithm.ECC_P256_K1, KeyAlgorithm.ECC_P384_K1))
+                .setSupportedFormats(Arrays.asList(SignatureFormat.RAW))
                 .setSscdId("YUBI") // TODO: This needs to be SSCD instance specific
                 .build();
     }
@@ -542,7 +542,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
      */
     private KeyType resolveKeyType(KeyGenReq req) {
 
-        MusapKeyAlgorithm algorithm = req.getAlgorithm();
+        KeyAlgorithm algorithm = req.getAlgorithm();
         if (algorithm == null) return KeyType.ECCP384;
         if (algorithm.isEc()) {
             if (algorithm.bits == 256) return KeyType.ECCP256;

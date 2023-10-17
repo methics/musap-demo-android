@@ -10,9 +10,9 @@ public class MusapCertificate {
 
     private String subject;
     private byte[] certificate;
-    private MusapPublicKey publicKey;
+    private PublicKey publicKey;
 
-    public MusapCertificate(String subject, byte[] cert, MusapPublicKey publicKey) {
+    public MusapCertificate(String subject, byte[] cert, PublicKey publicKey) {
         this.subject     = subject;
         this.certificate = cert;
         this.publicKey   = publicKey;
@@ -21,13 +21,13 @@ public class MusapCertificate {
     public MusapCertificate(X509CertificateHolder cert) throws IOException {
         this.subject     = cert.getSubject().toString();
         this.certificate = cert.getEncoded();
-        this.publicKey   = new MusapPublicKey(cert.getSubjectPublicKeyInfo().getEncoded());
+        this.publicKey   = new PublicKey(cert.getSubjectPublicKeyInfo().getEncoded());
     }
 
     public MusapCertificate(X509Certificate cert) throws CertificateEncodingException {
         this.subject     = cert.getSubjectDN().toString();
         this.certificate = cert.getEncoded();
-        this.publicKey   = new MusapPublicKey(cert.getPublicKey().getEncoded());
+        this.publicKey   = new PublicKey(cert.getPublicKey().getEncoded());
     }
 
     public String getSubject() {
@@ -38,7 +38,7 @@ public class MusapCertificate {
         return this.certificate;
     }
 
-    public MusapPublicKey getPublicKey() {
+    public PublicKey getPublicKey() {
         return this.publicKey;
     }
 

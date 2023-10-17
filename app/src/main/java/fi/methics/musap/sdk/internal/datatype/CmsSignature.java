@@ -8,17 +8,13 @@ import java.io.IOException;
 import java.util.Collection;
 
 import fi.methics.musap.sdk.api.MusapException;
-import fi.methics.musap.sdk.internal.datatype.MusapCertificate;
-import fi.methics.musap.sdk.internal.datatype.MusapKey;
-import fi.methics.musap.sdk.internal.datatype.MusapSignature;
-import fi.methics.musap.sdk.internal.datatype.MusapSignatureAlgorithm;
 
 public class CmsSignature extends MusapSignature {
 
     private CMSSignedData signedData;
 
     public CmsSignature(byte[] cms) throws MusapException {
-        super(cms, null, null, MusapSignatureFormat.CMS);
+        super(cms, null, null, SignatureFormat.CMS);
         try {
             final ContentInfo ci = ContentInfo.getInstance(cms);
             this.signedData = new CMSSignedData(ci);
@@ -26,8 +22,8 @@ public class CmsSignature extends MusapSignature {
             throw new MusapException(e);
         }
     }
-    public CmsSignature(byte[] cms, MusapKey key, MusapSignatureAlgorithm algorithm) throws MusapException {
-        super(cms, key, algorithm, MusapSignatureFormat.CMS);
+    public CmsSignature(byte[] cms, MusapKey key, SignatureAlgorithm algorithm) throws MusapException {
+        super(cms, key, algorithm, SignatureFormat.CMS);
         try {
             final ContentInfo ci = ContentInfo.getInstance(cms);
             this.signedData = new CMSSignedData(ci);

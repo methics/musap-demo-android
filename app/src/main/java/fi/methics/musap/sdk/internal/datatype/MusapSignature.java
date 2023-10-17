@@ -10,8 +10,8 @@ public class MusapSignature {
 
     private byte[] rawSignature;
     private MusapKey key;
-    private MusapSignatureAlgorithm algorithm;
-    private MusapSignatureFormat format;
+    private SignatureAlgorithm algorithm;
+    private SignatureFormat format;
 
     /**
      * Create a new MUSAP Signature object
@@ -22,8 +22,8 @@ public class MusapSignature {
      */
     public MusapSignature(byte[] rawSignature,
                           MusapKey key,
-                          MusapSignatureAlgorithm algorithm,
-                          MusapSignatureFormat format)
+                          SignatureAlgorithm algorithm,
+                          SignatureFormat format)
     {
         this.rawSignature = rawSignature;
         this.key          = key;
@@ -53,7 +53,7 @@ public class MusapSignature {
      * Get Signature Algorithm used to generate this signature
      * @return Signature Algorithm
      */
-    public MusapSignatureAlgorithm getSignatureAlgorithm() {
+    public SignatureAlgorithm getSignatureAlgorithm() {
         return this.algorithm;
     }
 
@@ -61,7 +61,7 @@ public class MusapSignature {
      * Get the signature format
      * @return format
      */
-    public MusapSignatureFormat getSignatureFormat() {
+    public SignatureFormat getSignatureFormat() {
         return this.format;
     }
 

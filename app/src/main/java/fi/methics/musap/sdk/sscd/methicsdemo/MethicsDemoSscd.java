@@ -12,14 +12,13 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.EditText;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
-import fi.methics.musap.sdk.internal.datatype.MusapSignatureFormat;
+import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.SignatureFormat;
 import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
@@ -123,8 +122,8 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 .setCountry("FI")
                 .setProvider("Methics")
                 .setKeygenSupported(true /* TODO: This should be false */)
-                .setSupportedAlgorithms(Arrays.asList(MusapKeyAlgorithm.RSA_2K))
-                .setSupportedFormats(Arrays.asList(MusapSignatureFormat.RAW, MusapSignatureFormat.CMS))
+                .setSupportedAlgorithms(Arrays.asList(KeyAlgorithm.RSA_2K))
+                .setSupportedFormats(Arrays.asList(SignatureFormat.RAW, SignatureFormat.CMS))
                 .setSscdId("METHICS_DEMO") // TODO: This needs to be SSCD instance specific
                 .build();
     }

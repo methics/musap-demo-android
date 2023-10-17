@@ -19,7 +19,6 @@ import fi.methics.musap.databinding.FragmentKeygenBinding;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
-import fi.methics.musap.sdk.internal.datatype.MusapKeyAlgorithm;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReqBuilder;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
