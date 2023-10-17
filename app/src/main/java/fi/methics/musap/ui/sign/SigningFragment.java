@@ -21,6 +21,8 @@ import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.MusapSigner;
+import fi.methics.musap.sdk.internal.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.sign.SignatureReqBuilder;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.internal.util.StringUtil;
@@ -64,11 +66,12 @@ public class SigningFragment extends Fragment {
 
         sign.setOnClickListener(view -> {
 
-            MusapKey key = MusapClient.getKeyByUri(keyuri);
+            MusapKey       key = MusapClient.getKeyByUri(keyuri);
+            SignatureReq   req = new SignatureReqBuilder().setKey(key).setData(data).setActivity(this.getActivity()).createSignatureReq();
             MusapSigner signer = new MusapSigner(key, this.getActivity());
 
             try {
-                signer.sign(data, new MusapCallback<MusapSignature>() {
+                signer.sign(req, new MusapCallback<MusapSignature>() {
                     @Override
                     public void onSuccess(MusapSignature mSig) {
                         String signatureStr = mSig.getB64Signature();

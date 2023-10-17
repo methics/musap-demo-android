@@ -50,7 +50,7 @@ public class KeyDiscoveryAPI {
      * Get the list of available SSCDs with {@link #listEnabledSscds()}.
      * @param sscd SSCD
      */
-    public void enableSSCD(MusapSscdInterface sscd) {
+    public void enableSscd(MusapSscdInterface sscd) {
         enabledSscds.add(sscd);
     }
 
