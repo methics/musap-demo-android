@@ -543,11 +543,11 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         MusapKeyAlgorithm algorithm = req.getAlgorithm();
         if (algorithm == null) return KeyType.ECCP384;
         if (algorithm.isEc()) {
-            if (algorithm.key_length == 256) return KeyType.ECCP256;
-            if (algorithm.key_length == 384) return KeyType.ECCP384;
+            if (algorithm.bits == 256) return KeyType.ECCP256;
+            if (algorithm.bits == 384) return KeyType.ECCP384;
         } else if (algorithm.isRsa()) {
-            if (algorithm.key_length == 1024) return KeyType.RSA1024;
-            if (algorithm.key_length == 2048) return KeyType.RSA2048;
+            if (algorithm.bits == 1024) return KeyType.RSA1024;
+            if (algorithm.bits == 2048) return KeyType.RSA2048;
         }
         return KeyType.ECCP384;
     }

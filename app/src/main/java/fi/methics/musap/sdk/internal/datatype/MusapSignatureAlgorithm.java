@@ -1,5 +1,7 @@
 package fi.methics.musap.sdk.internal.datatype;
 
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+
 import java.security.Signature;
 import java.util.Objects;
 
@@ -9,9 +11,9 @@ import java.util.Objects;
 public class MusapSignatureAlgorithm {
 
     // Note: Schemes according to SOG-IS ACM
-    public static final String SCHEME_RSA_PSS  = "PSS (PKCS#1v2.1)";
-    public static final String SCHEME_PKCS_1_5 = "PKCS#1v1.5";
-    public static final String SCHEME_ECDSA    = "EC-DSA";
+    public static final String SCHEME_RSA_PSS  = "PSS (PKCS#1v2.1)"; // a.k.a. RSA PSS
+    public static final String SCHEME_PKCS_1_5 = "PKCS#1v1.5";       // a.k.a. RSA
+    public static final String SCHEME_ECDSA    = "EC-DSA";           // a.k.a. ECDSA
 
     public static final String HASH_SHA256 = "SHA256";
     public static final String HASH_SHA384 = "SHA384";
