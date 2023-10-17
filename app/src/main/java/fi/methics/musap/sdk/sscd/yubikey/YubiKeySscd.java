@@ -64,8 +64,7 @@ import fi.methics.musap.sdk.internal.util.KeyGenerationResult;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.internal.util.SigningResult;
 
-public class YubiKeyExtension implements MusapSscdInterface<YubiKeySettings> {
-
+public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
 
     private static final byte[] MANAGEMENT_KEY = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     private static final ManagementKeyType TYPE = ManagementKeyType.TDES;
@@ -88,7 +87,7 @@ public class YubiKeyExtension implements MusapSscdInterface<YubiKeySettings> {
 
     private final Context c;
 
-    public YubiKeyExtension(Context context) {
+    public YubiKeySscd(Context context) {
         this.managementKey = MANAGEMENT_KEY;
         this.type = TYPE;
         this.c = context;
