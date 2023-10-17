@@ -137,6 +137,11 @@ public class SigningFragment extends Fragment {
         }
     }
 
+    /**
+     * Build a sample JWS using the given algorithm
+     * @param algorithm Algorithm
+     * @return Unsigned JWS
+     */
     private JWSObject buildSampleJws(SignatureAlgorithm algorithm) {
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
                 .subject("Sample user")
