@@ -19,28 +19,28 @@ public class MusapKeyAlgorithm {
 
     public String primitive;
     public String curve;
-    public int key_length;
+    public int bits;
 
     /**
      * Create a new Key Algorithm
      * @param primitive Primitive (usually RSA or EC)
-     * @param keyLength Key length
+     * @param bits      Bits (often same as key length)
      */
-    public MusapKeyAlgorithm(String primitive, int keyLength) {
+    public MusapKeyAlgorithm(String primitive, int bits) {
         this.primitive  = primitive;
-        this.key_length = keyLength;
+        this.bits       = bits;
     }
 
     /**
      * Create a new Key Algorithm with a specific curve
      * @param primitive Primitive (usually RSA or EC)
      * @param curve     Curve (e.g. secp256r1)
-     * @param keyLength Key length
+     * @param bits      Bits (often same as key length)
      */
-    public MusapKeyAlgorithm(String primitive, String curve, int keyLength) {
+    public MusapKeyAlgorithm(String primitive, String curve, int bits) {
         this.primitive  = primitive;
         this.curve      = curve;
-        this.key_length = keyLength;
+        this.bits       = bits;
     }
 
     /**
@@ -62,9 +62,9 @@ public class MusapKeyAlgorithm {
     @Override
     public String toString() {
         if (curve != null) {
-            return "[" + primitive + "/" + curve + "/"  + key_length + "]";
+            return "[" + primitive + "/" + curve + "/"  + bits + "]";
         } else {
-            return "[" + primitive + "/"  + key_length + "]";
+            return "[" + primitive + "/"  + bits + "]";
         }
     }
 
@@ -73,7 +73,7 @@ public class MusapKeyAlgorithm {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MusapKeyAlgorithm that = (MusapKeyAlgorithm) o;
-        if (key_length != that.key_length) return false;
+        if (bits != that.bits) return false;
         if (!Objects.equals(primitive, that.primitive))  return false;
         return Objects.equals(curve, that.curve);
     }
@@ -82,7 +82,7 @@ public class MusapKeyAlgorithm {
     public int hashCode() {
         int result = primitive != null ? primitive.hashCode() : 0;
         result = 31 * result + (curve != null ? curve.hashCode() : 0);
-        result = 31 * result + key_length;
+        result = 31 * result + bits;
         return result;
     }
 }
