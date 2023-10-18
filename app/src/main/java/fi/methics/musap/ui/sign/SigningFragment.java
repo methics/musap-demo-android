@@ -79,9 +79,9 @@ public class SigningFragment extends Fragment {
             data = StringUtil.toUTF8Bytes(dtbs);
         }
 
-        final SignatureReq req = new SignatureReqBuilder()
+        final SignatureReq req = new SignatureReqBuilder(algorithm)
                 .setKey(key)
-                .setData(data, algorithm)
+                .setData(data)
                 .setActivity(this.getActivity())
                 .createSignatureReq();
 

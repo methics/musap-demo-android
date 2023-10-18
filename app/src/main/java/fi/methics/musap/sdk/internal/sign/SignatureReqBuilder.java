@@ -13,18 +13,21 @@ public class SignatureReqBuilder {
     private SignatureFormat format;
     private Activity activity;
 
+    public SignatureReqBuilder(SignatureAlgorithm algorithm) {
+        this.algorithm = algorithm;
+    }
+
     public SignatureReqBuilder setKey(MusapKey key) {
         this.key = key;
         return this;
     }
 
     /**
-     * Set the data to be signed and signature algorithm
-     * @param data      Data to be signed
-     * @param algorithm Signature algorithm to use
+     * Set the data to be signed
+     * @param data  Data to be signed
      * @return this builder
      */
-    public SignatureReqBuilder setData(byte[] data, SignatureAlgorithm algorithm) {
+    public SignatureReqBuilder setData(byte[] data) {
         this.data      = data;
         this.algorithm = algorithm;
         return this;
