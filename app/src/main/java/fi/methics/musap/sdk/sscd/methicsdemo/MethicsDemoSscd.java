@@ -12,6 +12,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.EditText;
 
+import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -19,6 +21,7 @@ import java.util.concurrent.Executors;
 
 import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
 import fi.methics.musap.sdk.internal.datatype.SignatureFormat;
+import fi.methics.musap.sdk.internal.util.KeyGenerationResult;
 import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
@@ -45,7 +48,10 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
     public static final String SSCD_TYPE         = "demo";
     public static final String ATTRIBUTE_MSISDN  = "msisdn";
 
+    private static final int POLL_AMOUNT = 10;
+
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final Gson GSON = new Gson();
 
 
     private Context             context;
@@ -89,8 +95,9 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         jReq.msisdn  = req.getKey().getAttributeValue(ATTRIBUTE_MSISDN);
         jReq.message = "Sign with MUSAP"; // TODO
         jReq.dtbs    = MBase64.toBase64String(req.getData());
+        jReq.async   = true;
 
-        RequestBody body = RequestBody.create(gson.toJson(jReq), JSON);
+        RequestBody body = RequestBody.create(GSON.toJson(jReq), JSON);
         Request request = new Request.Builder()
                 .url(this.settings.getDemoUrl() + jReq.msisdn)
                 .post(body)
@@ -98,19 +105,12 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
 
         try (Response response = client.newCall(request).execute()) {
 
-            MLog.d("Sending request " + gson.toJson(jReq));
+            MLog.d("Sending request " + GSON.toJson(jReq));
             String sResp = response.body().string();
             MLog.d("Got response " + sResp);
 
-            DemoSigResp jResp = gson.fromJson(sResp, DemoSigResp.class);
-
-            if ("500".equals(jResp.statuscode)) {
-                MLog.d("Successfully signed");
-            } else {
-                throw new MusapException("Failed to sign: " + jResp.statuscode);
-            }
-
-            return new CmsSignature(MBase64.toBytes(jResp.signature), req.getKey(), req.getAlgorithm());
+            DemoSigResp jResp = GSON.fromJson(sResp, DemoSigResp.class);
+            return pollForSignature(req, jResp.transid);
         }
     }
 
@@ -204,21 +204,72 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
 
                 if ("500".equals(jResp.statuscode)) {
                     MLog.d("Successfully bound Methics Demo SSCD");
+                    CmsSignature signature = new CmsSignature(MBase64.toBytes(jResp.signature));
+                    MusapKey.Builder builder = new MusapKey.Builder();
+                    builder.setCertificate(signature.getSignerCertificate());
+                    builder.setKeyName(req.getKeyAlias());
+                    builder.setSscdType("Methics Demo");
+                    builder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
+                    builder.setSscdId(this.getSscdInfo().getSscdId());
+                    builder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
+                    builder.setKeyAttribute(ATTRIBUTE_MSISDN, msisdn);
+                    return builder.build();
+                } else {
+                    throw this.handleError(jResp.statuscode);
                 }
-
-                CmsSignature signature = new CmsSignature(MBase64.toBytes(jResp.signature));
-                MusapKey.Builder builder = new MusapKey.Builder();
-                builder.setCertificate(signature.getSignerCertificate());
-                builder.setKeyName(req.getKeyAlias());
-                builder.setSscdType("Methics Demo");
-                builder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
-                builder.setSscdId(this.getSscdInfo().getSscdId());
-                builder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
-                builder.setKeyAttribute(ATTRIBUTE_MSISDN, msisdn);
-                return builder.build();
             }
         } catch (Exception e) {
             throw new MusapException(e);
+        }
+    }
+
+    private CmsSignature pollForSignature(SignatureReq req, String transid) throws IOException, MusapException {
+        DemoSigReq jReq = new DemoSigReq();
+        jReq.msisdn  = req.getKey().getAttributeValue(ATTRIBUTE_MSISDN);
+        jReq.transid = transid;
+
+        RequestBody body = RequestBody.create(GSON.toJson(jReq), JSON);
+        Request request = new Request.Builder()
+                .url(this.getSettings().getDemoUrl() + jReq.msisdn)
+                .post(body)
+                .build();
+
+        for (int i = 0; i < POLL_AMOUNT; i++) {
+            try (Response response = client.newCall(request).execute()) {
+
+                MLog.d("Sending request " + GSON.toJson(jReq));
+                String sResp = response.body().string();
+                MLog.d("Got response " + sResp);
+
+                DemoSigResp jResp = GSON.fromJson(sResp, DemoSigResp.class);
+
+                if (jResp.success == false && jResp.statuscode == null) {
+                    // No response yet
+                    MLog.d("Not ready yet");
+                    continue;
+                }
+
+                if ("500".equals(jResp.statuscode)) {
+                    MLog.d("Successfully signed");
+                } else {
+                    throw this.handleError(jResp.statuscode);
+                }
+
+                return new CmsSignature(MBase64.toBytes(jResp.signature));
+            }
+        }
+        throw new MusapException(MusapException.ERROR_TIMED_OUT, "Failed to get a signature in " + POLL_AMOUNT + " attempts");
+    }
+
+    private MusapException handleError(String statusCode) throws MusapException {
+        switch (statusCode) {
+            case "105": return new MusapException(MusapException.ERROR_UNKNOWN_KEY, "No such user");
+            case "208": return new MusapException(MusapException.ERROR_TIMED_OUT,   "Timed out");
+            case "401": return new MusapException(MusapException.ERROR_USER_CANCEL, "User cancelled");
+            case "402": return new MusapException(MusapException.ERROR_KEY_BLOCKED, "PIN blocked");
+            case "403": return new MusapException(MusapException.ERROR_SSCD_BLOCKED, "SSCD blocked");
+            case "425": return new MusapException(MusapException.ERROR_SSCD_BLOCKED, "Certificate validation failed");
+            default: return new MusapException(MusapException.ERROR_INTERNAL, "Failed with status " + statusCode);
         }
     }
 
@@ -242,9 +293,11 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         public String type = "sign";
         public String msisdn;
         public String message;
+        public String transid;
         public String dtbs;
         public String mimetype;
         public String encoding;
+        public boolean async;
 
     }
 
@@ -253,6 +306,8 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         public String type;
         public String statuscode;
         public String signature;
+        public String transid;
+        public boolean success;
 
     }
 
