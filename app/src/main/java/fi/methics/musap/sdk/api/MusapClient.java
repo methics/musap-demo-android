@@ -248,4 +248,14 @@ public class MusapClient {
         return null;
     }
 
+    /**
+     * Enable or disable MUSAP debug logging.
+     * This only takes effect for lifetime of this app instance.
+     * Default value is true. This should be set off for production. 
+     * @param isDebug
+     */
+    public static void setDebugLog(boolean isDebug) {
+        MLog.setDebugEnabled(false);
+    }
+
 }
