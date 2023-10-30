@@ -126,8 +126,10 @@ public class MusapClient {
      * @return matching keys
      */
     public static List<MusapKey> listKeys(KeySearchReq req) {
-        // TODO: Filter keys by req
-        return listKeys();
+        MetadataStorage storage = new MetadataStorage(context.get());
+        List<MusapKey> keys = storage.listKeys(req);
+        MLog.d("Found " + keys.size() + " keys");
+        return keys;
     }
 
     /**

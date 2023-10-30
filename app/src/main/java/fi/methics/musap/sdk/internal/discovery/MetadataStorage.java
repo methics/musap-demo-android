@@ -102,6 +102,32 @@ public class MetadataStorage {
     }
 
     /**
+     * List available MUSAP keys that match the search request.
+     * @param req Key search request
+     * @return List of matching keys
+     */
+    public List<MusapKey> listKeys(KeySearchReq req) {
+        Set<String> keyNames = this.getKeyNameSet();
+        List<MusapKey> keyList = new ArrayList<>();
+        for (String keyName: keyNames) {
+            String keyJson = this.getKeyJson(keyName);
+            if (keyJson == null) {
+                MLog.e("Missing key metadata JSON for key name " + keyName);
+            } else {
+                MusapKey key = new Gson().fromJson(keyJson, MusapKey.class);
+                if (req.matches(key)) {
+                    MLog.d("Request matches key " + keyName);
+                    keyList.add(key);
+                } else {
+                    MLog.d("Request does not match key " + keyName);
+                }
+            }
+        }
+
+        return keyList;
+    }
+
+    /**
      * Remove key metadata from storage
      * @param key Key to remove
      * @return true if key was found and removed
