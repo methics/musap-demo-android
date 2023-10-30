@@ -8,6 +8,12 @@ import android.util.Log;
  */
 public class MLog {
 
+    private static boolean debugEnabled = true;
+
+    public static void setDebugEnabled(boolean isEnabled) {
+        debugEnabled = isEnabled;
+    }
+
     private static final String TAG = "MUSAPLog";
 
     public static void d(String msg) {
@@ -16,7 +22,7 @@ public class MLog {
 
 
     public static void d(String tag, String msg) {
-        Log.d(tag, msg);
+        largeLogD(tag, msg);
     }
 
     public static void e(String msg) {
@@ -32,13 +38,21 @@ public class MLog {
     }
 
 
-    private static void largeLogD(String content) {
+    private static void largeLogD(String tag, String content) {
+        if (!debugEnabled) {
+            return;
+        }
+
         if (content.length() > 4000) {
-            Log.d(TAG, content.substring(0, 4000));
+            Log.d(tag, content.substring(0, 4000));
             largeLogD(content.substring(4000));
         } else {
-            Log.d(TAG, content);
+            Log.d(tag, content);
         }
+
+    }
+    private static void largeLogD(String content) {
+        largeLogD(TAG, content);
     }
 
 }
