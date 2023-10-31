@@ -16,6 +16,7 @@ import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Arrays;
 
 import fi.methics.musap.sdk.api.MusapConstants;
+import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.datatype.KeyURI;
 import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
@@ -97,7 +98,6 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
         }
 
         SignatureAlgorithm algorithm = req.getAlgorithm();
-
         MLog.d("Signing " + MBase64.toBase64String(req.getData()) + " with algorithm " + algorithm);
         Signature s = Signature.getInstance(algorithm.getJavaAlgorithm());
         s.initSign(((KeyStore.PrivateKeyEntry) entry).getPrivateKey());
