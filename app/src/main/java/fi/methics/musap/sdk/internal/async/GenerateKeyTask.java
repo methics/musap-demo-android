@@ -29,7 +29,7 @@ public class GenerateKeyTask extends MusapAsyncTask<MusapKey> {
             MusapKey key = sscd.generateKey(req);
             MLog.d("GenerateKeyTask Got MUSAP key");
             MetadataStorage storage = new MetadataStorage(context.get());
-            storage.storeKey(key, sscd.getSscdInfo());
+            storage.addKey(key, sscd.getSscdInfo());
             return new AsyncTaskResult<>(key);
         } catch (Exception e) {
             throw new MusapException(e);

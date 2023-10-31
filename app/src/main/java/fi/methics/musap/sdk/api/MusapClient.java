@@ -25,6 +25,7 @@ import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.datatype.MusapLink;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
+import fi.methics.musap.sdk.internal.keygeneration.UpdateKeyReq;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MLog;
 
@@ -130,6 +131,11 @@ public class MusapClient {
         List<MusapKey> keys = storage.listKeys(req);
         MLog.d("Found " + keys.size() + " keys");
         return keys;
+    }
+
+    public static boolean updateKey(UpdateKeyReq req) {
+        MetadataStorage storage = new MetadataStorage(context.get());
+        return storage.updateKeyMetaData(req);
     }
 
     /**
