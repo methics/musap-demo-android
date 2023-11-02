@@ -2,6 +2,8 @@ package fi.methics.musap.sdk.api;
 
 import android.content.Context;
 
+import com.google.gson.JsonSyntaxException;
+
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 import fi.methics.musap.sdk.internal.async.GenerateKeyTask;
 import fi.methics.musap.sdk.internal.async.SignTask;
 import fi.methics.musap.sdk.internal.discovery.KeySearchReq;
+import fi.methics.musap.sdk.internal.discovery.MusapImportData;
 import fi.methics.musap.sdk.internal.discovery.SscdSearchReq;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
@@ -183,9 +186,12 @@ public class MusapClient {
     /**
      * Import MUSAP key data and SSCD details
      * @param data JSON data from another MUSA
+     * @throws JsonSyntaxException if data is not parseable
      */
-    public static void importData(String data) {
-        // TODO
+    public static void importData(String data) throws JsonSyntaxException {
+        MusapImportData importData = MusapImportData.fromJson(data);
+        MetadataStorage storage = new MetadataStorage(context.get());
+        storage.storeImportData(importData);
     }
 
     /**
@@ -193,7 +199,8 @@ public class MusapClient {
      * @return JSON export that can be imported in another MUSAP
      */
     public static String exportData() {
-        return "";
+        MetadataStorage storage = new MetadataStorage(context.get());
+        return storage.getImportData().toJson();
     }
 
     /**

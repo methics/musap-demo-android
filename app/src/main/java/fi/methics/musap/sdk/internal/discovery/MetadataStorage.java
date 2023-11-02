@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import fi.methics.musap.sdk.api.MusapClient;
+import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.util.MLog;
@@ -205,6 +207,42 @@ public class MetadataStorage {
             }
         }
         return sscdList;
+    }
+
+    /**
+     * Store MUSAP import data
+     * @param data import data
+     */
+    public void storeImportData(MusapImportData data) {
+        if (data == null) return;
+        List<MusapSscd> activeSscds = this.listActiveSscds();
+        List<MusapSscdInterface> enabledSscds = MusapClient.listEnabledSscds();
+        List<MusapKey>  activeKeys  = this.listKeys();
+        for (MusapSscd sscd : data.sscds) {
+            // Avoid duplicate SSCDs and SSCDs that are not enabled in this MUSAP
+            boolean alreadyExists   = activeSscds.stream().anyMatch(s -> s.getSscdId().equals(sscd.getSscdId()));
+            boolean sscdTypeEnabled = !enabledSscds.stream().anyMatch(s -> s.getSscdInfo().getSscdType().equals(sscd.getSscdType()));
+            if (alreadyExists || !sscdTypeEnabled) continue;
+            this.storeSscd(sscd);
+        }
+        for (MusapKey key : data.keys) {
+            // Avoid duplicate keys
+            if (activeKeys.stream().anyMatch(k -> k.getKeyUri().equals(k.getKeyUri()))) continue;
+            if (key.getSscd() != null) {
+                this.storeKey(key, key.getSscd().getSscdInfo());
+            }
+        }
+    }
+
+    /**
+     * Get MUSAP import data for export
+     * @return import data
+     */
+    public MusapImportData getImportData() {
+        MusapImportData data = new MusapImportData();
+        data.sscds = this.listActiveSscds();
+        data.keys  = this.listKeys();
+        return data;
     }
 
     @Deprecated
