@@ -234,7 +234,7 @@ public class MusapClient {
      * Check if MUSAP Link has been enabled
      * @return true if enabled
      */
-    public static boolean isMusapLinkEnabled() {
+    public static boolean isLinkEnabled() {
         return false; // TODO
     }
 
@@ -244,7 +244,7 @@ public class MusapClient {
      * @return SignatureReq or null if no request available
      * @throws MusapException if polling failed (e.g. a network issue)
      */
-    public static SignatureReq pollForSignatureRequest() {
+    public static SignatureReq pollLink() {
         return null;
     }
 
