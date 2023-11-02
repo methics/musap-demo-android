@@ -6,6 +6,7 @@ import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.discovery.MetadataStorage;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
@@ -30,7 +31,13 @@ public class BindKeyTask extends MusapAsyncTask<MusapKey> {
             MusapKey key = sscd.bindKey(req);
             MLog.d("BindKeyTask Got MUSAP key");
             MetadataStorage storage = new MetadataStorage(context.get());
-            storage.storeKey(key, sscd.getSscdInfo());
+
+            MusapSscd activeSscd = sscd.getSscdInfo();
+            String        sscdId = sscd.generateSscdId(key);
+            activeSscd.setSscdId(sscdId);
+            key.setSscdId(sscdId);
+
+            storage.storeKey(key, activeSscd);
             return new AsyncTaskResult<>(key);
         } catch (Exception e) {
             throw new MusapException(e);

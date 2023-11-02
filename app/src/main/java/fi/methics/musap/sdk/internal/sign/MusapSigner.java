@@ -16,7 +16,7 @@ public class MusapSigner {
     private final Activity activity;
 
     public MusapSigner(MusapKey key, Activity activity) {
-        this.key = key;
+        this.key      = key;
         this.activity = activity;
     }
 
@@ -31,9 +31,9 @@ public class MusapSigner {
             throw new MusapException("Missing key type");
         }
         try {
-            MusapSscdInterface sscd = this.key.getSscd();
+            MusapSscdInterface sscd = this.key.getSscdImpl();
             if (sscd == null) {
-                throw new MusapException("No SSCD found for key " + this.key.getKeyUri());
+                throw new MusapException("No SSCD found for key " + this.key.getKeyId() + "(" + this.key.getSscdId() + ")");
             }
             MusapClient.sign(sscd, req, callback);
         } catch (Exception e) {

@@ -70,6 +70,9 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     private static final byte[] MANAGEMENT_KEY = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     private static final ManagementKeyType TYPE = ManagementKeyType.TDES;
 
+    private static final String SSCD_TYPE        = "Yubikey";
+    private static final String ATTRIBUTE_SERIAL = "SerialNumber";
+
     private YubiKeySettings settings = new YubiKeySettings();
 
     private AlertDialog currentPrompt;
@@ -143,6 +146,11 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         if (result.exception != null) throw  result.exception;
 
         throw new MusapException("Signing failed");
+    }
+
+    @Override
+    public String generateSscdId(MusapKey key) {
+        return SSCD_TYPE + "/" + key.getAttributeValue(ATTRIBUTE_SERIAL);
     }
 
     public void signAsync(SignatureReq req) {
@@ -326,13 +334,12 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     public MusapSscd getSscdInfo() {
         return new MusapSscd.Builder()
                 .setSscdName("Yubikey")
-                .setSscdType("Yubikey")
+                .setSscdType(SSCD_TYPE)
                 .setCountry("FI")
                 .setProvider("Yubico")
                 .setKeygenSupported(true)
                 .setSupportedAlgorithms(Arrays.asList(KeyAlgorithm.ECC_P256_K1, KeyAlgorithm.ECC_P384_K1))
                 .setSupportedFormats(Arrays.asList(SignatureFormat.RAW))
-                .setSscdId("YUBI") // TODO: This needs to be SSCD instance specific
                 .build();
     }
 
@@ -470,6 +477,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         MusapKey.Builder keyBuilder = new MusapKey.Builder();
         keyBuilder.setCertificate(cert);
         keyBuilder.setKeyName(req.getKeyAlias());
+        keyBuilder.addAttribute(ATTRIBUTE_SERIAL, Integer.toHexString(pivSession.getSerialNumber()));
         keyBuilder.setSscdType(this.getSscdInfo().getSscdType());
         keyBuilder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
         keyBuilder.setSscdId(this.getSscdInfo().getSscdId());

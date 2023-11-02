@@ -13,6 +13,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.google.gson.Gson;
+
 import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentEnabledSscdDetailsBinding;
 import fi.methics.musap.sdk.api.MusapClient;
@@ -44,7 +46,7 @@ public class ActiveSscdDetailsFragment extends Fragment {
                 sscd = s;
                 break;
             } else {
-                MLog.d("SSCD ID " + sscdid + " does not match " + s.getSscdId());
+                MLog.d("SSCD ID " + sscdid + " does not match " + s.getSscdId() + ". Skipping " + new Gson().toJson(s));
             }
         }
         if (sscd != null) {

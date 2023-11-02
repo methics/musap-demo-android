@@ -42,7 +42,7 @@ import okhttp3.Response;
 public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> {
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    public static final String SSCD_TYPE         = "demo";
+    public static final String SSCD_TYPE         = "Methics Demo";
     public static final String ATTRIBUTE_MSISDN  = "msisdn";
 
     private static final int POLL_AMOUNT = 10;
@@ -114,8 +114,12 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 .setKeygenSupported(false)
                 .setSupportedAlgorithms(Arrays.asList(KeyAlgorithm.RSA_2K))
                 .setSupportedFormats(Arrays.asList(SignatureFormat.RAW, SignatureFormat.CMS))
-                .setSscdId("METHICS_DEMO") // TODO: This needs to be SSCD instance specific
                 .build();
+    }
+
+    @Override
+    public String generateSscdId(MusapKey key) {
+        return SSCD_TYPE + "/" + key.getAttributeValue(ATTRIBUTE_MSISDN);
     }
 
     @Override
@@ -198,11 +202,11 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 MusapKey.Builder builder = new MusapKey.Builder();
                 builder.setCertificate(signature.getSignerCertificate());
                 builder.setKeyName(req.getKeyAlias());
-                builder.setSscdType("Methics Demo");
+                builder.setSscdType(SSCD_TYPE);
                 builder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
                 builder.setSscdId(this.getSscdInfo().getSscdId());
                 builder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
-                builder.setKeyAttribute(ATTRIBUTE_MSISDN, msisdn);
+                builder.addAttribute(ATTRIBUTE_MSISDN, msisdn);
                 return builder.build();
             }
         } catch (Exception e) {

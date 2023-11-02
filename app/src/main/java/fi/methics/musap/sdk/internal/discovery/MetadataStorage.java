@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -79,7 +78,7 @@ public class MetadataStorage {
                 .apply();
 
         if (sscd != null) {
-            this.storeSscd(sscd);
+            this.addSscd(sscd);
         }
     }
 
@@ -95,6 +94,7 @@ public class MetadataStorage {
             if (keyJson == null) {
                 MLog.e("Missing key metadata JSON for key name " + keyName);
             } else {
+                MLog.d("Found key " + keyJson);
                 MusapKey key = new Gson().fromJson(keyJson, MusapKey.class);
                 keyList.add(key);
             }
@@ -159,7 +159,7 @@ public class MetadataStorage {
      * Store metadata of an active MUSAP SSCD
      * @param sscd SSCD (that has keys bound or generated)
      */
-    public void storeSscd(MusapSscd sscd) {
+    public void addSscd(MusapSscd sscd) {
         if (sscd == null) {
             MLog.e("Cannot store null MUSAP SSCD");
             throw new IllegalArgumentException("Cannot store null MUSAP SSCD");
@@ -177,7 +177,7 @@ public class MetadataStorage {
         }
         sscdIds.add(sscd.getSscdId());
 
-        MLog.d("Storing SSCD");
+        MLog.d("Storing SSCD " + sscd.getSscdId());
 
         String json = new Gson().toJson(sscd);
         MLog.d("SSCD JSON=" + json);
@@ -223,13 +223,13 @@ public class MetadataStorage {
             boolean alreadyExists   = activeSscds.stream().anyMatch(s -> s.getSscdId().equals(sscd.getSscdId()));
             boolean sscdTypeEnabled = !enabledSscds.stream().anyMatch(s -> s.getSscdInfo().getSscdType().equals(sscd.getSscdType()));
             if (alreadyExists || !sscdTypeEnabled) continue;
-            this.storeSscd(sscd);
+            this.addSscd(sscd);
         }
         for (MusapKey key : data.keys) {
             // Avoid duplicate keys
             if (activeKeys.stream().anyMatch(k -> k.getKeyUri().equals(k.getKeyUri()))) continue;
-            if (key.getSscd() != null) {
-                this.storeKey(key, key.getSscd().getSscdInfo());
+            if (key.getSscdImpl() != null) {
+                this.storeKey(key, key.getSscdImpl().getSscdInfo());
             }
         }
     }

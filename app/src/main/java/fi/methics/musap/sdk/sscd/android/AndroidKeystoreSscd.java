@@ -121,8 +121,12 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
                         KeyAlgorithm.ECC_P256_K1,
                         KeyAlgorithm.ECC_P384_K1))
                 .setSupportedFormats(Arrays.asList(SignatureFormat.RAW))
-                .setSscdId("AKS") // TODO: This needs to be SSCD instance specific
                 .build();
+    }
+
+    @Override
+    public String generateSscdId(MusapKey key) {
+        return "AKS";
     }
 
     @Override
