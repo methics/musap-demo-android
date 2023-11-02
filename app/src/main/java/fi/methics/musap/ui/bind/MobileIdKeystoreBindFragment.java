@@ -11,9 +11,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.api.MusapClient;
-import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
-import fi.methics.musap.sdk.internal.discovery.KeyBindReqBuilder;
 
 /**
  *
@@ -47,12 +44,12 @@ public class MobileIdKeystoreBindFragment extends Fragment {
                 public void onClick(View view) {
                     String number = phoneView.getText().toString();
 
-                    KeyBindReq req = new KeyBindReqBuilder()
-                            .setMsisdn(number)
-                            .setSscd("MobileID")
-                                    .createKeyBindReq();
+                    //KeyBindReq req = new KeyBindReqBuilder()
+                    //        .setMsisdn(number)
+                    //        .setSscd("MobileID")
+                    //                .createKeyBindReq();
 
-                    MusapClient.bindKey(req);
+                    //MusapClient.bindKey(req);
                 }
             });
         }

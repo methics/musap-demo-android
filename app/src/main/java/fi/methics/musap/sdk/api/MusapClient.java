@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import fi.methics.musap.sdk.internal.async.BindKeyTask;
 import fi.methics.musap.sdk.internal.async.GenerateKeyTask;
 import fi.methics.musap.sdk.internal.async.SignTask;
 import fi.methics.musap.sdk.internal.discovery.KeySearchReq;
@@ -62,9 +63,8 @@ public class MusapClient {
      * @param req  Key Bind Request
      * @param callback Callback that will deliver success or failure
      */
-    public static void bindKey(MusapSscdInterface sscd, KeyGenReq req, MusapCallback<MusapKey> callback) {
-        // TODO: Change to KeyBindTask, etc
-        new GenerateKeyTask(callback, context.get(), sscd, req).executeOnExecutor(executor);
+    public static void bindKey(MusapSscdInterface sscd, KeyBindReq req, MusapCallback<MusapKey> callback) {
+        new BindKeyTask(callback, context.get(), sscd, req).executeOnExecutor(executor);
     }
 
     /**
@@ -150,12 +150,6 @@ public class MusapClient {
         keyDiscovery.enableSscd(sscd);
     }
 
-    @Deprecated // Remove this and use bindKey(sscd, req, callback)
-    public static void bindKey(KeyBindReq req) {
-        MetadataStorage storage = new MetadataStorage(context.get());
-        storage.storeKeyMetaData(req);
-    }
-
     /**
      * Get a key by KeyURI
      * @param keyUri KeyURI as String
@@ -197,7 +191,7 @@ public class MusapClient {
     public static void importData(String data) throws JsonSyntaxException {
         MusapImportData importData = MusapImportData.fromJson(data);
         MetadataStorage storage = new MetadataStorage(context.get());
-        storage.storeImportData(importData);
+        storage.addImportData(importData);
     }
 
     /**

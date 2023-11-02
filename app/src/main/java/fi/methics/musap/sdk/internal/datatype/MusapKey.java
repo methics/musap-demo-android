@@ -12,6 +12,7 @@ public class MusapKey {
 
     private String keyName;
     private String keyType;
+    private String keyId;
     private String sscdId;
     private String sscdType;
     private Instant createdDate;
@@ -29,6 +30,7 @@ public class MusapKey {
     private MusapKey(Builder builder) {
         this.keyName          = builder.keyName;
         this.keyType          = builder.keyType;
+        this.keyId            = builder.keyId;
         this.sscdId           = builder.sscdId;
         this.sscdType         = builder.sscdType;
         this.publicKey        = builder.publicKey;
@@ -41,6 +43,10 @@ public class MusapKey {
         this.attestation      = builder.attestation;
         this.attributes       = builder.attributes;
         this.createdDate      = Instant.now();
+    }
+
+    public String getKeyId() {
+        return keyId;
     }
 
     public String getKeyName() {
@@ -89,6 +95,10 @@ public class MusapKey {
 
     public KeyURI getKeyUri() {
         return new KeyURI(this.keyUri);
+    }
+
+    public KeyAttestation getAttestation() {
+        return this.attestation;
     }
 
     public List<KeyAttribute> getAttributes() {
@@ -140,6 +150,7 @@ public class MusapKey {
     public static class Builder {
         private String keyName;
         private String keyType;
+        private String keyId;
         private String sscdId;
         private String sscdType;
         private PublicKey publicKey;
@@ -213,6 +224,11 @@ public class MusapKey {
 
         public Builder setKeyUri(String keyUri) {
             this.keyUri = keyUri;
+            return this;
+        }
+
+        public Builder setKeyId(String keyId) {
+            this.keyId = keyId;
             return this;
         }
 

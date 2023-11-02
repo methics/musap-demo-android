@@ -220,7 +220,7 @@ public class MetadataStorage {
      * Store MUSAP import data
      * @param data import data
      */
-    public void storeImportData(MusapImportData data) {
+    public void addImportData(MusapImportData data) {
         if (data == null) return;
         List<MusapSscd> activeSscds = this.listActiveSscds();
         List<MusapSscdInterface> enabledSscds = MusapClient.listEnabledSscds();
@@ -236,7 +236,7 @@ public class MetadataStorage {
             // Avoid duplicate keys
             if (activeKeys.stream().anyMatch(k -> k.getKeyUri().equals(k.getKeyUri()))) continue;
             if (key.getSscd() != null) {
-                this.storeKey(key, key.getSscd().getSscdInfo());
+                this.addKey(key, key.getSscd().getSscdInfo());
             }
         }
     }
@@ -250,19 +250,6 @@ public class MetadataStorage {
         data.sscds = this.listActiveSscds();
         data.keys  = this.listKeys();
         return data;
-    }
-
-    @Deprecated
-    public void storeKeyMetaData(KeyBindReq req) {
-        Set<String> metadatas = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-                        .getStringSet(SSCD_SET, new HashSet<>());
-        Set<String> newMetadatas = new HashSet<>(metadatas);
-        newMetadatas.add(req.getSscd());
-
-        this.getSharedPref()
-                .edit()
-                .putStringSet(SSCD_SET, newMetadatas)
-                .apply();
     }
 
     public boolean updateKeyMetaData(UpdateKeyReq req) {
@@ -280,7 +267,7 @@ public class MetadataStorage {
 //        req
         String newDid = req.getDid();
         String newState = req.getState();
-        
+
 
         return true;
     }
