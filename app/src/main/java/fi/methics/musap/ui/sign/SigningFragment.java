@@ -111,7 +111,8 @@ public class SigningFragment extends Fragment {
                     }
                 });
             } catch (MusapException e) {
-                MLog.e("Failed to sign", e.getCause());
+                MLog.e("Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", e.getCause());
+                Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
             }
         });
 
