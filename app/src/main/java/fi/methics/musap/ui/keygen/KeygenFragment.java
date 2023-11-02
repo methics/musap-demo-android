@@ -19,8 +19,8 @@ import fi.methics.musap.databinding.FragmentKeygenBinding;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.internal.keygeneration.KeyGenReqBuilder;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.api.MusapCallback;
@@ -46,12 +46,6 @@ public class KeygenFragment extends Fragment {
             String alias = binding.edittextAlias.getText().toString();
             MLog.d("Alias=" + alias);
 
-            KeyGenReq req = new KeyGenReqBuilder()
-                    .setActivity(this.getActivity())
-                    .setView(this.getView())
-                    .setAlias(alias)
-                    .createKeyGenReq();
-
             MusapSscdInterface<?> sscd = this.getSelectedSscd(radioButtons);
             if (sscd == null) {
                 MLog.d("No SSCD selected");
@@ -61,21 +55,55 @@ public class KeygenFragment extends Fragment {
             try {
                 MLog.d("Generating key");
 
-                MusapClient.generateKey(sscd, req, new MusapCallback<MusapKey>() {
-                    @Override
-                    public void onSuccess(MusapKey result) {
-                        MLog.d("Successfully generated key " + alias);
-                        Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
-                        binding.edittextAlias.getText().clear();
-                    }
+                if (sscd.isKeygenSupported()) {
 
-                    @Override
-                    public void onException(MusapException e) {
-                        Toast.makeText(KeygenFragment.this.getContext(), "Failed to generate key " + alias + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        binding.edittextAlias.getText().clear();
-                        MLog.e("Failed to generate key " + alias, e);
-                    }
-                });
+                    KeyGenReq req = new KeyGenReq.Builder()
+                            .setActivity(this.getActivity())
+                            .setView(this.getView())
+                            .setRole("personal")
+                            .setKeyAlias(alias)
+                            .createKeyGenReq();
+
+                    MusapClient.generateKey(sscd, req, new MusapCallback<MusapKey>() {
+                        @Override
+                        public void onSuccess(MusapKey result) {
+                            MLog.d("Successfully generated key " + alias);
+                            Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
+                            binding.edittextAlias.getText().clear();
+                        }
+
+                        @Override
+                        public void onException(MusapException e) {
+                            Toast.makeText(KeygenFragment.this.getContext(), "Failed to generate key " + alias + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            binding.edittextAlias.getText().clear();
+                            MLog.e("Failed to generate key " + alias, e);
+                        }
+                    });
+                } else {
+
+                    KeyBindReq req = new KeyBindReq.Builder()
+                            .setActivity(this.getActivity())
+                            .setView(this.getView())
+                            .setRole("personal")
+                            .setKeyAlias(alias)
+                            .createKeyBindReq();
+
+                    MusapClient.bindKey(sscd, req, new MusapCallback<MusapKey>() {
+                        @Override
+                        public void onSuccess(MusapKey result) {
+                            MLog.d("Successfully bound key " + alias);
+                            Toast.makeText(KeygenFragment.this.getContext(), "Bound key " + alias, Toast.LENGTH_SHORT).show();
+                            binding.edittextAlias.getText().clear();
+                        }
+
+                        @Override
+                        public void onException(MusapException e) {
+                            Toast.makeText(KeygenFragment.this.getContext(), "Failed to bind key " + alias + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            binding.edittextAlias.getText().clear();
+                            MLog.e("Failed to bind key " + alias, e);
+                        }
+                    });
+                }
             } catch (Exception e) {
 //                throw new RuntimeException(e);
                 MLog.e("Failed to generate key", e);
@@ -96,7 +124,6 @@ public class KeygenFragment extends Fragment {
         MLog.d("Found " + sscds.size() + " SSCDs");
 
         for (MusapSscdInterface sscd : MusapClient.listEnabledSscds()) {
-            if (!sscd.isKeygenSupported()) continue;
             i++;
             RadioButton rb = new RadioButton(this.getContext());
             rb.setText(sscd.getSscdInfo().getSscdName());

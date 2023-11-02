@@ -10,9 +10,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import fi.methics.musap.R;
-import fi.methics.musap.sdk.api.MusapClient;
-import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
-import fi.methics.musap.sdk.internal.discovery.KeyBindReqBuilder;
 
 
 public class AndroidKeystoreBindFragment extends Fragment {
@@ -38,12 +35,12 @@ public class AndroidKeystoreBindFragment extends Fragment {
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    KeyBindReq req = new KeyBindReqBuilder()
-                            .setSscd("Android Keystore")
-                            .setGenerateNewKey(true)
-                            .createKeyBindReq();
+                    //KeyBindReq req = new KeyBindReqBuilder()
+                    //        .setSscd("Android Keystore")
+                    //        .setGenerateNewKey(true)
+                    //        .createKeyBindReq();
 
-                    MusapClient.bindKey(req);
+                    //MusapClient.bindKey(req);
                 }
             });
         }

@@ -31,7 +31,6 @@ import fi.methics.musap.sdk.internal.datatype.SignatureFormat;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
-import fi.methics.musap.sdk.internal.util.KeyGenerationResult;
 import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.internal.util.MLog;
 import okhttp3.MediaType;
@@ -61,27 +60,20 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
     }
 
     @Override
-    public MusapKey bindKey(KeyBindReq req) {
-        throw new java.lang.UnsupportedOperationException(); // TODO: This should actually bind
-        // TODO:
-        // 1. Call https://demo.methics.fi/appactivation/appactivation/sign?msisdn=35847004112
-        // 2. Parse response into a MUSAPKey
-        // 3. Store the MUSAPKey into fi.methics.musap.keydiscovery.KeyMetaDataStorage
-        // 4. Return the MUSAPKey
-        //return null;
-    }
-
-    @Override
-    public MusapKey generateKey(KeyGenReq req) throws Exception {
-
-        CompletableFuture<KeyGenerationResult> future = new CompletableFuture<>();
+    public MusapKey bindKey(KeyBindReq req) throws Exception {
+        CompletableFuture<DemoBindResult> future = new CompletableFuture<>();
         openKeygenPopup(req, future);
 
-        KeyGenerationResult result = future.get();
+        DemoBindResult result = future.get();
         if (result.key       != null) return result.key;
         if (result.exception != null) throw result.exception;
 
-        throw new MusapException("Keygen failed");
+        throw new MusapException("Bind failed");
+    }
+
+    @Override
+    public MusapKey generateKey(KeyGenReq req) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -119,7 +111,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 .setSscdType(SSCD_TYPE)
                 .setCountry("FI")
                 .setProvider("Methics")
-                .setKeygenSupported(true /* TODO: This should be false */)
+                .setKeygenSupported(false)
                 .setSupportedAlgorithms(Arrays.asList(KeyAlgorithm.RSA_2K))
                 .setSupportedFormats(Arrays.asList(SignatureFormat.RAW, SignatureFormat.CMS))
                 .setSscdId("METHICS_DEMO") // TODO: This needs to be SSCD instance specific
@@ -131,7 +123,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         return settings;
     }
 
-    private void openKeygenPopup(KeyGenReq req, CompletableFuture<KeyGenerationResult> future) {
+    private void openKeygenPopup(KeyBindReq req, CompletableFuture<DemoBindResult> future) {
 
         PopupWindow popupWindow = new PopupWindow(context);
         TextView   popupContent = new TextView(context);
@@ -146,15 +138,15 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         msisdnEditText.setInputType(InputType.TYPE_CLASS_PHONE);
 
         Button button = new Button(context);
-        button.setText("Generate Key");
+        button.setText("Bind Key");
         button.setOnClickListener(v -> {
             CompletableFuture.runAsync(() -> {
                 try {
-                    MusapKey key = _generateKey(req, msisdnEditText.getText().toString());
-                    future.complete(new KeyGenerationResult(key));
+                    MusapKey key = _bindKey(req, msisdnEditText.getText().toString());
+                    future.complete(new DemoBindResult(key));
                 } catch (MusapException e) {
-                    MLog.e("Failed to generate key", e);
-                    future.complete(new KeyGenerationResult(e));
+                    MLog.e("Failed to bind key", e);
+                    future.complete(new DemoBindResult(e));
                 }
             });
             popupWindow.dismiss();
@@ -177,7 +169,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         req.getActivity().runOnUiThread(() -> popupWindow.showAtLocation(req.getView(), Gravity.CENTER, 0, 0));
     }
 
-    private MusapKey _generateKey(KeyGenReq req, String msisdn) throws MusapException {
+    private MusapKey _bindKey(KeyBindReq req, String msisdn) throws MusapException {
 
         MLog.d("Sending keygen request to Methics demo for MSISDN " + msisdn);
 
@@ -274,16 +266,16 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         }
     }
 
-    private static class KeyGenerationResult {
+    private static class DemoBindResult {
 
         public MusapKey key;
         public MusapException exception;
 
-        public KeyGenerationResult(MusapKey key) {
+        public DemoBindResult(MusapKey key) {
             this.key = key;
         }
 
-        public KeyGenerationResult(MusapException e) {
+        public DemoBindResult(MusapException e) {
             this.exception = e;
         }
 

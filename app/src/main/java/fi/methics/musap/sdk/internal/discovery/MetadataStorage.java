@@ -245,19 +245,6 @@ public class MetadataStorage {
         return data;
     }
 
-    @Deprecated
-    public void storeKeyMetaData(KeyBindReq req) {
-        Set<String> metadatas = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-                        .getStringSet(SSCD_SET, new HashSet<>());
-        Set<String> newMetadatas = new HashSet<>(metadatas);
-        newMetadatas.add(req.getSscd());
-
-        this.getSharedPref()
-                .edit()
-                .putStringSet(SSCD_SET, newMetadatas)
-                .apply();
-    }
-
     private String makeStoreName(MusapKey key) {
         return KEY_JSON_PREFIX + key.getKeyName();
     }
