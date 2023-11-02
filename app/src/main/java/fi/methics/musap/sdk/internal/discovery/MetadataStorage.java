@@ -266,16 +266,22 @@ public class MetadataStorage {
     }
 
     public boolean updateKeyMetaData(UpdateKeyReq req) {
-        MusapKey newKey = req.getKey();
+        MusapKey targetKey = req.getKey();
 
-        if (newKey == null) {
+        if (targetKey == null) {
             MLog.d("Update request is missing target key");
             throw new IllegalArgumentException("Missing key");
         }
 
         String keyJson = this.getKeyJson(req.getKey().getKeyName());
         MusapKey oldKey = this.parseKeyJson(keyJson);
+
+        String newAlias = req.getAlias();
+//        req
+        String newDid = req.getDid();
+        String newState = req.getState();
         
+
         return true;
     }
 
