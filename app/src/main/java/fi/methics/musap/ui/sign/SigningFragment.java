@@ -26,7 +26,6 @@ import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.datatype.SignatureAlgorithm;
 import fi.methics.musap.sdk.internal.sign.MusapSigner;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
-import fi.methics.musap.sdk.internal.sign.SignatureReqBuilder;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.internal.util.StringUtil;
@@ -79,10 +78,9 @@ public class SigningFragment extends Fragment {
             data = StringUtil.toUTF8Bytes(dtbs);
         }
 
-        final SignatureReq req = new SignatureReqBuilder(algorithm)
+        final SignatureReq req = new SignatureReq.Builder(algorithm)
                 .setKey(key)
                 .setData(data)
-                .setActivity(this.getActivity())
                 .createSignatureReq();
 
         sign.setOnClickListener(view -> {
@@ -113,7 +111,6 @@ public class SigningFragment extends Fragment {
             } catch (MusapException e) {
                 MLog.e("Failed to sign", e.getCause());
             }
-
         });
 
         return v;

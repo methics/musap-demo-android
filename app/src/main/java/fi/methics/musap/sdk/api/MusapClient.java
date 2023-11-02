@@ -68,12 +68,11 @@ public class MusapClient {
 
     /**
      * Sign data with given SSCD
-     * @param sscd SSCD to sign with
      * @param req  Request containing the data to sign
      * @param callback Callback that will deliver success or failure
      */
-    public static void sign(MusapSscdInterface sscd, SignatureReq req, MusapCallback<MusapSignature> callback) {
-        new SignTask(callback, context.get(), sscd, req).executeOnExecutor(executor);
+    public static void sign(SignatureReq req, MusapCallback<MusapSignature> callback) {
+        new SignTask(callback, context.get(), req).executeOnExecutor(executor);
     }
 
 
@@ -252,7 +251,7 @@ public class MusapClient {
     /**
      * Enable or disable MUSAP debug logging.
      * This only takes effect for lifetime of this app instance.
-     * Default value is true. This should be set off for production. 
+     * Default value is true. This should be set off for production.
      * @param isDebug
      */
     public static void setDebugLog(boolean isDebug) {
