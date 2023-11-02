@@ -45,6 +45,10 @@ public class MusapKey {
         this.createdDate      = Instant.now();
     }
 
+    public void setSscdId(String sscdId) {
+        this.sscdId = sscdId;
+    }
+
     public String getKeyId() {
         return keyId;
     }
@@ -129,17 +133,34 @@ public class MusapKey {
     }
 
     /**
-     * Get a handle to the SSCD that created this MUSAP key
+     * Get a handle to the SSCD implementation that created this MUSAP key
      * @return SSCD
      */
-    public MusapSscdInterface getSscd() {
+    public MusapSscdInterface getSscdImpl() {
+        if (this.sscdType == null) {
+            MLog.d("No SSCD Type found");
+            return null;
+        }
+        MLog.d("Looking for an SSCD with type " + this.sscdType);
+        for (MusapSscdInterface sscd : MusapClient.listEnabledSscds()) {
+            if (this.sscdType.equals(sscd.getSscdInfo().getSscdType())) {
+                MLog.d("Found SSCD with type " + this.sscdType);
+                return sscd;
+            } else {
+                MLog.d("SSCD " + sscd.getSscdInfo().getSscdType() + " does not match " + this.sscdType);
+            }
+        }
+        return null;
+    }
+
+    public MusapSscd getSscdInfo() {
         if (this.sscdId == null) {
-            MLog.d("No sscdid found");
+            MLog.d("No SSCD ID found");
             return null;
         }
         MLog.d("Looking for an SSCD with id " + this.sscdId);
-        for (MusapSscdInterface sscd : MusapClient.listEnabledSscds()) {
-            if (this.sscdId.equals(sscd.getSscdInfo().getSscdId())) {
+        for (MusapSscd sscd : MusapClient.listActiveSscds()) {
+            if (this.sscdId.equals(sscd.getSscdId())) {
                 MLog.d("Found SSCD with id " + this.sscdId);
                 return sscd;
             }
@@ -171,11 +192,6 @@ public class MusapKey {
 
         public Builder setKeyType(String keyType) {
             this.keyType = keyType;
-            return this;
-        }
-
-        public Builder setKeyAttribute(String name, String value) {
-            this.attributes.add(new KeyAttribute(name, value));
             return this;
         }
 
@@ -234,6 +250,16 @@ public class MusapKey {
 
         public Builder setAttestation(KeyAttestation attestation) {
             this.attestation = attestation;
+            return this;
+        }
+
+        public Builder addAttribute(String key, String value) {
+            this.attributes.add(new KeyAttribute(key, value));
+            return this;
+        }
+
+        public Builder addAttribute(KeyAttribute attr) {
+            this.attributes.add(attr);
             return this;
         }
 

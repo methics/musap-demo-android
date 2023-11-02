@@ -57,7 +57,7 @@ public class SigningFragment extends Fragment {
         final String keyuri   = args.getString(SignMethodRecyclerViewAdapter.KEY_URI);
         final String dtbsType = args.getString("dtbstype");
 
-        MusapKey     key = MusapClient.getKeyByUri(keyuri);
+        MusapKey key = MusapClient.getKeyByUri(keyuri);
 
         KeyAlgorithm keyAlgo = key.getAlgorithm();
         if (keyAlgo == null) {

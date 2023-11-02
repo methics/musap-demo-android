@@ -58,7 +58,7 @@ public class EnabledSscdListViewAdapter extends RecyclerView.Adapter<EnabledSscd
 
             mIdView.setOnClickListener(view -> {
                 Bundle args = new Bundle();
-                args.putString(MusapConstants.SSCD_ID, mItem.getSscdInfo().getSscdId());
+                args.putString(MusapConstants.SSCD_NAME, mItem.getSscdInfo().getSscdName());
                 controller.navigate(R.id.action_keystoreFragment_to_keystoreDetailsFragment, args);
             });
         }
