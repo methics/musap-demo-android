@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -106,6 +107,7 @@ public class SigningFragment extends Fragment {
                     @Override
                     public void onException(MusapException e) {
                         MLog.e("Failed to sign", e.getCause());
+                        Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
                     }
                 });
             } catch (MusapException e) {
