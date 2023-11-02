@@ -39,6 +39,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * MUSAP implementation for demo RemoteSignature SSCD that uses Methics demo at https://mobileid.dev
+ */
 public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> {
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
