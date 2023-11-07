@@ -1,4 +1,4 @@
-package fi.methics.musap.sdk.sscd.methicsdemo;
+package fi.methics.musap.sdk.sscd.rest204;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -15,7 +15,9 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import fi.methics.musap.sdk.api.MusapException;
@@ -33,38 +35,45 @@ import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.internal.util.MLog;
+import fi.methics.musap.sdk.sscd.rest204.json.MSS_Resp;
+import fi.methics.musap.sdk.sscd.rest204.json.MSS_SignatureReq;
+import fi.methics.musap.sdk.sscd.rest204.json.MSS_SignatureResp;
+import fi.methics.musap.sdk.sscd.rest204.json.MSS_StatusReq;
+import fi.methics.musap.sdk.sscd.rest204.json.MSS_StatusResp;
+import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> {
+public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    public static final String SSCD_TYPE         = "Methics Demo";
+
+    public static final String SSCD_TYPE         = "204 REST";
     public static final String ATTRIBUTE_MSISDN  = "msisdn";
-
-    private static final int POLL_AMOUNT = 10;
-
     private static final Gson GSON = new Gson();
+    private static final int POLL_AMOUNT = 20;
 
-    private Context             context;
-    private MethicsDemoSettings settings;
-    private OkHttpClient        client;
+    private Context         context;
+    private Rest204Settings settings;
+    private OkHttpClient    client;
+    private RestHmac        hmacClient;
 
-    public MethicsDemoSscd(Context context, MethicsDemoSettings settings) {
+    public Rest204Sscd(Context context, Rest204Settings settings) {
         this.context  = context;
         this.settings = settings;
         this.client   = new OkHttpClient.Builder().readTimeout(settings.getTimeout()).build();
+        this.hmacClient = new RestHmac(this.client, this.settings.getRestUserId(), this.settings.getRestApiKey());
     }
 
     @Override
     public MusapKey bindKey(KeyBindReq req) throws Exception {
-        CompletableFuture<DemoBindResult> future = new CompletableFuture<>();
+        CompletableFuture<RestBindResult> future = new CompletableFuture<>();
         openKeygenPopup(req, future);
 
-        DemoBindResult result = future.get();
+        RestBindResult result = future.get();
         if (result.key       != null) return result.key;
         if (result.exception != null) throw result.exception;
 
@@ -72,48 +81,71 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
     }
 
     @Override
-    public MusapKey generateKey(KeyGenReq req) throws UnsupportedOperationException {
+    public MusapKey generateKey(KeyGenReq req) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public MusapSignature sign(SignatureReq req) throws Exception {
-        DemoSigReq jReq = new DemoSigReq();
-        jReq.msisdn  = req.getKey().getAttributeValue(ATTRIBUTE_MSISDN);
-        jReq.message = "Sign with MUSAP"; // TODO
-        jReq.dtbs    = MBase64.toBase64String(req.getData());
-        jReq.async   = true;
 
-        if (jReq.msisdn == null) throw new MusapException(MusapException.ERROR_MISSING_PARAM, "Missing MSISDN");
-        if (jReq.dtbs   == null) throw new MusapException(MusapException.ERROR_MISSING_PARAM, "Missing DTBS");
+        MusapKey musapKey = req.getKey();
+        String msisdn = musapKey.getAttributeValue(ATTRIBUTE_MSISDN);
+        MLog.d("Sending signature request to REST 204 for MSISDN " + msisdn);
 
-        RequestBody body = RequestBody.create(GSON.toJson(jReq), JSON);
-        Request request = new Request.Builder()
-                .url(this.settings.getDemoUrl() + jReq.msisdn)
-                .post(body)
-                .build();
+        MSS_SignatureReq jReq = new MSS_SignatureReq(msisdn);
+        jReq.dtbd = new MSS_SignatureReq.DTBD("Activate MUSAP");
+        jReq.dtbs = new MSS_SignatureReq.DTBS(jReq.dtbd);
 
-        try (Response response = client.newCall(request).execute()) {
+        if (msisdn == null) throw new MusapException(MusapException.ERROR_MISSING_PARAM, "Missing MSISDN");
+
+        try {
+            String restUrl = this.getSettings().getRestUrl();
+            URL        url = new URL(restUrl);
+
+            String             json = "{\"MSS_SignatureReq\": " + GSON.toJson(jReq) + "}";
+            RequestBody        body = RequestBody.create(json, JSON);
+            Headers.Builder headers = new Headers.Builder();
+
+            Map<String, String> headersToAdd = this.hmacClient.requestHeaders("POST", url, json);
+            for (String key : headersToAdd.keySet()) {
+                headers.add(key, headersToAdd.get(key));
+            }
+
+            Request request = new Request.Builder()
+                    .url(restUrl)
+                    .headers(headers.build())
+                    .post(body)
+                    .build();
 
             MLog.d("Sending request " + GSON.toJson(jReq));
-            String sResp = response.body().string();
-            MLog.d("Got response " + sResp);
+            try (Response response = client.newCall(request).execute()) {
 
-            DemoSigResp jResp = GSON.fromJson(sResp, DemoSigResp.class);
-            return pollForSignature(jReq.msisdn, jResp.transid, "fetch");
+                String sResp = response.body().string();
+                MLog.d("Got response " + sResp);
+
+                MSS_Resp resp = GSON.fromJson(sResp, MSS_Resp.class);
+                MSS_SignatureResp jResp = resp.signatureResp;
+
+                if (resp.fault != null) {
+                    throw this.handleError(resp.fault.code.subCode.value);
+                }
+                return pollForSignature(jResp);
+            }
+        } catch (Exception e) {
+            throw new MusapException(e);
         }
     }
 
     @Override
     public MusapSscd getSscdInfo() {
         return new MusapSscd.Builder()
-                .setSscdName("Methics Demo")
                 .setSscdType(SSCD_TYPE)
-                .setCountry("FI")
-                .setProvider("Methics")
+                .setCountry(this.getSettings().getCountry())
+                .setSscdName(this.getSettings().getSscdName())
                 .setKeygenSupported(false)
                 .setSupportedAlgorithms(Arrays.asList(KeyAlgorithm.RSA_2K))
                 .setSupportedFormats(Arrays.asList(SignatureFormat.RAW, SignatureFormat.CMS))
+                .setProvider(this.getSettings().getProvider())
                 .build();
     }
 
@@ -123,14 +155,14 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
     }
 
     @Override
-    public MethicsDemoSettings getSettings() {
-        return settings;
+    public Rest204Settings getSettings() {
+        return this.settings;
     }
 
-    private void openKeygenPopup(KeyBindReq req, CompletableFuture<DemoBindResult> future) {
+    private void openKeygenPopup(KeyBindReq req, CompletableFuture<RestBindResult> future) {
 
         PopupWindow popupWindow = new PopupWindow(context);
-        TextView   popupContent = new TextView(context);
+        TextView popupContent = new TextView(context);
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         popupContent.setText("Please enter MSISDN");
@@ -147,10 +179,10 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
             CompletableFuture.runAsync(() -> {
                 try {
                     MusapKey key = _bindKey(req, msisdnEditText.getText().toString());
-                    future.complete(new DemoBindResult(key));
+                    future.complete(new RestBindResult(key));
                 } catch (MusapException e) {
                     MLog.e("Failed to bind key", e);
-                    future.complete(new DemoBindResult(e));
+                    future.complete(new RestBindResult(e));
                 }
             });
             popupWindow.dismiss();
@@ -173,32 +205,51 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         req.getActivity().runOnUiThread(() -> popupWindow.showAtLocation(req.getView(), Gravity.CENTER, 0, 0));
     }
 
+
     private MusapKey _bindKey(KeyBindReq req, String msisdn) throws MusapException {
 
-        MLog.d("Sending keygen request to Methics demo for MSISDN " + msisdn);
+        MLog.d("Sending keygen request to REST 204 for MSISDN " + msisdn);
 
-        DemoSigReq jReq = new DemoSigReq();
-        jReq.msisdn  = msisdn;
-        jReq.message = "Activate MUSAP";
-        jReq.async   = true;
+        MSS_SignatureReq jReq = new MSS_SignatureReq(msisdn);
+        jReq.dtbd = new MSS_SignatureReq.DTBD("Activate MUSAP");
+        jReq.dtbs = new MSS_SignatureReq.DTBS(jReq.dtbd);
 
-        if (jReq.msisdn == null) throw new MusapException(MusapException.ERROR_MISSING_PARAM, "Missing MSISDN");
+        if (msisdn == null) throw new MusapException(MusapException.ERROR_MISSING_PARAM, "Missing MSISDN");
 
         try {
-            RequestBody body = RequestBody.create(GSON.toJson(jReq), JSON);
+            String restUrl = this.getSettings().getRestUrl();
+            URL        url = new URL(restUrl);
+
+            String             json = "{\"MSS_SignatureReq\": " + GSON.toJson(jReq) + "}";
+            RequestBody        body = RequestBody.create(json, JSON);
+            Headers.Builder headers = new Headers.Builder();
+
+            Map<String, String> headersToAdd = this.hmacClient.requestHeaders("POST", url, json);
+            for (String key : headersToAdd.keySet()) {
+                headers.add(key, headersToAdd.get(key));
+            }
+
             Request request = new Request.Builder()
-                    .url(this.getSettings().getDemoUrl() + jReq.msisdn)
+                    .url(restUrl)
+                    .headers(headers.build())
                     .post(body)
                     .build();
+
             MLog.d("Sending request " + GSON.toJson(jReq));
             try (Response response = client.newCall(request).execute()) {
 
                 String sResp = response.body().string();
                 MLog.d("Got response " + sResp);
 
-                DemoSigResp jResp = GSON.fromJson(sResp, DemoSigResp.class);
-                CmsSignature signature = pollForSignature(msisdn, jResp.transid, "fetch");
-                MLog.d("Successfully bound Methics Demo SSCD");
+                MSS_Resp resp = GSON.fromJson(sResp, MSS_Resp.class);
+                MSS_SignatureResp jResp = resp.signatureResp;
+
+                if (resp.fault != null) {
+                    throw this.handleError(resp.fault.code.subCode.value);
+                }
+
+                CmsSignature signature = pollForSignature(jResp);
+                MLog.d("Successfully bound REST 204 SSCD");
                 MusapKey.Builder builder = new MusapKey.Builder();
                 builder.setCertificate(signature.getSignerCertificate());
                 builder.setKeyName(req.getKeyAlias());
@@ -214,15 +265,24 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         }
     }
 
-    private CmsSignature pollForSignature(String msisdn, String transid, String type) throws IOException, MusapException {
-        DemoSigReq jReq = new DemoSigReq();
-        jReq.msisdn  = msisdn;
-        jReq.transid = transid;
-        jReq.type    = type;
+    private CmsSignature pollForSignature(MSS_SignatureResp sigResp) throws IOException, MusapException {
+        MSS_StatusReq jReq = new MSS_StatusReq(sigResp);
 
-        RequestBody body = RequestBody.create(GSON.toJson(jReq), JSON);
+        String restUrl = this.getSettings().getRestUrl();
+        URL        url = new URL(restUrl);
+
+        String             json = "{ \"MSS_StatusReq\": " + GSON.toJson(jReq) + "}";
+        RequestBody        body = RequestBody.create(json, JSON);
+        Headers.Builder headers = new Headers.Builder();
+
+        Map<String, String> headersToAdd = this.hmacClient.requestHeaders("POST", url, json);
+        for (String key : headersToAdd.keySet()) {
+            headers.add(key, headersToAdd.get(key));
+        }
+
         Request request = new Request.Builder()
-                .url(this.getSettings().getDemoUrl() + jReq.msisdn)
+                .url(this.getSettings().getRestUrl())
+                .headers(headers.build())
                 .post(body)
                 .build();
 
@@ -238,21 +298,29 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 String sResp = response.body().string();
                 MLog.d("Got response " + sResp);
 
-                DemoSigResp jResp = GSON.fromJson(sResp, DemoSigResp.class);
+                MSS_Resp resp = GSON.fromJson(sResp, MSS_Resp.class);
+                MSS_StatusResp jResp = resp.statusResp;
 
-                if (jResp.success == false && (jResp.statuscode == null || "0".equals(jResp.statuscode))) {
+                if (resp.fault != null) {
+                    throw this.handleError(resp.fault.code.subCode.value);
+                }
+
+                if (jResp.status != null && (jResp.status.statusCode == null || "504".equals(jResp.status.statusCode))) {
                     // No response yet
                     MLog.d("Not ready yet");
                     continue;
                 }
 
-                if ("500".equals(jResp.statuscode)) {
-                    MLog.d("Successfully signed");
-                } else {
-                    throw this.handleError(jResp.statuscode);
+                switch (jResp.status.statusCode.value) {
+                    case "500":
+                    case "502":
+                        MLog.d("Successfully signed");
+                        break;
+                    default:
+                        throw this.handleError(jResp.status.statusCode.value);
                 }
 
-                return new CmsSignature(MBase64.toBytes(jResp.signature));
+                return new CmsSignature(MBase64.toBytes(jResp.signature.base64Signature));
             }
         }
         throw new MusapException(MusapException.ERROR_TIMED_OUT, "Failed to get a signature in " + POLL_AMOUNT + " attempts");
@@ -270,41 +338,18 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
         }
     }
 
-    private static class DemoBindResult {
+    private static class RestBindResult {
 
         public MusapKey key;
         public MusapException exception;
 
-        public DemoBindResult(MusapKey key) {
+        public RestBindResult(MusapKey key) {
             this.key = key;
         }
 
-        public DemoBindResult(MusapException e) {
+        public RestBindResult(MusapException e) {
             this.exception = e;
         }
-
-    }
-
-    private static class DemoSigReq {
-
-        public String type = "sign";
-        public String msisdn;
-        public String message;
-        public String transid;
-        public String dtbs;
-        public String mimetype;
-        public String encoding;
-        public boolean async;
-
-    }
-
-    private static class DemoSigResp {
-
-        public String type;
-        public String statuscode;
-        public String signature;
-        public String transid;
-        public boolean success;
 
     }
 

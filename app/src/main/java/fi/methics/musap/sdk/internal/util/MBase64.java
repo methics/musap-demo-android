@@ -24,6 +24,18 @@ public class MBase64 {
     }
 
     /**
+     * Encode a byte array to a base 64 string.
+     * @param arr
+     * @return
+     */
+    public static String toBase64(byte[] arr) {
+        if (arr == null) {
+            return null;
+        }
+        return Base64.encodeToString(arr, FLAGS);
+    }
+
+    /**
      * Decode a Base64 string into a byte array.
      * @param s
      * @return
