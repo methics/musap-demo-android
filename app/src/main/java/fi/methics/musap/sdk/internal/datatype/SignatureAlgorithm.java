@@ -15,6 +15,8 @@ public class SignatureAlgorithm {
     public static SignatureAlgorithm SHA512_WITH_ECDSA = new SignatureAlgorithm("SHA512withECDSA");
     public static SignatureAlgorithm NONE_WITH_ECDSA   = new SignatureAlgorithm("NONEwithECDSA");
 
+    public static SignatureAlgorithm EDDSA = new SignatureAlgorithm("NONEwithEdDSA");
+
     public static SignatureAlgorithm SHA256_WITH_RSA = new SignatureAlgorithm("SHA256withRSA");
     public static SignatureAlgorithm SHA384_WITH_RSA = new SignatureAlgorithm("SHA384withRSA");
     public static SignatureAlgorithm SHA512_WITH_RSA = new SignatureAlgorithm("SHA512withRSA");
@@ -29,6 +31,7 @@ public class SignatureAlgorithm {
     public static final String SCHEME_RSA_PSS  = "RSASSA-PSS"; // a.k.a. PSS (PKCS#1v2.1)
     public static final String SCHEME_RSA      = "RSA";        // a.k.a. PKCS#1v1.5
     public static final String SCHEME_ECDSA    = "ECDSA";      // a.k.a. EC-DSA
+    public static final String SCHEME_EDDSA    = "EdDSA";
 
     public static final String HASH_SHA256 = "SHA256";
     public static final String HASH_SHA384 = "SHA384";
@@ -75,15 +78,23 @@ public class SignatureAlgorithm {
      * @return JWS algorithm identifier (e.g. RS256 for RSA with SHA-256)
      */
     public String getJwsAlgorithm() {
-        if (SCHEME_RSA_PSS.equals(this.scheme) || SCHEME_RSA_PSS.equals(this.scheme)) {
+        if (SCHEME_RSA_PSS.equals(this.scheme)) {
             if (HASH_SHA256.equals(this.hashAlgorithm)) return "RS256";
             if (HASH_SHA384.equals(this.hashAlgorithm)) return "RS384";
             if (HASH_SHA512.equals(this.hashAlgorithm)) return "RS512";
+        }
+        if (SCHEME_RSA_PSS.equals(this.scheme)) {
+            if (HASH_SHA256.equals(this.hashAlgorithm)) return "PS256";
+            if (HASH_SHA384.equals(this.hashAlgorithm)) return "PS384";
+            if (HASH_SHA512.equals(this.hashAlgorithm)) return "PS512";
         }
         if (SCHEME_ECDSA.equals(this.scheme)) {
             if (HASH_SHA256.equals(this.hashAlgorithm)) return "ES256";
             if (HASH_SHA384.equals(this.hashAlgorithm)) return "ES384";
             if (HASH_SHA512.equals(this.hashAlgorithm)) return "ES512";
+        }
+        if (SCHEME_EDDSA.equals(this.scheme)) {
+            return "EdDSA";
         }
         MLog.d("No matches for scheme=" + scheme + " and hash " + hashAlgorithm);
         return null;
@@ -95,6 +106,24 @@ public class SignatureAlgorithm {
      */
     public String getScheme() {
         return this.scheme;
+    }
+
+    /**
+     * Does this signature algorithm use RSA keys?
+     * @return true for RSA
+     */
+    public boolean isRsa() {
+        String jwsAlgo = this.getJwsAlgorithm();
+        if (jwsAlgo == null) return false;
+        return getJwsAlgorithm().startsWith("RS");
+    }
+
+    /**
+     * Does this signature algorithm use EC keys?
+     * @return true for EC
+     */
+    public boolean isEc() {
+        return !isRsa();
     }
 
     /**

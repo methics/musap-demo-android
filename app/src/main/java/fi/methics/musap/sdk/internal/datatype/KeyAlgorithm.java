@@ -14,6 +14,7 @@ public class KeyAlgorithm {
     public static final String CURVE_SECP384K1 = "secp384k1";
     public static final String CURVE_SECP256R1 = "secp256r1";
     public static final String CURVE_SECP384R1 = "secp384r1";
+    public static final String CURVE_25519     = "Ed25519";
 
     public static final KeyAlgorithm RSA_2K      = new KeyAlgorithm(PRIMITIVE_RSA, 2048);
     public static final KeyAlgorithm RSA_4K      = new KeyAlgorithm(PRIMITIVE_RSA, 4096);
@@ -21,6 +22,7 @@ public class KeyAlgorithm {
     public static final KeyAlgorithm ECC_P384_K1 = new KeyAlgorithm(PRIMITIVE_EC, CURVE_SECP384K1, 384);
     public static final KeyAlgorithm ECC_P256_R1 = new KeyAlgorithm(PRIMITIVE_EC, CURVE_SECP256R1, 256);
     public static final KeyAlgorithm ECC_P384_R1 = new KeyAlgorithm(PRIMITIVE_EC, CURVE_SECP384R1, 384);
+    public static final KeyAlgorithm ECC_ED25519 = new KeyAlgorithm(PRIMITIVE_EC, CURVE_25519, 256);
 
     public String primitive;
     public String curve;
@@ -29,7 +31,7 @@ public class KeyAlgorithm {
     /**
      * Create a new Key Algorithm
      * @param primitive Primitive (usually RSA or EC)
-     * @param bits      Bits (often same as key length)
+     * @param bits      Bits (key length)
      */
     public KeyAlgorithm(String primitive, int bits) {
         this.primitive  = primitive;
@@ -40,7 +42,7 @@ public class KeyAlgorithm {
      * Create a new Key Algorithm with a specific curve
      * @param primitive Primitive (usually RSA or EC)
      * @param curve     Curve (e.g. secp256r1)
-     * @param bits      Bits (often same as key length)
+     * @param bits      Bits (key length)
      */
     public KeyAlgorithm(String primitive, String curve, int bits) {
         this.primitive  = primitive;
