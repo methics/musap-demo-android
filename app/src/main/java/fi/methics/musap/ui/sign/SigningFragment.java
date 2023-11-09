@@ -66,13 +66,18 @@ public class SigningFragment extends Fragment {
         SignatureAlgorithm algorithm = keyAlgo.isEc() ? SignatureAlgorithm.SHA256_WITH_ECDSA :
                                                         SignatureAlgorithm.SHA256_WITH_RSA;
 
+        // TODO: Remove this. test-only.
+        algorithm = SignatureAlgorithm.EDDSA;
+
         final JWSObject jws;
         byte[] data;
         if ("jws".equalsIgnoreCase(dtbsType)) {
+            MLog.d("Signing JWT with key " + key.getKeyUri());
             jws = this.buildSampleJws(algorithm);
             text.setText(jws.getPayload().toString());
             data = jws.getSigningInput();
         } else {
+            MLog.d("Signing text with key " + key.getKeyUri());
             jws = null;
             final String dtbs = args.getString(SignMethodRecyclerViewAdapter.DTBS);
             text.setText(dtbs);

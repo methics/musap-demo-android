@@ -77,8 +77,8 @@ public class SignMethodFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            Set<String> keyNames = MusapClient.listKeys().stream().map(key -> key.getKeyUri()).map(uri -> uri.toString()).collect(Collectors.toSet());
-            List<String> keys = new ArrayList<>(keyNames);
+            Set<String> keyUris = MusapClient.listKeys().stream().map(key -> key.getKeyUri()).map(uri -> uri.toString()).collect(Collectors.toSet());
+            List<String> keys = new ArrayList<>(keyUris);
 
             MLog.d("Found keys: ");
             for (String keyuri : keys) {

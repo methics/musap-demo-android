@@ -3,6 +3,7 @@ package fi.methics.musap.sdk.internal.datatype;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
@@ -10,7 +11,7 @@ import fi.methics.musap.sdk.internal.util.MLog;
 
 public class MusapKey {
 
-    private String keyName;
+    private String keyAlias;
     private String keyType;
     private String keyId;
     private String sscdId;
@@ -28,7 +29,7 @@ public class MusapKey {
     private KeyAttestation attestation;
 
     private MusapKey(Builder builder) {
-        this.keyName          = builder.keyName;
+        this.keyAlias         = builder.keyAlias;
         this.keyType          = builder.keyType;
         this.keyId            = builder.keyId;
         this.sscdId           = builder.sscdId;
@@ -53,8 +54,8 @@ public class MusapKey {
         return keyId;
     }
 
-    public String getKeyName() {
-        return keyName;
+    public String getKeyAlias() {
+        return keyAlias;
     }
 
     public String getKeyType() {
@@ -122,7 +123,7 @@ public class MusapKey {
 
     public SignatureAlgorithm getDefaultsignatureAlgorithm() {
         if (this.algorithm == null) {
-            MLog.d("Unable to determine algorithm for key " + this.keyName);
+            MLog.d("Unable to determine algorithm for key " + this.keyAlias);
             return SignatureAlgorithm.SHA256_WITH_ECDSA;
         }
         if (this.algorithm.isRsa()) {
@@ -169,7 +170,7 @@ public class MusapKey {
     }
 
     public static class Builder {
-        private String keyName;
+        private String keyAlias;
         private String keyType;
         private String keyId;
         private String sscdId;
@@ -185,8 +186,8 @@ public class MusapKey {
 
         private KeyAttestation attestation;
 
-        public Builder setKeyName(String keyName) {
-            this.keyName = keyName;
+        public Builder setKeyAlias(String keyAlias) {
+            this.keyAlias = keyAlias;
             return this;
         }
 
@@ -264,6 +265,9 @@ public class MusapKey {
         }
 
         public MusapKey build() {
+            if (this.keyId == null) {
+                this.keyId = UUID.randomUUID().toString(); // TODO: Call an util class for this
+            }
             return new MusapKey(this);
         }
     }

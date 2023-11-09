@@ -57,7 +57,7 @@ public class MetadataStorage {
             MLog.e("Cannot store null MUSAP key");
             throw new IllegalArgumentException("Cannot store null MUSAP key");
         }
-        if (key.getKeyName() == null) {
+        if (key.getKeyAlias() == null) {
             MLog.e("Cannot store unnamed MUSAP key");
             throw new IllegalArgumentException("Cannot store unnamed MUSAP key");
         }
@@ -66,7 +66,7 @@ public class MetadataStorage {
 
         // Update Key Name list with new Key Name
         Set<String> newKeyNames = new HashSet<>(this.getKeyNameSet());
-        newKeyNames.add(key.getKeyName());
+        newKeyNames.add(key.getKeyAlias());
 
         String keyJson = new Gson().toJson(key);
         MLog.d("KeyJson=" + keyJson);
@@ -137,11 +137,11 @@ public class MetadataStorage {
     public boolean removeKey(MusapKey key) {
         // Update Key Name list without given Key Name
         Set<String> newKeyNames = new HashSet<>(this.getKeyNameSet());
-        if (!this.getKeyNameSet().contains(key.getKeyName())) {
-            MLog.d("No key found with name " + key.getKeyName());
+        if (!this.getKeyNameSet().contains(key.getKeyAlias())) {
+            MLog.d("No key found with name " + key.getKeyAlias());
             return false;
         }
-        newKeyNames.remove(key.getKeyName());
+        newKeyNames.remove(key.getKeyAlias());
 
         String keyJson = new Gson().toJson(key);
         MLog.d("KeyJson=" + keyJson);
@@ -150,7 +150,7 @@ public class MetadataStorage {
                 .edit()
                 .putStringSet(KEY_NAME_SET, newKeyNames)
                 .putString(this.makeStoreName(key), keyJson)
-                .remove(this.makeStoreName(key.getKeyName()))
+                .remove(this.makeStoreName(key.getKeyAlias()))
                 .apply();
         return true;
     }
@@ -246,7 +246,7 @@ public class MetadataStorage {
     }
 
     private String makeStoreName(MusapKey key) {
-        return KEY_JSON_PREFIX + key.getKeyName();
+        return KEY_JSON_PREFIX + key.getKeyAlias();
     }
     private String makeStoreName(MusapSscd sscd) {
         return SSCD_JSON_PREFIX + sscd.getSscdId();

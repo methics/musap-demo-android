@@ -76,18 +76,11 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     private YubiKeySettings settings = new YubiKeySettings();
 
     private AlertDialog currentPrompt;
-    private CompletableFuture<KeyGenerationResult> keygenFuture;
-    private CompletableFuture<SigningResult> signFuture;
-
     private final ManagementKeyType type;
 
     private final byte[] managementKey;
 
     private final YubiKitManager yubiKitManager;
-
-    private KeyGenReq keyGenReq;
-    private SignatureReq sigReq;
-    private GenerateKeyCallback callback;
 
     private final Context c;
 
@@ -96,7 +89,6 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         this.type = TYPE;
         this.c = context;
         this.yubiKitManager = new YubiKitManager(this.c);
-
     }
 
     @Override
@@ -108,23 +100,11 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
 
     @Override
     public MusapKey generateKey(KeyGenReq req) throws Exception {
-        // Save request type
-        this.keyGenReq = req;
-        this.sigReq = null;
-        this.keygenFuture = new CompletableFuture<>();
+        CompletableFuture<KeyGenerationResult> keygenFuture = new CompletableFuture<>();
 
         Context c = req.getActivity();
         View v = LayoutInflater.from(c).inflate(R.layout.dialog_pin, null);
-        showInsertPinDialog();
-        //req.getActivity().runOnUiThread(() -> new AlertDialog.Builder(c)
-        //        .setTitle("PIN")
-        //        .setView(v)
-        //        .setPositiveButton("OK", (dialogInterface, i) -> {
-        //            String pin = ((TextView) v.findViewById(R.id.dialog_pin_edittext)).getText().toString();
-        //            MLog.d("PIN=" + pin);
-        //        })
-        //        .setNeutralButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel())
-        //        .show());
+        showInsertPinDialog(new SscdTransaction(req, keygenFuture));
 
         KeyGenerationResult result = keygenFuture.get();
         if (result.key       != null) return result.key;
@@ -136,10 +116,8 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     @Override
     public MusapSignature sign(SignatureReq req) throws Exception {
 
-        this.signFuture = new CompletableFuture<>();
-        this.sigReq = req;
-        this.keyGenReq = null;
-        this.showInsertPinDialog();
+        CompletableFuture<SigningResult> signFuture = new CompletableFuture<>();
+        this.showInsertPinDialog(new SscdTransaction(req, signFuture));
 
         SigningResult result = signFuture.get();
         if (result.signature != null) return result.signature;
@@ -153,20 +131,13 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         return SSCD_TYPE + "/" + key.getAttributeValue(ATTRIBUTE_SERIAL);
     }
 
-    public void signAsync(SignatureReq req) {
-        this.sigReq    = req;
-        this.keyGenReq = null;
-
-        this.showInsertPinDialog();
-    }
-
-    private Activity getActivity() {
-        if (this.sigReq != null) return this.sigReq.getActivity();
-        if (this.keyGenReq != null) return this.keyGenReq.getActivity();
+    private Activity getActivity(SignatureReq sigReq, KeyGenReq keygenReq) {
+        if (sigReq    != null) return sigReq.getActivity();
+        if (keygenReq != null) return keygenReq.getActivity();
         return null;
     }
 
-    private void showInsertYubiKeyDialog(String pin, Activity activity, GenerateKeyCallback callback) {
+    private void showInsertYubiKeyDialog(SscdTransaction txn, String pin, Activity activity) {
 
         // Dismiss old dialog if it it showing
         activity.runOnUiThread(() -> {
@@ -186,30 +157,22 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
             currentPrompt.show();
         });
 
-        if (this.keyGenReq != null) {
-            this.yubiKeyGen(pin, this.keyGenReq, callback);
+        if (txn.keyGenReq != null) {
+            this.yubiKeyGen(pin, txn);
         } else {
-            this.yubiSign(pin, this.sigReq);
+            this.yubiSign(pin, txn);
         }
     }
 
-    public void genKeyAsync(KeyGenReq req, GenerateKeyCallback callback) {
-        // Save request type
-        this.keyGenReq = req;
-        this.sigReq = null;
-
-        this.showInsertPinDialog();
-    }
-
-    private void showInsertPinDialog() {
+    private void showInsertPinDialog(SscdTransaction txn) {
         MLog.d("Showing dialog");
 
-        if (this.keyGenReq == null && this.sigReq == null) {
+        if (txn == null) {
             MLog.d("Missing request");
             throw new IllegalArgumentException();
         }
         MLog.d("Building view");
-        Activity activity = this.keyGenReq != null ? this.keyGenReq.getActivity() : this.sigReq.getActivity();
+        Activity activity = txn.getActivity();
         View v = LayoutInflater.from(activity).inflate(R.layout.dialog_pin, null);
 
         MLog.d("Running on UI thread. Activity=" + activity.getClass());
@@ -222,7 +185,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
                         String pin = ((TextView) v.findViewById(R.id.dialog_pin_edittext)).getText().toString();
                         MLog.d("PIN=" + pin);
 
-                        showInsertYubiKeyDialog(pin, activity, callback);
+                        showInsertYubiKeyDialog(txn, pin, activity);
                     })
                     .setNeutralButton("Cancel", (dialogInterface, i) ->  {
                         dialogInterface.cancel();
@@ -255,19 +218,19 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         });
     }
 
-    public void showKeyGenFailedDualog(KeyGenReq req) {
+    public void showKeyGenFailedDualog(SscdTransaction txn) {
 
         // Dismiss old dialog if it it showing
-        req.getActivity().runOnUiThread(() -> {
+        txn.getActivity().runOnUiThread(() -> {
             if (currentPrompt != null) {
                 currentPrompt.dismiss();
             }
         });
 
-        Context c = req.getActivity();
+        Context c = txn.getActivity();
         View v = LayoutInflater.from(c).inflate(R.layout.dialog_keygen_failed, null);
 
-        req.getActivity().runOnUiThread(() -> {
+        txn.getActivity().runOnUiThread(() -> {
             currentPrompt = new AlertDialog.Builder(c)
                     .setTitle("Key Generation Failed")
                     .setView(v)
@@ -276,19 +239,19 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         });
     }
 
-    public void showSignFailedDialog(SignatureReq req) {
+    public void showSignFailedDialog(SscdTransaction txn) {
 
         // Dismiss old dialog if it it showing
-        req.getActivity().runOnUiThread(() -> {
+        txn.getActivity().runOnUiThread(() -> {
             if (currentPrompt != null) {
                 currentPrompt.dismiss();
             }
         });
 
-        Context c = req.getActivity();
+        Context c = txn.getActivity();
         View v = LayoutInflater.from(c).inflate(R.layout.dialog_sign_failed, null);
 
-        req.getActivity().runOnUiThread(() -> {
+        txn.getActivity().runOnUiThread(() -> {
             currentPrompt = new AlertDialog.Builder(c)
                     .setTitle("Signature Failed")
                     .setView(v)
@@ -298,11 +261,11 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     }
 
 
-    private void yubiKeyGen(String pin, KeyGenReq req, GenerateKeyCallback callback) {
+    private void yubiKeyGen(String pin, SscdTransaction txn) {
         try {
-            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), req.getActivity(), device -> {
+            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), txn.getActivity(), device -> {
                 MLog.d("Found NFC");
-                connect(device, req, pin);
+                connect(device, txn, pin);
             });
         } catch (NfcNotAvailable e) {
             if (e.isDisabled()) {
@@ -310,15 +273,15 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
             } else {
                 Toast.makeText(c, "NFC is not available", Toast.LENGTH_SHORT).show();
             }
-            yubiKitManager.stopNfcDiscovery(req.getActivity());
+            yubiKitManager.stopNfcDiscovery(txn.getActivity());
         }
     }
 
-    private void yubiSign(String pin, SignatureReq req) {
+    private void yubiSign(String pin, SscdTransaction txn) {
         try {
-            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), req.getActivity(), device -> {
+            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), txn.getActivity(), device -> {
                 MLog.d("Found NFC");
-                connectForSign(device, req, pin);
+                connectForSign(device, txn, pin);
             });
         } catch (NfcNotAvailable e) {
             if (e.isDisabled()) {
@@ -326,7 +289,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
             } else {
                 Toast.makeText(c, "NFC is not available", Toast.LENGTH_SHORT).show();
             }
-            yubiKitManager.stopNfcDiscovery(req.getActivity());
+            yubiKitManager.stopNfcDiscovery(txn.getActivity());
         }
     }
 
@@ -353,7 +316,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         return settings;
     }
 
-    private void connect(final NfcYubiKeyDevice device, final KeyGenReq req, String pin)  {
+    private void connect(NfcYubiKeyDevice device, SscdTransaction txn, String pin)  {
 
         device.requestConnection(SmartCardConnection.class, result -> {
             // The result is a Result<SmartCardConnection, IOException>, which represents either a successful connection, or an error.
@@ -364,20 +327,20 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
                 // If the connection is not successful, try again
                 if (!success) {
                     MLog.d("Failed to connect");
-                    this.showKeyGenFailedDualog(req);
+                    this.showKeyGenFailedDualog(txn);
                 } else {
                     MLog.d("PIN=" + pin);
-                    keyGenOnDevice(req, pin, result.getValue());
+                    keyGenOnDevice(txn, pin, result.getValue());
                 }
             } catch (Exception e) {
                 MLog.e("Failed to connect", e);
-                this.showKeyGenFailedDualog(req);
-                yubiKitManager.stopNfcDiscovery(req.getActivity());
+                this.showKeyGenFailedDualog(txn);
+                yubiKitManager.stopNfcDiscovery(txn.getActivity());
             }
         });
     }
 
-    private void connectForSign(final NfcYubiKeyDevice device, final SignatureReq req, String pin)  {
+    private void connectForSign(final NfcYubiKeyDevice device, final SscdTransaction txn, String pin)  {
 
         device.requestConnection(SmartCardConnection.class, result -> {
             // The result is a Result<SmartCardConnection, IOException>, which represents either a successful connection, or an error.
@@ -388,21 +351,21 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
                 // If the connection is not successful, try again
                 if (!success) {
                     MLog.d("Failed to connect");
-                    this.showSignFailedDialog(req);
-                    yubiKitManager.stopNfcDiscovery(req.getActivity());
+                    this.showSignFailedDialog(txn);
+                    yubiKitManager.stopNfcDiscovery(txn.getActivity());
                 } else {
                     MLog.d("PIN=" + pin);
-                    signOnDevice(pin, req, result.getValue());
+                    signOnDevice(pin, txn, result.getValue());
                 }
             } catch (Exception e) {
                 MLog.e("Failed to connect", e);
-                this.showSignFailedDialog(req);
-                yubiKitManager.stopNfcDiscovery(req.getActivity());
+                this.showSignFailedDialog(txn);
+                yubiKitManager.stopNfcDiscovery(txn.getActivity());
             }
         });
     }
 
-    private void keyGenOnDevice(KeyGenReq req, String pin, SmartCardConnection connection) throws Exception {
+    private void keyGenOnDevice(SscdTransaction txn, String pin, SmartCardConnection connection) throws Exception {
         PivSession pivSession = new PivSession(connection);
         pivSession.authenticate(this.type, this.managementKey);
 
@@ -419,7 +382,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         ecKpg.initialize(
                 new PivAlgorithmParameterSpec(
                         usedSlot,
-                        this.resolveKeyType(req),
+                        this.resolveKeyType(txn),
                         null, // PinPolicy
                         null, // TouchPolicy
                         pin.toCharArray() // PIV PIN
@@ -474,24 +437,25 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         pivSession.putCertificate(usedSlot, builtCert);
         MusapCertificate cert = new MusapCertificate(builtCert);
 
+        KeyGenReq req = txn.keyGenReq;
+
         MusapKey.Builder keyBuilder = new MusapKey.Builder();
         keyBuilder.setCertificate(cert);
-        keyBuilder.setKeyName(req.getKeyAlias());
+        keyBuilder.setKeyAlias(req.getKeyAlias());
         keyBuilder.addAttribute(ATTRIBUTE_SERIAL, Integer.toHexString(pivSession.getSerialNumber()));
         keyBuilder.setSscdType(this.getSscdInfo().getSscdType());
         keyBuilder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
         keyBuilder.setSscdId(this.getSscdInfo().getSscdId());
         keyBuilder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
-        // TODO: Find out Yubikey serial number
 
-        this.keygenFuture.complete(new KeyGenerationResult(keyBuilder.build()));
+        txn.keyGenFuture.complete(new KeyGenerationResult(keyBuilder.build()));
 
         MLog.d("Put certificate to slot");
 
-        showRemoveYubiKeyDialog(req.getActivity());
+        showRemoveYubiKeyDialog(txn.getActivity());
     }
 
-    private void signOnDevice(String pin, SignatureReq req, SmartCardConnection connection) throws Exception {
+    private void signOnDevice(String pin, SscdTransaction txn,  SmartCardConnection connection) throws Exception {
 
         String msg = "Test string";
 
@@ -528,29 +492,32 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
             MLog.d("Valid signature=" + valid);
 
             // Dismiss old dialog if it it showing
-            getActivity().runOnUiThread(() -> {
+            txn.getActivity().runOnUiThread(() -> {
                 if (currentPrompt != null) {
                     currentPrompt.dismiss();
                     currentPrompt.cancel();
                 }
             });
-
-            signFuture.complete(new SigningResult(new MusapSignature(sigResult, req.getKey(), req.getAlgorithm(), req.getFormat())));
+            SignatureReq req = txn.sigReq;
+            txn.signFuture.complete(new SigningResult(new MusapSignature(sigResult, req.getKey(), req.getAlgorithm(), req.getFormat())));
 
         } catch (Exception e) {
-            signFuture.complete(new SigningResult(new MusapException(e)));
+            txn.signFuture.complete(new SigningResult(new MusapException(e)));
             throw new MusapException(e);
         }
     }
 
     /**
      * Convert MUSAP Key type to YubiKey Key type
-     * @param req
+     * @param txn
      * @return
      */
-    private KeyType resolveKeyType(KeyGenReq req) {
+    private KeyType resolveKeyType(SscdTransaction txn) {
 
-        KeyAlgorithm algorithm = req.getAlgorithm();
+        KeyAlgorithm algorithm = null;
+
+        if (txn.keyGenReq != null) algorithm = txn.keyGenReq.getAlgorithm();
+
         if (algorithm == null) return KeyType.ECCP384;
         if (algorithm.isEc()) {
             if (algorithm.bits == 256) return KeyType.ECCP256;

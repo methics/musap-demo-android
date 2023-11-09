@@ -33,7 +33,7 @@ public class MusapSigner {
         try {
             MusapSscdInterface sscd = this.key.getSscdImpl();
             if (sscd == null) {
-                throw new MusapException("No SSCD found for key " + this.key.getKeyId() + "(" + this.key.getSscdId() + ")");
+                throw new MusapException("No SSCD found for key " + this.key.getKeyId() + " (" + this.key.getSscdId() + ")");
             }
             req.setActivity(this.activity);
             MusapClient.sign(req, callback);

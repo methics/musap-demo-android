@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import fi.methics.musap.R;
 
 
+@Deprecated
 public class YubiKeyGenFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match

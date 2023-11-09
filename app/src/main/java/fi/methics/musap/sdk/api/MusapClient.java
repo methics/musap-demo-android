@@ -153,7 +153,7 @@ public class MusapClient {
         MetadataStorage storage = new MetadataStorage(context.get());
         for (MusapKey key : storage.listKeys()) {
             if (key.getKeyUri().matches(new KeyURI(keyUri))) {
-                MLog.d("Found key " + key.getKeyName());
+                MLog.d("Found key " + key.getKeyAlias());
                 return key;
             }
         }

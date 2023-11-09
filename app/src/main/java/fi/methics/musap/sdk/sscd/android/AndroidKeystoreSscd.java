@@ -15,8 +15,6 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Arrays;
 
-import fi.methics.musap.sdk.api.MusapConstants;
-import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.datatype.KeyURI;
 import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
@@ -78,8 +76,8 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
         MLog.d("Key generation successful");
 
         MusapKey generatedKey = new MusapKey.Builder()
-                .setSscdType(MusapConstants.ANDROID_KS_TYPE)
-                .setKeyName(req.getKeyAlias())
+                .setSscdType(SSCD_TYPE)
+                .setKeyAlias(req.getKeyAlias())
                 .setKeyUri(new KeyURI(req.getKeyAlias(), sscd.getSscdType(), "loa3").getUri())
                 .setSscdId(sscd.getSscdId())
                 .setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3))
@@ -92,7 +90,7 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
 
     @Override
     public MusapSignature sign(SignatureReq req) throws GeneralSecurityException, IOException {
-        String alias = req.getKey().getKeyName();
+        String alias = req.getKey().getKeyAlias();
 
         KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
         ks.load(null);
@@ -124,6 +122,7 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
                         KeyAlgorithm.RSA_2K,
                         KeyAlgorithm.ECC_P256_R1,
                         KeyAlgorithm.ECC_P256_K1,
+                        KeyAlgorithm.ECC_P384_R1,
                         KeyAlgorithm.ECC_P384_K1))
                 .setSupportedFormats(Arrays.asList(SignatureFormat.RAW))
                 .build();

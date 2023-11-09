@@ -63,7 +63,7 @@ public class KeygenFragment extends Fragment {
                             .setView(this.getView())
                             .setRole("personal")
                             .setKeyAlias(alias)
-                            //.setKeyAlgorithm(KeyAlgorithm.RSA_2K)
+                            .setKeyAlgorithm(KeyAlgorithm.ECC_ED25519)
                             .createKeyGenReq();
 
                     MusapClient.generateKey(sscd, req, new MusapCallback<MusapKey>() {
