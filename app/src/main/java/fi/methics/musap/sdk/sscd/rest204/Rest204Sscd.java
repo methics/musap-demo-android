@@ -16,6 +16,8 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -33,6 +35,7 @@ import fi.methics.musap.sdk.internal.datatype.SignatureFormat;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.util.IdGenerator;
 import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.sscd.rest204.json.MSS_Resp;
@@ -95,6 +98,14 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
         MSS_SignatureReq jReq = new MSS_SignatureReq(msisdn);
         jReq.dtbd = new MSS_SignatureReq.DTBD("Activate MUSAP");
         jReq.dtbs = new MSS_SignatureReq.DTBS(jReq.dtbd);
+
+        if (this.settings.isNoSpamEnabled()) {
+            jReq.additionalServices = new ArrayList<>();
+            MSS_SignatureReq.AdditionalService nospam = new MSS_SignatureReq.AdditionalService();
+            nospam.description = "http://mss.ficom.fi/TS102204/v1.0.0#noSpam";
+            nospam.noSpamCode  = new MSS_SignatureReq.NoSpamCode();
+            jReq.additionalServices.add(nospam);
+        }
 
         if (msisdn == null) throw new MusapException(MusapException.ERROR_MISSING_PARAM, "Missing MSISDN");
 
@@ -213,6 +224,13 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
         MSS_SignatureReq jReq = new MSS_SignatureReq(msisdn);
         jReq.dtbd = new MSS_SignatureReq.DTBD("Activate MUSAP");
         jReq.dtbs = new MSS_SignatureReq.DTBS(jReq.dtbd);
+        if (this.settings.isNoSpamEnabled()) {
+            jReq.additionalServices = new ArrayList<>();
+            MSS_SignatureReq.AdditionalService nospam = new MSS_SignatureReq.AdditionalService();
+            nospam.description = "http://mss.ficom.fi/TS102204/v1.0.0#noSpam";
+            nospam.noSpamCode  = new MSS_SignatureReq.NoSpamCode();
+            jReq.additionalServices.add(nospam);
+        }
 
         if (msisdn == null) throw new MusapException(MusapException.ERROR_MISSING_PARAM, "Missing MSISDN");
 
@@ -258,6 +276,7 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
                 builder.setSscdId(this.getSscdInfo().getSscdId());
                 builder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
                 builder.addAttribute(ATTRIBUTE_MSISDN, msisdn);
+                builder.setKeyId(IdGenerator.generateKeyId());
                 return builder.build();
             }
         } catch (Exception e) {
@@ -305,7 +324,7 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
                     throw this.handleError(resp.fault.code.subCode.value);
                 }
 
-                if (jResp.status != null && (jResp.status.statusCode == null || "504".equals(jResp.status.statusCode))) {
+                if (jResp.status != null && (jResp.status.statusCode == null || "504".equals(jResp.status.statusCode.value))) {
                     // No response yet
                     MLog.d("Not ready yet");
                     continue;

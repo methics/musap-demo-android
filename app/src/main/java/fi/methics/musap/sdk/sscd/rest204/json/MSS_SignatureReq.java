@@ -99,13 +99,23 @@ public class MSS_SignatureReq {
         public String eventId;
 
         @SerializedName("NoSpamCode")
-        public String noSpamCode;
+        public NoSpamCode noSpamCode;
 
         @SerializedName("UserLang")
         public String userLang;
 
         @SerializedName("App2App")
         public String app2app;
+
+    }
+
+    public static class NoSpamCode {
+
+        @SerializedName("Verify")
+        public String verify = "no";
+
+        @SerializedName("Code")
+        public String code;
 
     }
 

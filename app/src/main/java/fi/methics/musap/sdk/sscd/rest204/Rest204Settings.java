@@ -24,6 +24,8 @@ public class Rest204Settings implements SscdSettings {
 
     private Map<String, String> settings = new HashMap<>();
     private Duration timeout;
+    private boolean noSpamEnabled;
+    private boolean eventIdEnabled;
 
     /**
      * Construct REST SSCD settings
@@ -46,6 +48,14 @@ public class Rest204Settings implements SscdSettings {
 
     public void setApiKey(String apikey) {
         settings.put(SETTINGS_REST_API_KEY, apikey);
+    }
+
+    public void enableNoSpam() {
+        this.noSpamEnabled = true;
+    }
+
+    public void setEventIdEnabled() {
+        this.eventIdEnabled = true;
     }
 
     @Override
@@ -89,6 +99,14 @@ public class Rest204Settings implements SscdSettings {
     public Duration getTimeout() {
         if (this.timeout == null) return Duration.ofMinutes(2);
         return this.timeout;
+    }
+
+    public boolean isNoSpamEnabled() {
+        return this.noSpamEnabled;
+    }
+
+    public boolean isEventIdEnabled() {
+        return this.eventIdEnabled;
     }
 
 }

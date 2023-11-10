@@ -24,17 +24,19 @@ public class MusapApplication extends Application {
         MusapClient.enableSscd(new YubiKeySscd(this));
         MusapClient.enableSscd(new MethicsDemoSscd(this,
                 new MethicsDemoSettings("https://demo.methics.fi/appactivation/appactivation/sign?msisdn=",
-                        "http://www.methics.fi/KiuruMSSP/v3.2.0#PKCS1",
-                        "http://uri.etsi.org/TS102204/v1.1.2#CMS-Signature", Duration.ofMinutes(2)))
+                        "http://uri.etsi.org/TS102204/v1.1.2#CMS-Signature",
+                        "http://www.methics.fi/KiuruMSSP/v3.2.0#PKCS1", Duration.ofMinutes(2)))
         );
 
         Rest204Settings rest204Settings = new Rest204Settings("https://demo.methics.fi/rest/service",
-                "http://www.methics.fi/KiuruMSSP/v3.2.0#PKCS1",
                 "http://uri.etsi.org/TS102204/v1.1.2#CMS-Signature",
+                "http://www.methics.fi/KiuruMSSP/v3.2.0#PKCS1",
                 Duration.ofMinutes(2));
         rest204Settings.setApId("http://musap-ap");
         rest204Settings.setApiKey("LGTiKluF7uvV9uwdK2Zk8v3yRm0Thxz8CDk3gLVcNNV5uH4s");
+        rest204Settings.enableNoSpam();
 
         MusapClient.enableSscd(new Rest204Sscd(this, rest204Settings));
     }
+
 }
