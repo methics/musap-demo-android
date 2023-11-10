@@ -1,7 +1,9 @@
 package fi.methics.musap.sdk.internal.keygeneration;
 
+import java.util.List;
 import java.util.Map;
 
+import fi.methics.musap.sdk.internal.datatype.KeyAttribute;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 
 public class UpdateKeyReq {
@@ -24,7 +26,7 @@ public class UpdateKeyReq {
     /**
      * New key-specific attributes.
      */
-    private Map<String, String> attributes;
+    private List<KeyAttribute> attributes;
 
     /**
      * New role for the key.
@@ -36,7 +38,7 @@ public class UpdateKeyReq {
      */
     private String state;
 
-    protected UpdateKeyReq(String alias, String did, Map<String, String> attributes, String role, String state) {
+    protected UpdateKeyReq(String alias, String did, List<KeyAttribute> attributes, String role, String state) {
         this.alias = alias;
         this.did = did;
         this.attributes = attributes;
@@ -56,7 +58,7 @@ public class UpdateKeyReq {
         return did;
     }
 
-    public Map<String, String> getAttributes() {
+    public List<KeyAttribute> getAttributes() {
         return attributes;
     }
 

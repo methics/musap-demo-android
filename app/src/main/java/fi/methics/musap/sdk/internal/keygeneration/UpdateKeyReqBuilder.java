@@ -1,12 +1,14 @@
 package fi.methics.musap.sdk.internal.keygeneration;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
+import fi.methics.musap.sdk.internal.datatype.KeyAttribute;
 
 public class UpdateKeyReqBuilder {
     private String alias;
     private String did;
-    private Map<String, String> attributes = new HashMap<>();
+    private List<KeyAttribute> attributes = new ArrayList<>();
     private String role;
     private String state;
 
@@ -21,7 +23,7 @@ public class UpdateKeyReqBuilder {
     }
 
     public UpdateKeyReqBuilder addAttribute(String attrName, String attrValue) {
-        this.attributes.put(attrName, attrValue);
+        this.attributes.add(new KeyAttribute(attrName, attrValue));
         return this;
     }
 

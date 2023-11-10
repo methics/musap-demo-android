@@ -10,8 +10,10 @@ import fi.methics.musap.sdk.internal.util.MLog;
 
 public class MusapKey {
 
+    // TODO: Rename to alias
     private String keyName;
     private String keyType;
+
     private String keyId;
     private String sscdId;
     private String sscdType;
@@ -24,6 +26,10 @@ public class MusapKey {
     private List<MusapLoA> loa;
     private KeyAlgorithm algorithm;
     private String keyUri;
+
+    private String did;
+
+    private String state;
 
     private KeyAttestation attestation;
 
@@ -47,6 +53,10 @@ public class MusapKey {
 
     public String getKeyId() {
         return keyId;
+    }
+
+    public void setKeyId(String keyId) {
+        this.keyId = keyId;
     }
 
     public String getKeyName() {
@@ -110,6 +120,40 @@ public class MusapKey {
         return this.attributes.stream().filter(n -> name.equals(n.name)).findFirst().orElse(null);
     }
 
+    /**
+     * Add a new attribute to a key. If there is an existing with the name,
+     * this replaces the value with a new one.
+     * @param attr
+     */
+    public void addAttribute(KeyAttribute attr) {
+        for (KeyAttribute oldAttr: this.attributes) {
+            if (oldAttr.name.equalsIgnoreCase(attr.name)) {
+                oldAttr.value = attr.value;
+                return;
+            }
+        }
+
+        this.attributes.add(attr);
+    }
+
+    public void removeAttribute(String name) {
+        MLog.d("Removing attribute " + name);
+        if (name == null) return;
+
+        KeyAttribute toRemove = null;
+        for (KeyAttribute attr: this.attributes) {
+            if (attr.name.equalsIgnoreCase(name)) {
+                toRemove = attr;
+                break;
+            }
+        }
+
+        if (toRemove != null) {
+            MLog.d("Removed attribute " + name);
+            this.attributes.remove(toRemove);
+        }
+    }
+
     public String getAttributeValue(String name) {
         KeyAttribute attr = this.getAttribute(name);
         if (attr == null) return null;
@@ -145,6 +189,18 @@ public class MusapKey {
             }
         }
         return null;
+    }
+
+    public void setAlias(String alias) {
+        this.keyName = alias;
+    }
+
+    public void setDid(String did) {
+        this.did = did;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public static class Builder {

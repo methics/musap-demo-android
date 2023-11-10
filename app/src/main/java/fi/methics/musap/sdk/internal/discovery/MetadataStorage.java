@@ -12,6 +12,7 @@ import java.util.Set;
 
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.internal.datatype.KeyAttribute;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.keygeneration.UpdateKeyReq;
@@ -20,7 +21,7 @@ import fi.methics.musap.sdk.internal.util.MLog;
 /**
  * MUSAP Metadata Storage class
  * This is used to store Key and SSCD metadata. Both are saved in JSON format. String sets
- * "keynames" and "sscdids" contain all added keys and SSCDs. The JSON of a key or an SSCD can be
+ * "keyids" and "sscdids" contain all added keys and SSCDs. The JSON of a key or an SSCD can be
  * fetched with a key name or SSCD ID.
  *
  * Key JSON contains a reference to the SSCD it belongs to, but the reverse is not true.
@@ -35,7 +36,7 @@ public class MetadataStorage {
     /**
      * Set that contains all known key names
      */
-    private static final String KEY_NAME_SET = "keynames";
+    private static final String KEY_ID_SET = "keyids";
     private static final String SSCD_ID_SET  = "sscdids";
 
     /**
@@ -53,8 +54,8 @@ public class MetadataStorage {
     /**
      * Store a MUSAP key metadata.
      * The storage has two parts:
-     *  1. A set of all known key names.
-     *  2. For each key name, there is an entry "keyjson_<keyname>" that contains the key
+     *  1. A set of all known key IDs.
+     *  2. For each key name, there is an entry "keyjson_<keyid>" that contains the key
      *     metadata.
      * @param key  MUSAP key
      * @param sscd MUSAP SSCD that holds the key
@@ -64,7 +65,7 @@ public class MetadataStorage {
             MLog.e("Cannot store null MUSAP key");
             throw new IllegalArgumentException("Cannot store null MUSAP key");
         }
-        if (key.getKeyName() == null) {
+        if (key.getKeyId() == null) {
             MLog.e("Cannot store unnamed MUSAP key");
             throw new IllegalArgumentException("Cannot store unnamed MUSAP key");
         }
@@ -72,8 +73,8 @@ public class MetadataStorage {
         MLog.d("Storing key");
 
         // Update Key Name list with new Key Name
-        Set<String> newKeyNames = new HashSet<>(this.getAllKeyNames());
-        newKeyNames.add(key.getKeyName());
+        Set<String> newKeyIds = new HashSet<>(this.getAllKeyIds());
+        newKeyIds.add(key.getKeyId());
 
         // Conver
         String keyJson = this.toJson(key);
@@ -81,12 +82,12 @@ public class MetadataStorage {
 
         this.getSharedPref()
                 .edit()
-                .putStringSet(KEY_NAME_SET, newKeyNames)
+                .putStringSet(KEY_ID_SET, newKeyIds)
                 .putString(this.makeStoreName(key), keyJson)
                 .apply();
 
         if (sscd != null) {
-            this.storeSscd(sscd);
+            this.addSscd(sscd);
         }
     }
 
@@ -95,12 +96,12 @@ public class MetadataStorage {
      * @return MUSAP keys
      */
     public List<MusapKey> listKeys() {
-        Set<String> keyNames = this.getAllKeyNames();
+        Set<String> keyIds = this.getAllKeyIds();
         List<MusapKey> keyList = new ArrayList<>();
-        for (String keyName: keyNames) {
-            String keyJson = this.getKeyJson(keyName);
+        for (String keyId: keyIds) {
+            String keyJson = this.getKeyJson(keyId);
             if (keyJson == null) {
-                MLog.e("Missing key metadata JSON for key name " + keyName);
+                MLog.e("Missing key metadata JSON for key name " + keyId);
             } else {
                 MusapKey key = new Gson().fromJson(keyJson, MusapKey.class);
                 keyList.add(key);
@@ -116,19 +117,19 @@ public class MetadataStorage {
      * @return List of matching keys
      */
     public List<MusapKey> listKeys(KeySearchReq req) {
-        Set<String> keyNames = this.getAllKeyNames();
+        Set<String> keyIds = this.getAllKeyIds();
         List<MusapKey> keyList = new ArrayList<>();
-        for (String keyName: keyNames) {
-            String keyJson = this.getKeyJson(keyName);
+        for (String keyId: keyIds) {
+            String keyJson = this.getKeyJson(keyId);
             if (keyJson == null) {
-                MLog.e("Missing key metadata JSON for key name " + keyName);
+                MLog.e("Missing key metadata JSON for key name " + keyId);
             } else {
                 MusapKey key = new Gson().fromJson(keyJson, MusapKey.class);
                 if (req.matches(key)) {
-                    MLog.d("Request matches key " + keyName);
+                    MLog.d("Request matches key " + keyId);
                     keyList.add(key);
                 } else {
-                    MLog.d("Request does not match key " + keyName);
+                    MLog.d("Request does not match key " + keyId);
                 }
             }
         }
@@ -143,21 +144,21 @@ public class MetadataStorage {
      */
     public boolean removeKey(MusapKey key) {
         // Update Key Name list without given Key Name
-        Set<String> newKeyNames = new HashSet<>(this.getAllKeyNames());
-        if (!this.getAllKeyNames().contains(key.getKeyName())) {
-            MLog.d("No key found with name " + key.getKeyName());
+        Set<String> newKeyIds = new HashSet<>(this.getAllKeyIds());
+        if (!this.getAllKeyIds().contains(key.getKeyId())) {
+            MLog.d("No key found with name " + key.getKeyId());
             return false;
         }
-        newKeyNames.remove(key.getKeyName());
+        newKeyIds.remove(key.getKeyId());
 
         String keyJson = new Gson().toJson(key);
         MLog.d("KeyJson=" + keyJson);
 
         this.getSharedPref()
                 .edit()
-                .putStringSet(KEY_NAME_SET, newKeyNames)
+                .putStringSet(KEY_ID_SET, newKeyIds)
                 .putString(this.makeStoreName(key), keyJson)
-                .remove(this.makeStoreName(key.getKeyName()))
+                .remove(this.makeStoreName(key.getKeyId()))
                 .apply();
         return true;
     }
@@ -166,7 +167,7 @@ public class MetadataStorage {
      * Store metadata of an active MUSAP SSCD
      * @param sscd SSCD (that has keys bound or generated)
      */
-    public void storeSscd(MusapSscd sscd) {
+    public void addSscd(MusapSscd sscd) {
         if (sscd == null) {
             MLog.e("Cannot store null MUSAP SSCD");
             throw new IllegalArgumentException("Cannot store null MUSAP SSCD");
@@ -230,7 +231,7 @@ public class MetadataStorage {
             boolean alreadyExists   = activeSscds.stream().anyMatch(s -> s.getSscdId().equals(sscd.getSscdId()));
             boolean sscdTypeEnabled = !enabledSscds.stream().anyMatch(s -> s.getSscdInfo().getSscdType().equals(sscd.getSscdType()));
             if (alreadyExists || !sscdTypeEnabled) continue;
-            this.storeSscd(sscd);
+            this.addSscd(sscd);
         }
         for (MusapKey key : data.keys) {
             // Avoid duplicate keys
@@ -252,6 +253,11 @@ public class MetadataStorage {
         return data;
     }
 
+    /**
+     * Update target key metadata with new values.
+     * @param req
+     * @return True if the update is succesful.
+     */
     public boolean updateKeyMetaData(UpdateKeyReq req) {
         MusapKey targetKey = req.getKey();
 
@@ -260,43 +266,71 @@ public class MetadataStorage {
             throw new IllegalArgumentException("Missing key");
         }
 
-        String keyJson = this.getKeyJson(req.getKey().getKeyName());
+        String keyJson = this.getKeyJson(req.getKey().getKeyId());
         MusapKey oldKey = this.parseKeyJson(keyJson);
 
-        String newAlias = req.getAlias();
-//        req
-        String newDid = req.getDid();
-        String newState = req.getState();
+        if (req.getAlias() != null) {
+            oldKey.setAlias(req.getAlias());
+        }
 
+        if (req.getDid() != null) {
+            oldKey.setDid(req.getDid());
+        }
+
+        if (req.getState() != null) {
+            oldKey.setState(req.getState());
+        }
+        if (req.getAttributes() != null) {
+            for (KeyAttribute attr: req.getAttributes()) {
+
+                // Remove attribute if the new value is set to null.
+                if (attr.value == null) {
+                    oldKey.removeAttribute(attr.name);
+                } else {
+                    oldKey.addAttribute(attr);
+                }
+            }
+        }
+
+        // Store the updated key.
+        this.storeKey(oldKey);
 
         return true;
     }
 
     private String makeStoreName(MusapKey key) {
-        return KEY_JSON_PREFIX + key.getKeyName();
+        return KEY_JSON_PREFIX + key.getKeyId();
     }
     private String makeStoreName(MusapSscd sscd) {
         return SSCD_JSON_PREFIX + sscd.getSscdId();
     }
-    private String makeStoreName(String keyName) {
-        return KEY_JSON_PREFIX + keyName;
+    private String makeStoreName(String keyId) {
+        return KEY_JSON_PREFIX + keyId;
     }
 
-    private Set<String> getAllKeyNames() {
-        return this.getSharedPref().getStringSet(KEY_NAME_SET, new HashSet<>());
+    private Set<String> getAllKeyIds() {
+        return this.getSharedPref().getStringSet(KEY_ID_SET, new HashSet<>());
     }
     private Set<String> getAllSscdIds() {
         return this.getSharedPref().getStringSet(SSCD_ID_SET, new HashSet<>());
     }
 
-    private String getKeyJson(String keyName) {
-        return this.getSharedPref().getString(this.makeStoreName(keyName), null);
+    private String getKeyJson(String keyId) {
+        return this.getSharedPref().getString(this.makeStoreName(keyId), null);
     }
     private String getSscdJson(String sscdid) {
         return this.getSharedPref().getString(SSCD_JSON_PREFIX + sscdid, null);
     }
     private SharedPreferences getSharedPref() {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    private void storeKey(MusapKey key) {
+        String keyJson = this.toJson(key);
+        this.getSharedPref()
+                .edit()
+                .putString(this.makeStoreName(key), keyJson)
+                .apply();
     }
 
     private String toJson(MusapKey key) {
