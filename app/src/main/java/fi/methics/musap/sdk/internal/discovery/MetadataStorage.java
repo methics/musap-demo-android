@@ -239,7 +239,7 @@ public class MetadataStorage {
             if (activeKeys.stream().anyMatch(k -> k.getKeyUri().equals(k.getKeyUri()))) continue;
 
             if (key.getSscdImpl() != null) {
-                this.storeKey(key, key.getSscdImpl().getSscdInfo());
+                this.addKey(key, key.getSscdImpl().getSscdInfo());
             }
         }
     }
@@ -295,7 +295,7 @@ public class MetadataStorage {
         }
 
         // Store the updated key.
-        this.storeKey(oldKey);
+        this.addKeyToMetadataStorage(oldKey);
 
         return true;
     }
@@ -327,7 +327,11 @@ public class MetadataStorage {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    private void storeKey(MusapKey key) {
+    /**
+     * Add key metadata to the metadata storage.
+     * @param key
+     */
+    private void addKeyToMetadataStorage(MusapKey key) {
         String keyJson = this.toJson(key);
         this.getSharedPref()
                 .edit()

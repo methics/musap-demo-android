@@ -38,7 +38,7 @@ public class BindKeyTask extends MusapAsyncTask<MusapKey> {
             activeSscd.setSscdId(sscdId);
             key.setSscdId(sscdId);
 
-            storage.storeKey(key, activeSscd);
+            storage.addKey(key, activeSscd);
             return new AsyncTaskResult<>(key);
         } catch (Exception e) {
             throw new MusapException(e);
