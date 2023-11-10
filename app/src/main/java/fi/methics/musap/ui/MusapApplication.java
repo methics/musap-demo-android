@@ -34,7 +34,8 @@ public class MusapApplication extends Application {
         rest204Settings.setDtbdEnabled(false);
         rest204Settings.setSscdName("Mobiilivarmenne");
         rest204Settings.setRawFormat("http://mss.ficom.fi/TS102204/v1.0.0#PKCS1");
-        rest204Settings.setSignatureProfile("http://alauda.mobi/nonRepudiation");
+        rest204Settings.setBindSignatureProfile("http://mss.ficom.fi/TS102206/v1.0.0/signature-profile.xml");
+        rest204Settings.setSignatureProfile("http://mss.ficom.fi/TS102206/v1.0.0/digestive-signature-profile.xml");
         MusapClient.enableSscd(new Rest204Sscd(this, rest204Settings));
     }
 

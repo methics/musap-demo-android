@@ -17,6 +17,7 @@ public class Rest204Settings implements SscdSettings {
     public static final String SETTINGS_PROVIDER   = "provider";
     public static final String SETTINGS_SSCD_NAME  = "sscdname";
     public static final String SETTINGS_SIGNATUREPROFILE  = "signatureprofile";
+    public static final String SETTINGS_BIND_SIGNATUREPROFILE  = "bindsignatureprofile";
 
     // AP settings
     public static final String SETTINGS_REST_APID    = "apid";
@@ -48,6 +49,10 @@ public class Rest204Settings implements SscdSettings {
 
     public void setSignatureProfile(String signatureProfile) {
         this.setSetting(SETTINGS_SIGNATUREPROFILE, signatureProfile);
+    }
+
+    public void setBindSignatureProfile(String signatureProfile) {
+        this.setSetting(SETTINGS_BIND_SIGNATUREPROFILE, signatureProfile);
     }
 
     /**
@@ -109,6 +114,23 @@ public class Rest204Settings implements SscdSettings {
     public String getCmsFormatUri() {
         return this.getSetting(SETTINGS_CMS_FORMAT);
     }
+
+    /**
+     * Get the SignatureProfile used during binding
+     * @return SignatureProfile
+     */
+    public String getBindSignatureProfile() {
+        String sigprof = this.getSetting(SETTINGS_BIND_SIGNATUREPROFILE);
+        if (sigprof != null) {
+            return sigprof;
+        }
+        return this.getSignatureProfile();
+    }
+
+    /**
+     * Get the SignatureProfile used during signing
+     * @return SignatureProfile
+     */
     public String getSignatureProfile() {
         return this.getSetting(SETTINGS_SIGNATUREPROFILE);
     }

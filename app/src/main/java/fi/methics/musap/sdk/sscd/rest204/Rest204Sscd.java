@@ -155,7 +155,9 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
                 if (resp.fault != null) {
                     throw this.handleError(resp.fault.code.subCode.value);
                 }
-                return pollForSignature(req.getFormat(), jResp);
+                MusapSignature signature = pollForSignature(req.getFormat(), jResp);
+                signature.setKey(req.getKey());
+                return signature;
             }
         } catch (Exception e) {
             throw new MusapException(e);
@@ -240,7 +242,7 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
         MSS_SignatureReq jReq = new MSS_SignatureReq(msisdn);
         jReq.dtbd             = new MSS_SignatureReq.DTBD(req.getDisplayText());
         jReq.dtbs             = new MSS_SignatureReq.DTBS(jReq.dtbd);
-        jReq.signatureProfile = this.settings.getSignatureProfile();
+        jReq.signatureProfile = this.settings.getBindSignatureProfile();
         jReq.format           = this.getSettings().getCmsFormatUri();
 
         if (!this.settings.isDtbdEnabled()) {
@@ -254,14 +256,12 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
             nospam.noSpamCode.code = req.getAttribute(ATTRIBUTE_NOSPAM);
             jReq.additionalServices.add(nospam);
         }
-        MLog.d("Wut3");
 
         if (msisdn == null) throw new MusapException(MusapException.ERROR_MISSING_PARAM, "Missing MSISDN");
 
         try {
             String restUrl = this.getSettings().getRestUrl();
             URL        url = new URL(restUrl);
-            MLog.d("Wut4");
 
             String             json = "{\"MSS_SignatureReq\": " + GSON.toJson(jReq) + "}";
             RequestBody        body = RequestBody.create(json, JSON);
@@ -271,7 +271,6 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
             for (String key : headersToAdd.keySet()) {
                 headers.add(key, headersToAdd.get(key));
             }
-            MLog.d("Wut5");
 
             Request request = new Request.Builder()
                     .url(restUrl)
@@ -298,7 +297,6 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
                 builder.setCertificate(signature.getSignerCertificate());
                 builder.setKeyName(req.getKeyAlias());
                 builder.setSscdType(SSCD_TYPE);
-                builder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
                 builder.setSscdId(this.getSscdInfo().getSscdId());
                 builder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
                 builder.addAttribute(ATTRIBUTE_MSISDN, msisdn);

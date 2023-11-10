@@ -71,7 +71,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     private static final ManagementKeyType TYPE = ManagementKeyType.TDES;
 
     private static final String SSCD_TYPE        = "Yubikey";
-    private static final String ATTRIBUTE_SERIAL = "SerialNumber";
+    private static final String ATTRIBUTE_SERIAL = "serial";
 
     private YubiKeySettings settings = new YubiKeySettings();
 
@@ -479,7 +479,6 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         keyBuilder.setKeyName(req.getKeyAlias());
         keyBuilder.addAttribute(ATTRIBUTE_SERIAL, Integer.toHexString(pivSession.getSerialNumber()));
         keyBuilder.setSscdType(this.getSscdInfo().getSscdType());
-        keyBuilder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
         keyBuilder.setSscdId(this.getSscdInfo().getSscdId());
         keyBuilder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
         // TODO: Find out Yubikey serial number

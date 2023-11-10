@@ -206,7 +206,6 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 builder.setCertificate(signature.getSignerCertificate());
                 builder.setKeyName(req.getKeyAlias());
                 builder.setSscdType(SSCD_TYPE);
-                builder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
                 builder.setSscdId(this.getSscdInfo().getSscdId());
                 builder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
                 builder.addAttribute(ATTRIBUTE_MSISDN, msisdn);
