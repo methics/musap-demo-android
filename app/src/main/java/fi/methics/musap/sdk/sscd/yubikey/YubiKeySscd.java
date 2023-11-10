@@ -496,7 +496,10 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         String msg = "Test string";
 
         try {
+
+
             PivSession pivSession = new PivSession(connection);
+
             pivSession.authenticate(this.type, this.managementKey);
 
             Slot slot = Slot.SIGNATURE;
