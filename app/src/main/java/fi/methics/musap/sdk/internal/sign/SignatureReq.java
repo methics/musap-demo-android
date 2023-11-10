@@ -17,11 +17,14 @@ public class SignatureReq {
     protected SignatureFormat format;
     protected Activity activity;
 
-    public SignatureReq(MusapKey key, byte[] data, SignatureAlgorithm algorithm, SignatureFormat format, Activity activity) {
+    public SignatureReq(MusapKey key, byte[] data, SignatureAlgorithm algorithm, SignatureFormat format) {
         this.key = key;
         this.data = data;
         this.algorithm = algorithm;
         this.format = format;
+    }
+
+    public void setActivity(Activity activity) {
         this.activity = activity;
     }
 
@@ -62,4 +65,35 @@ public class SignatureReq {
     public Activity getActivity() {
         return activity;
     }
+
+    public static class Builder {
+        private MusapKey key;
+        private byte[] data;
+        private SignatureAlgorithm algorithm;
+        private SignatureFormat format;
+
+        public Builder(SignatureAlgorithm algorithm) {
+            this.algorithm = algorithm;
+        }
+
+        public Builder setKey(MusapKey key) {
+            this.key = key;
+            return this;
+        }
+
+        public Builder setData(byte[] data) {
+            this.data = data;
+            return this;
+        }
+
+        public Builder setFormat(SignatureFormat format) {
+            this.format = format;
+            return this;
+        }
+
+        public SignatureReq createSignatureReq() {
+            return new SignatureReq(key, data, algorithm, format);
+        }
+    }
+
 }

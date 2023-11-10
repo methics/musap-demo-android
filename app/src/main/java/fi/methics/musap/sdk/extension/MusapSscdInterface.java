@@ -12,10 +12,6 @@ import fi.methics.musap.sdk.internal.sign.SignatureReq;
  */
 public interface MusapSscdInterface<T extends SscdSettings> {
 
-    // TODO: Should the bindKey and generateKey be the same API?
-    //       Each SSCD basically supports either binding or generating.
-    //       Usually not both at the same time.
-
     /**
      * Bind an existing key to this MUSAP library
      * @param req Key bind request
@@ -45,6 +41,13 @@ public interface MusapSscdInterface<T extends SscdSettings> {
      * @return SSCD info
      */
     public MusapSscd getSscdInfo();
+
+    /**
+     * Generate a stable SSCD ID for this
+     * @param key MUSAP key
+     * @return SSCD ID
+     */
+    public String generateSscdId(MusapKey key);
 
     /**
      * Does this SSCD support key generation?

@@ -48,7 +48,7 @@ public class KeySearchReq {
     public boolean matches(MusapKey key) {
         if (this.keyAlgorithm != null && !this.keyAlgorithm.equals(key.getAlgorithm())) return false;
         if (this.keyUri       != null && !new KeyURI(this.keyUri).matches(key.getKeyUri())) return false;
-        MusapSscdInterface iface = key.getSscd();
+        MusapSscdInterface iface = key.getSscdImpl();
         if (iface != null) {
             MusapSscd sscd = iface.getSscdInfo();
             if (sscd != null) {

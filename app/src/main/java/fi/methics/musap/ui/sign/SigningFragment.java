@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -26,7 +27,6 @@ import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.datatype.SignatureAlgorithm;
 import fi.methics.musap.sdk.internal.sign.MusapSigner;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
-import fi.methics.musap.sdk.internal.sign.SignatureReqBuilder;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.internal.util.StringUtil;
@@ -57,7 +57,7 @@ public class SigningFragment extends Fragment {
         final String keyuri   = args.getString(SignMethodRecyclerViewAdapter.KEY_URI);
         final String dtbsType = args.getString("dtbstype");
 
-        MusapKey     key = MusapClient.getKeyByUri(keyuri);
+        MusapKey key = MusapClient.getKeyByUri(keyuri);
 
         KeyAlgorithm keyAlgo = key.getAlgorithm();
         if (keyAlgo == null) {
@@ -79,10 +79,9 @@ public class SigningFragment extends Fragment {
             data = StringUtil.toUTF8Bytes(dtbs);
         }
 
-        final SignatureReq req = new SignatureReqBuilder(algorithm)
+        final SignatureReq req = new SignatureReq.Builder(algorithm)
                 .setKey(key)
                 .setData(data)
-                .setActivity(this.getActivity())
                 .createSignatureReq();
 
         sign.setOnClickListener(view -> {
@@ -108,12 +107,13 @@ public class SigningFragment extends Fragment {
                     @Override
                     public void onException(MusapException e) {
                         MLog.e("Failed to sign", e.getCause());
+                        Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
                     }
                 });
             } catch (MusapException e) {
-                MLog.e("Failed to sign", e.getCause());
+                MLog.e("Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", e.getCause());
+                Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
             }
-
         });
 
         return v;

@@ -3,6 +3,7 @@ package fi.methics.musap.sdk.internal.async;
 import android.content.Context;
 
 import fi.methics.musap.sdk.api.MusapException;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.discovery.MetadataStorage;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
@@ -30,8 +31,13 @@ public class GenerateKeyTask extends MusapAsyncTask<MusapKey> {
             MusapKey key = sscd.generateKey(req);
             MLog.d("GenerateKeyTask Got MUSAP key");
             MetadataStorage storage = new MetadataStorage(context.get());
-            key.setKeyId(IdGenerator.generateKeyId());
-            storage.addKey(key, sscd.getSscdInfo());
+
+            MusapSscd activeSscd = sscd.getSscdInfo();
+            String        sscdId = sscd.generateSscdId(key);
+            activeSscd.setSscdId(sscdId);
+            key.setSscdId(sscdId);
+
+            storage.storeKey(key, activeSscd);
             return new AsyncTaskResult<>(key);
         } catch (Exception e) {
             throw new MusapException(e);

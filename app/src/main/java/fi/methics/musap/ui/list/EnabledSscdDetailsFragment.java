@@ -32,19 +32,19 @@ public class EnabledSscdDetailsFragment extends Fragment {
 
         final Bundle args = getArguments();
 
-        final String sscdid = args.getString(MusapConstants.SSCD_ID);
-        if (sscdid == null) {
-            MLog.d("Cannot handle null SSCD ID");
+        final String sscdName = args.getString(MusapConstants.SSCD_NAME);
+        if (sscdName == null) {
+            MLog.d("Cannot handle null SSCD Name");
             return root;
         }
         MusapSscdInterface sscd = null;
         for (MusapSscdInterface s : MusapClient.listEnabledSscds()) {
-            if (sscdid.equals(s.getSscdInfo().getSscdId())) {
+            if (sscdName.equals(s.getSscdInfo().getSscdName())) {
                 MLog.d("Found SSCD " + s.getSscdInfo().getSscdName());
                 sscd = s;
                 break;
             } else {
-                MLog.d("SSCD ID " + sscdid + " does not match " + s.getSscdInfo().getSscdId());
+                MLog.d("SSCD " + sscdName + " does not match " + s.getSscdInfo().getSscdName());
             }
         }
         if (sscd != null) {

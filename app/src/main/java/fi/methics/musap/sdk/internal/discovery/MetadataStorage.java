@@ -103,6 +103,7 @@ public class MetadataStorage {
             if (keyJson == null) {
                 MLog.e("Missing key metadata JSON for key name " + keyId);
             } else {
+                MLog.d("Found key " + keyJson);
                 MusapKey key = new Gson().fromJson(keyJson, MusapKey.class);
                 keyList.add(key);
             }
@@ -185,7 +186,7 @@ public class MetadataStorage {
         }
         sscdIds.add(sscd.getSscdId());
 
-        MLog.d("Storing SSCD");
+        MLog.d("Storing SSCD " + sscd.getSscdId());
 
         String json = new Gson().toJson(sscd);
         MLog.d("SSCD JSON=" + json);
@@ -236,8 +237,9 @@ public class MetadataStorage {
         for (MusapKey key : data.keys) {
             // Avoid duplicate keys
             if (activeKeys.stream().anyMatch(k -> k.getKeyUri().equals(k.getKeyUri()))) continue;
-            if (key.getSscd() != null) {
-                this.addKey(key, key.getSscd().getSscdInfo());
+
+            if (key.getSscdImpl() != null) {
+                this.storeKey(key, key.getSscdImpl().getSscdInfo());
             }
         }
     }

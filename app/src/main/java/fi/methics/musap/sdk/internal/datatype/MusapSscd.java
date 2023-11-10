@@ -33,6 +33,10 @@ public class MusapSscd {
         return sscdType;
     }
 
+    public void setSscdId(String sscdId) {
+        this.sscdId = sscdId;
+    }
+
     public String getSscdId() {
         return sscdId;
     }

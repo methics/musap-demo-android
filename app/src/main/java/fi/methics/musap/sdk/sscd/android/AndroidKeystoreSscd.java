@@ -33,6 +33,11 @@ import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.internal.util.MLog;
 
+/**
+ * MUSAP SSCD implementation for Android KeyStore
+ * Note that this SSCD does not ask for authentication by default.
+ * Authentication can be configure with step-up authentication policy.
+ */
 public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSettings> {
 
     private Context context;
@@ -121,8 +126,12 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
                         KeyAlgorithm.ECC_P256_K1,
                         KeyAlgorithm.ECC_P384_K1))
                 .setSupportedFormats(Arrays.asList(SignatureFormat.RAW))
-                .setSscdId("AKS") // TODO: This needs to be SSCD instance specific
                 .build();
+    }
+
+    @Override
+    public String generateSscdId(MusapKey key) {
+        return "AKS";
     }
 
     @Override
