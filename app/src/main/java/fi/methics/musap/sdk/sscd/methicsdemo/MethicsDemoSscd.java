@@ -83,7 +83,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
     public MusapSignature sign(SignatureReq req) throws Exception {
         DemoSigReq jReq = new DemoSigReq();
         jReq.msisdn  = req.getKey().getAttributeValue(ATTRIBUTE_MSISDN);
-        jReq.message = "Sign with MUSAP"; // TODO
+        jReq.message = req.getDisplayText();
         jReq.dtbs    = MBase64.toBase64String(req.getData());
         jReq.async   = true;
 
