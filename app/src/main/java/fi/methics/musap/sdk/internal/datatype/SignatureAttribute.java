@@ -1,14 +1,14 @@
 package fi.methics.musap.sdk.internal.datatype;
 
 /**
- * Key binding, key generation, or key specific attributes
+ * Signature request or signature specific attributes
  */
-public class KeyAttribute {
+public class SignatureAttribute {
 
     public String name;
     public String value;
 
-    public KeyAttribute(String name, String value) {
+    public SignatureAttribute(String name, String value) {
         this.name  = name;
         this.value = value;
     }

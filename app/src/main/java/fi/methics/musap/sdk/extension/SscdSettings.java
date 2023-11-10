@@ -12,4 +12,9 @@ public interface SscdSettings {
         return settings.get(key);
     }
 
+    public default void setSetting(String key, String value) {
+        if (this.getSettings() == null) return;
+        this.getSettings().put(key, value);
+    }
+
 }

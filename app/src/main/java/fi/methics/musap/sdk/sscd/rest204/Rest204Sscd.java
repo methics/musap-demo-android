@@ -56,6 +56,10 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
 
     public static final String SSCD_TYPE         = "204 REST";
     public static final String ATTRIBUTE_MSISDN  = "msisdn";
+    public static final String ATTRIBUTE_NOSPAM  = "nospamcode";
+    public static final String ATTRIBUTE_EVENTID = "eventid";
+    public static final String ATTRIBUTE_SSCD    = "sscdname";
+
     private static final Gson GSON = new Gson();
     private static final int POLL_AMOUNT = 20;
 
@@ -96,14 +100,25 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
         MLog.d("Sending signature request to REST 204 for MSISDN " + msisdn);
 
         MSS_SignatureReq jReq = new MSS_SignatureReq(msisdn);
-        jReq.dtbd = new MSS_SignatureReq.DTBD("Activate MUSAP");
-        jReq.dtbs = new MSS_SignatureReq.DTBS(jReq.dtbd);
+        jReq.dtbd             = new MSS_SignatureReq.DTBD(req.getDisplayText());
+        jReq.dtbs             = new MSS_SignatureReq.DTBS(req.getData());
+        jReq.signatureProfile = this.settings.getSignatureProfile();
+
+        if (!this.settings.isDtbdEnabled()) {
+            jReq.dtbd = null;
+        }
+        if (req.getFormat() == null || SignatureFormat.RAW.equals(req.getFormat())) {
+            jReq.format = this.getSettings().getRawFormatUri();
+        } else {
+            jReq.format = this.getSettings().getCmsFormatUri();
+        }
 
         if (this.settings.isNoSpamEnabled()) {
             jReq.additionalServices = new ArrayList<>();
             MSS_SignatureReq.AdditionalService nospam = new MSS_SignatureReq.AdditionalService();
             nospam.description = "http://mss.ficom.fi/TS102204/v1.0.0#noSpam";
             nospam.noSpamCode  = new MSS_SignatureReq.NoSpamCode();
+            nospam.noSpamCode.code = req.getAttribute(ATTRIBUTE_NOSPAM);
             jReq.additionalServices.add(nospam);
         }
 
@@ -140,7 +155,7 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
                 if (resp.fault != null) {
                     throw this.handleError(resp.fault.code.subCode.value);
                 }
-                return pollForSignature(jResp);
+                return pollForSignature(req.getFormat(), jResp);
             }
         } catch (Exception e) {
             throw new MusapException(e);
@@ -187,6 +202,7 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
         Button button = new Button(context);
         button.setText("Bind Key");
         button.setOnClickListener(v -> {
+            MLog.d("Bind Key pressed");
             CompletableFuture.runAsync(() -> {
                 try {
                     MusapKey key = _bindKey(req, msisdnEditText.getText().toString());
@@ -219,24 +235,33 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
 
     private MusapKey _bindKey(KeyBindReq req, String msisdn) throws MusapException {
 
-        MLog.d("Sending keygen request to REST 204 for MSISDN " + msisdn);
+        MLog.d("Sending bind request to REST 204 for MSISDN " + msisdn);
 
         MSS_SignatureReq jReq = new MSS_SignatureReq(msisdn);
-        jReq.dtbd = new MSS_SignatureReq.DTBD("Activate MUSAP");
-        jReq.dtbs = new MSS_SignatureReq.DTBS(jReq.dtbd);
+        jReq.dtbd             = new MSS_SignatureReq.DTBD(req.getDisplayText());
+        jReq.dtbs             = new MSS_SignatureReq.DTBS(jReq.dtbd);
+        jReq.signatureProfile = this.settings.getSignatureProfile();
+        jReq.format           = this.getSettings().getCmsFormatUri();
+
+        if (!this.settings.isDtbdEnabled()) {
+            jReq.dtbd = null;
+        }
         if (this.settings.isNoSpamEnabled()) {
             jReq.additionalServices = new ArrayList<>();
             MSS_SignatureReq.AdditionalService nospam = new MSS_SignatureReq.AdditionalService();
             nospam.description = "http://mss.ficom.fi/TS102204/v1.0.0#noSpam";
             nospam.noSpamCode  = new MSS_SignatureReq.NoSpamCode();
+            nospam.noSpamCode.code = req.getAttribute(ATTRIBUTE_NOSPAM);
             jReq.additionalServices.add(nospam);
         }
+        MLog.d("Wut3");
 
         if (msisdn == null) throw new MusapException(MusapException.ERROR_MISSING_PARAM, "Missing MSISDN");
 
         try {
             String restUrl = this.getSettings().getRestUrl();
             URL        url = new URL(restUrl);
+            MLog.d("Wut4");
 
             String             json = "{\"MSS_SignatureReq\": " + GSON.toJson(jReq) + "}";
             RequestBody        body = RequestBody.create(json, JSON);
@@ -246,6 +271,7 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
             for (String key : headersToAdd.keySet()) {
                 headers.add(key, headersToAdd.get(key));
             }
+            MLog.d("Wut5");
 
             Request request = new Request.Builder()
                     .url(restUrl)
@@ -266,7 +292,7 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
                     throw this.handleError(resp.fault.code.subCode.value);
                 }
 
-                CmsSignature signature = pollForSignature(jResp);
+                CmsSignature signature = (CmsSignature) pollForSignature(SignatureFormat.CMS, jResp);
                 MLog.d("Successfully bound REST 204 SSCD");
                 MusapKey.Builder builder = new MusapKey.Builder();
                 builder.setCertificate(signature.getSignerCertificate());
@@ -279,12 +305,13 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
                 builder.setKeyId(IdGenerator.generateKeyId());
                 return builder.build();
             }
-        } catch (Exception e) {
-            throw new MusapException(e);
+        } catch (Throwable e) {
+            MLog.d("Failed to bind MSISDN " + msisdn + ": " + e.getMessage());
+            throw new MusapException(new Exception(e));
         }
     }
 
-    private CmsSignature pollForSignature(MSS_SignatureResp sigResp) throws IOException, MusapException {
+    private MusapSignature pollForSignature(SignatureFormat format, MSS_SignatureResp sigResp) throws IOException, MusapException {
         MSS_StatusReq jReq = new MSS_StatusReq(sigResp);
 
         String restUrl = this.getSettings().getRestUrl();
@@ -309,6 +336,7 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
+                MLog.d("Poll interrupted");
                 continue;
             }
             try (Response response = client.newCall(request).execute()) {
@@ -338,8 +366,11 @@ public class Rest204Sscd implements MusapSscdInterface<Rest204Settings> {
                     default:
                         throw this.handleError(jResp.status.statusCode.value);
                 }
-
-                return new CmsSignature(MBase64.toBytes(jResp.signature.base64Signature));
+                if (SignatureFormat.CMS.equals(format)) {
+                    return new CmsSignature(MBase64.toBytes(jResp.signature.base64Signature));
+                } else {
+                    return new MusapSignature(MBase64.toBytes(jResp.signature.base64Signature));
+                }
             }
         }
         throw new MusapException(MusapException.ERROR_TIMED_OUT, "Failed to get a signature in " + POLL_AMOUNT + " attempts");

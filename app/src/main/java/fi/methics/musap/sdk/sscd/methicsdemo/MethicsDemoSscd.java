@@ -110,7 +110,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
     @Override
     public MusapSscd getSscdInfo() {
         return new MusapSscd.Builder()
-                .setSscdName("Methics Demo")
+                .setSscdName(this.settings.getSscdName())
                 .setSscdType(SSCD_TYPE)
                 .setCountry("FI")
                 .setProvider("Methics")
