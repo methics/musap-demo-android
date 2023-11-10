@@ -29,6 +29,7 @@ import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.datatype.MusapLink;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
+import fi.methics.musap.sdk.internal.keygeneration.UpdateKeyReq;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MLog;
 
@@ -134,6 +135,11 @@ public class MusapClient {
         return keys;
     }
 
+    public static boolean updateKey(UpdateKeyReq req) {
+        MetadataStorage storage = new MetadataStorage(context.get());
+        return storage.updateKeyMetaData(req);
+    }
+
     /**
      * Enable an SSCD. This needs to be called for each SSCD that the application using MUSAP wants
      * to support. These will be searchable with {@link #listEnabledSscds()}}.
@@ -184,7 +190,7 @@ public class MusapClient {
     public static void importData(String data) throws JsonSyntaxException {
         MusapImportData importData = MusapImportData.fromJson(data);
         MetadataStorage storage = new MetadataStorage(context.get());
-        storage.storeImportData(importData);
+        storage.addImportData(importData);
     }
 
     /**

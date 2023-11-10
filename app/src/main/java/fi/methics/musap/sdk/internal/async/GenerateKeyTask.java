@@ -9,6 +9,7 @@ import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.util.AsyncTaskResult;
+import fi.methics.musap.sdk.internal.util.IdGenerator;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.internal.util.MusapAsyncTask;
 import fi.methics.musap.sdk.api.MusapCallback;
@@ -36,7 +37,7 @@ public class GenerateKeyTask extends MusapAsyncTask<MusapKey> {
             activeSscd.setSscdId(sscdId);
             key.setSscdId(sscdId);
 
-            storage.storeKey(key, activeSscd);
+            storage.addKey(key, activeSscd);
             return new AsyncTaskResult<>(key);
         } catch (Exception e) {
             throw new MusapException(e);
