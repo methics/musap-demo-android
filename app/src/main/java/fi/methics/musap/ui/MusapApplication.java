@@ -22,19 +22,21 @@ public class MusapApplication extends Application {
 
         MusapClient.enableSscd(new AndroidKeystoreSscd(this));
         MusapClient.enableSscd(new YubiKeySscd(this));
-        MusapClient.enableSscd(new MethicsDemoSscd(this,
-                new MethicsDemoSettings("https://demo.methics.fi/appactivation/appactivation/sign?msisdn=",
-                        "http://www.methics.fi/KiuruMSSP/v3.2.0#PKCS1",
-                        "http://uri.etsi.org/TS102204/v1.1.2#CMS-Signature", Duration.ofMinutes(2)))
-        );
 
-        Rest204Settings rest204Settings = new Rest204Settings("https://demo.methics.fi/rest/service",
-                "http://www.methics.fi/KiuruMSSP/v3.2.0#PKCS1",
-                "http://uri.etsi.org/TS102204/v1.1.2#CMS-Signature",
-                Duration.ofMinutes(2));
+        MethicsDemoSettings demoSettings = new MethicsDemoSettings("https://demo.methics.fi/appactivation/appactivation/sign?msisdn=");
+        demoSettings.setSscdName("Alauda PBY");
+        MusapClient.enableSscd(new MethicsDemoSscd(this,demoSettings));
+
+        Rest204Settings rest204Settings = new Rest204Settings("https://demo.methics.fi/rest/service");
         rest204Settings.setApId("http://musap-ap");
         rest204Settings.setApiKey("LGTiKluF7uvV9uwdK2Zk8v3yRm0Thxz8CDk3gLVcNNV5uH4s");
-
+        rest204Settings.enableNoSpam();
+        rest204Settings.setDtbdEnabled(false);
+        rest204Settings.setSscdName("Mobiilivarmenne");
+        rest204Settings.setRawFormat("http://mss.ficom.fi/TS102204/v1.0.0#PKCS1");
+        rest204Settings.setBindSignatureProfile("http://mss.ficom.fi/TS102206/v1.0.0/signature-profile.xml");
+        rest204Settings.setSignatureProfile("http://mss.ficom.fi/TS102206/v1.0.0/digestive-signature-profile.xml");
         MusapClient.enableSscd(new Rest204Sscd(this, rest204Settings));
     }
+
 }

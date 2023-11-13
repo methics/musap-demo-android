@@ -3,6 +3,7 @@ package fi.methics.musap.sdk.internal.datatype;
 
 import android.util.Log;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -13,22 +14,43 @@ import fi.methics.musap.sdk.internal.util.MLog;
 
 public class KeyURI {
 
-    public static final String NAME     = "name";
-    public static final String LOA      = "loa";
-    public static final String COUNTRY  = "country";
-    public static final String SSCD     = "sscd";
+    public static final String ALIAS      = "alias";
+    public static final String LOA        = "loa";
+    public static final String COUNTRY    = "country";
+    public static final String PROVIDER   = "provider";
+    public static final String SSCD       = "sscd";
+    public static final String ALGORITHM  = "algorithm";
+    public static final String MSISDN     = "msisdn";
+    public static final String SERIAL     = "serial";
+    public static final String CREATED_DT = "created_dt";
 
     private Map<String, String> keyUriMap = new HashMap<>();
 
     /**
-     * Create a new KeyURI with just LoA
-     * @param name Name of the key
-     * @param loa  LoA of the key
+     * Create a new KeyURI
+     * @param key Key to create the URI form from
      */
-    public KeyURI(String name, String sscd, String loa) {
-        if (name != null) keyUriMap.put(NAME, name);
-        if (sscd != null) keyUriMap.put(SSCD, sscd);
-        if (loa  != null) keyUriMap.put(LOA,  loa);
+    public KeyURI(MusapKey key) {
+
+        // TODO: Rename key.getKeyName() to key.getKeyAlias()
+        if (key.getKeyName()     != null) keyUriMap.put(ALIAS,      key.getKeyName());
+        if (key.getAlgorithm()   != null) keyUriMap.put(ALGORITHM,  key.getAlgorithm().isEc() ? "EC" : "RSA");
+        if (key.getCreatedDate() != null && key.getCreatedDate().toEpochMilli() != 0) {
+            keyUriMap.put(CREATED_DT, key.getCreatedDate().toString().split("T")[0]);
+        }
+
+        if (key.getKeyAttribute(MSISDN) != null) keyUriMap.put(MSISDN, key.getKeyAttribute(MSISDN));
+        if (key.getKeyAttribute(SERIAL) != null) keyUriMap.put(MSISDN, key.getKeyAttribute(SERIAL));
+
+        if (key.getSscdInfo() != null) {
+            String sscdName     = key.getSscdInfo().getSscdName();
+            String sscdCountry  = key.getSscdInfo().getCountry();
+            String sscdProvider = key.getSscdInfo().getProvider();
+
+            if (sscdName     != null) keyUriMap.put(SSCD,     sscdName);
+            if (sscdCountry  != null) keyUriMap.put(COUNTRY,  sscdCountry);
+            if (sscdProvider != null) keyUriMap.put(PROVIDER, sscdProvider);
+        }
     }
 
     /**
@@ -77,7 +99,7 @@ public class KeyURI {
     }
 
     public String getName() {
-        return this.keyUriMap.get(NAME);
+        return this.keyUriMap.get(ALIAS);
     }
     public String getLoa() {
         return this.keyUriMap.get(LOA);
@@ -91,6 +113,7 @@ public class KeyURI {
      * @param criteria List of criteria
      * @return true if match is found
      */
+    @Deprecated
     public boolean matchesCriteria(Map<KeyDiscoveryCriteria, String> criteria) {
 
         // For every given criteria, check if they match
@@ -106,6 +129,7 @@ public class KeyURI {
         return true;
     }
 
+    @Deprecated
     private boolean matchesCriteria(KeyDiscoveryCriteria criteria, String value) {
         Log.d("KeyURI", "Comparing " + criteria + " to value " + value);
         switch (criteria) {
@@ -119,10 +143,12 @@ public class KeyURI {
         return true;
     }
 
+    @Deprecated
     private boolean compareLoA(String criteriaValue, String ownValue) {
         return LoA.compareLoA(ownValue, criteriaValue);
     }
 
+    @Deprecated
     private boolean compareValue(String criteriaValue, String ownValue) {
         return Objects.equals(criteriaValue, ownValue);
     }
@@ -152,7 +178,6 @@ public class KeyURI {
     public boolean matches(KeyURI keyUri) {
         if (this.equals(keyUri)) return true;
         if (this.getUri().equals(keyUri.getUri())) return true;
-        // TODO: Allow some partial match?
         return false;
     }
 

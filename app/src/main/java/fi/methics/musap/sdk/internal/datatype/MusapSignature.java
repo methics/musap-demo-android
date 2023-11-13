@@ -50,6 +50,14 @@ public class MusapSignature {
     }
 
     /**
+     * Set the MUSAP key reference to help validation of this signature
+     * @param key MUSAP key
+     */
+    public void setKey(MusapKey key) {
+        this.key = key;
+    }
+
+    /**
      * Get Signature Algorithm used to generate this signature
      * @return Signature Algorithm
      */

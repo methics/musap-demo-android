@@ -66,6 +66,11 @@ public class MSS_SignatureReq {
             this.encoding = "UTF-8";
             this.data     = dtbd.data;
         }
+        public DTBS(byte[] data) {
+            this.data     = MBase64.toBase64(data);
+            this.encoding = "BASE64";
+            this.mimeType = "application/octet-stream";
+        }
         public DTBS(byte[] data, String mimeType) {
             this.data     = MBase64.toBase64(data);
             this.encoding = "BASE64";
@@ -96,16 +101,33 @@ public class MSS_SignatureReq {
         public String description;
 
         @SerializedName("EventID")
-        public String eventId;
+        public EventId eventId;
 
         @SerializedName("NoSpamCode")
-        public String noSpamCode;
+        public NoSpamCode noSpamCode;
 
         @SerializedName("UserLang")
         public String userLang;
 
         @SerializedName("App2App")
         public String app2app;
+
+    }
+
+    public static class NoSpamCode {
+
+        @SerializedName("Verify")
+        public String verify = "no";
+
+        @SerializedName("Code")
+        public String code;
+
+    }
+
+    public static class EventId {
+
+        @SerializedName("Value")
+        public String value;
 
     }
 

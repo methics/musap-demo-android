@@ -14,7 +14,9 @@ import android.widget.Toast;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 
@@ -94,7 +96,8 @@ public class SigningFragment extends Fragment {
 
                         String signatureStr;
                         if ("jws".equalsIgnoreCase(dtbsType)) {
-                            signatureStr = attachSignature(jws, mSig).serialize();
+                            JWSObject signed = attachSignature(jws, mSig);
+                            signatureStr = signed.serialize();
                             MLog.d("Public key: " + mSig.getKey().getPublicKey().getPEM());
                         } else {
                             signatureStr = mSig.getB64Signature();
