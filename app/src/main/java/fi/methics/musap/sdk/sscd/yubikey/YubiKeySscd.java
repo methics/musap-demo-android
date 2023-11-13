@@ -96,7 +96,6 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         this.type = TYPE;
         this.c = context;
         this.yubiKitManager = new YubiKitManager(this.c);
-
     }
 
     @Override
@@ -496,8 +495,6 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         String msg = "Test string";
 
         try {
-
-
             PivSession pivSession = new PivSession(connection);
 
             pivSession.authenticate(this.type, this.managementKey);

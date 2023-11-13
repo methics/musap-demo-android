@@ -10,6 +10,7 @@ import fi.methics.musap.sdk.sscd.methicsdemo.MethicsDemoSettings;
 import fi.methics.musap.sdk.sscd.methicsdemo.MethicsDemoSscd;
 import fi.methics.musap.sdk.sscd.rest204.Rest204Settings;
 import fi.methics.musap.sdk.sscd.rest204.Rest204Sscd;
+import fi.methics.musap.sdk.sscd.yubikey.YubiKeyOpenPgpSscd;
 import fi.methics.musap.sdk.sscd.yubikey.YubiKeySscd;
 
 public class MusapApplication extends Application {
@@ -22,6 +23,7 @@ public class MusapApplication extends Application {
 
         MusapClient.enableSscd(new AndroidKeystoreSscd(this));
         MusapClient.enableSscd(new YubiKeySscd(this));
+        MusapClient.enableSscd(new YubiKeyOpenPgpSscd(this));
         MusapClient.enableSscd(new MethicsDemoSscd(this,
                 new MethicsDemoSettings("https://demo.methics.fi/appactivation/appactivation/sign?msisdn=",
                         "http://www.methics.fi/KiuruMSSP/v3.2.0#PKCS1",
