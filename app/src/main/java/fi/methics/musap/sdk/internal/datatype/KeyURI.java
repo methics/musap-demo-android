@@ -3,6 +3,7 @@ package fi.methics.musap.sdk.internal.datatype;
 
 import android.util.Log;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +35,9 @@ public class KeyURI {
         // TODO: Rename key.getKeyName() to key.getKeyAlias()
         if (key.getKeyName()     != null) keyUriMap.put(ALIAS,      key.getKeyName());
         if (key.getAlgorithm()   != null) keyUriMap.put(ALGORITHM,  key.getAlgorithm().isEc() ? "EC" : "RSA");
-        if (key.getCreatedDate() != null) keyUriMap.put(CREATED_DT, key.getCreatedDate().toString().split("T")[0]);
+        if (key.getCreatedDate() != null && key.getCreatedDate().toEpochMilli() != 0) {
+            keyUriMap.put(CREATED_DT, key.getCreatedDate().toString().split("T")[0]);
+        }
 
         if (key.getKeyAttribute(MSISDN) != null) keyUriMap.put(MSISDN, key.getKeyAttribute(MSISDN));
         if (key.getKeyAttribute(SERIAL) != null) keyUriMap.put(MSISDN, key.getKeyAttribute(SERIAL));
@@ -110,6 +113,7 @@ public class KeyURI {
      * @param criteria List of criteria
      * @return true if match is found
      */
+    @Deprecated
     public boolean matchesCriteria(Map<KeyDiscoveryCriteria, String> criteria) {
 
         // For every given criteria, check if they match
@@ -125,6 +129,7 @@ public class KeyURI {
         return true;
     }
 
+    @Deprecated
     private boolean matchesCriteria(KeyDiscoveryCriteria criteria, String value) {
         Log.d("KeyURI", "Comparing " + criteria + " to value " + value);
         switch (criteria) {
@@ -138,10 +143,12 @@ public class KeyURI {
         return true;
     }
 
+    @Deprecated
     private boolean compareLoA(String criteriaValue, String ownValue) {
         return LoA.compareLoA(ownValue, criteriaValue);
     }
 
+    @Deprecated
     private boolean compareValue(String criteriaValue, String ownValue) {
         return Objects.equals(criteriaValue, ownValue);
     }
@@ -171,7 +178,6 @@ public class KeyURI {
     public boolean matches(KeyURI keyUri) {
         if (this.equals(keyUri)) return true;
         if (this.getUri().equals(keyUri.getUri())) return true;
-        // TODO: Allow some partial match?
         return false;
     }
 
