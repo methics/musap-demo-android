@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import fi.methics.musap.databinding.FragmentKeygenBinding;
 import fi.methics.musap.sdk.api.MusapClient;
@@ -42,6 +43,9 @@ public class KeygenFragment extends Fragment {
 
         MLog.d("Keygen Fragment created");
         Map<RadioButton, MusapSscdInterface<?>> radioButtons = this.createRadiButtons();
+
+        // Set a random key name as default.
+        binding.edittextAlias.setText(UUID.randomUUID().toString());
 
         generate.setOnClickListener(view -> {
             String alias = binding.edittextAlias.getText().toString();

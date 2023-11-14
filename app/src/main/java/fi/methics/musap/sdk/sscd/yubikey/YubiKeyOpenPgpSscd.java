@@ -2,7 +2,6 @@ package fi.methics.musap.sdk.sscd.yubikey;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,11 +13,12 @@ import com.yubico.yubikit.android.transport.nfc.NfcConfiguration;
 import com.yubico.yubikit.android.transport.nfc.NfcNotAvailable;
 import com.yubico.yubikit.android.transport.nfc.NfcYubiKeyDevice;
 import com.yubico.yubikit.core.smartcard.SmartCardConnection;
-import com.yubico.yubikit.piv.KeyType;
+import com.yubico.yubikit.openpgp.KeyRef;
+import com.yubico.yubikit.openpgp.OpenPgpCurve;
+import com.yubico.yubikit.openpgp.OpenPgpSession;
 import com.yubico.yubikit.piv.ManagementKeyType;
 import com.yubico.yubikit.piv.PivSession;
 import com.yubico.yubikit.piv.Slot;
-import com.yubico.yubikit.piv.jca.PivAlgorithmParameterSpec;
 import com.yubico.yubikit.piv.jca.PivProvider;
 
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -27,6 +27,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 
 import java.io.ByteArrayInputStream;
@@ -34,8 +35,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -43,6 +42,9 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,30 +54,33 @@ import fi.methics.musap.R;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
-import fi.methics.musap.sdk.internal.datatype.SignatureFormat;
-import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
-import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.datatype.KeyURI;
 import fi.methics.musap.sdk.internal.datatype.MusapCertificate;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapLoA;
-import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
+import fi.methics.musap.sdk.internal.datatype.MusapSscd;
+import fi.methics.musap.sdk.internal.datatype.SignatureFormat;
+import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
+import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.IdGenerator;
 import fi.methics.musap.sdk.internal.util.KeyGenerationResult;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.internal.util.SigningResult;
 
-public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
-
+public class YubiKeyOpenPgpSscd implements MusapSscdInterface<YubiKeySettings> {
     private static final byte[] MANAGEMENT_KEY = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     private static final ManagementKeyType TYPE = ManagementKeyType.TDES;
 
-    private static final String SSCD_TYPE        = "Yubikey";
-    private static final String ATTRIBUTE_SERIAL = "serial";
 
-    private final YubiKeySettings settings = new YubiKeySettings();
+    public static final char[] DEFAULT_USER_PIN = "123456".toCharArray();
+    public static final char[] DEFAULT_ADMIN_PIN = "12345678".toCharArray();
+
+    private static final String SSCD_TYPE        = "YubikeyEddsa";
+    private static final String ATTRIBUTE_SERIAL = "SerialNumber";
+
+    private YubiKeySettings settings = new YubiKeySettings();
 
     private AlertDialog currentPrompt;
     private CompletableFuture<KeyGenerationResult> keygenFuture;
@@ -92,7 +97,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
 
     private final Context c;
 
-    public YubiKeySscd(Context context) {
+    public YubiKeyOpenPgpSscd(Context context) {
         this.managementKey = MANAGEMENT_KEY;
         this.type = TYPE;
         this.c = context;
@@ -102,7 +107,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     @Override
     public MusapKey bindKey(KeyBindReq req) throws Exception {
         // Bind an existing YubiKey keypair to MUSAP by signing with it
-        // Get the public key, and verify that it matches 
+        // Get the public key, and verify that it matches
         return null;
     }
 
@@ -307,7 +312,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     @Override
     public MusapSscd getSscdInfo() {
         return new MusapSscd.Builder()
-                .setSscdName("Yubikey")
+                .setSscdName("Yubikey EdDSA")
                 .setSscdType(SSCD_TYPE)
                 .setCountry("FI")
                 .setProvider("Yubico")
@@ -377,31 +382,27 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     }
 
     private void keyGenOnDevice(KeyGenReq req, String pin, SmartCardConnection connection) throws Exception {
-        PivSession pivSession = new PivSession(connection);
-        pivSession.authenticate(this.type, this.managementKey);
+        OpenPgpSession openpgp = new OpenPgpSession(connection);
+        MLog.d("Opened OpenPGP session");
 
-        PivProvider pivProvider = new PivProvider(pivSession);
-        Security.insertProviderAt(pivProvider, 1); // JCA Security providers are indexed from 1
+        MLog.d("Device supports ECC=" + openpgp.supports(OpenPgpSession.FEATURE_EC_KEYS));
 
-        KeyPairGenerator ecKpg = KeyPairGenerator.getInstance("YKPivEC");
-        MLog.d("Initialized KeyPairGenerator");
+        Security.removeProvider("BC");
+        Security.insertProviderAt(new BouncyCastleProvider(), 1);
+        openpgp.verifyAdminPin(DEFAULT_ADMIN_PIN);
 
-        // PinPolicy and TouchPolicy should come from the using app
-        // Pin and used slot comes from the user
-        final Slot usedSlot = Slot.SIGNATURE;
-
-        ecKpg.initialize(
-                new PivAlgorithmParameterSpec(
-                        usedSlot,
-                        this.resolveKeyType(req),
-                        null, // PinPolicy
-                        null, // TouchPolicy
-                        pin.toCharArray() // PIV PIN
-                )
-        );
-        KeyPair keyPair = ecKpg.generateKeyPair();
-
+        PublicKey publicKey = openpgp.generateEcKey(KeyRef.SIG, OpenPgpCurve.Ed25519).toPublicKey();
+        openpgp.verifyUserPin(pin.toCharArray(), false);
         MLog.d("Generated KeyPair");
+
+
+        // TODO: Remove this signature test code
+        byte[] message = "hello".getBytes(StandardCharsets.UTF_8);
+        byte[] signature = openpgp.sign(message);
+        Signature verifier = Signature.getInstance("Ed25519");
+        verifier.initVerify(publicKey);
+        verifier.update(message);
+        MLog.d("Signature valid=" + verifier.verify(signature));
 
         X500Name name = new X500Name("CN=MUSAP Test");
         X509v3CertificateBuilder builder = new X509v3CertificateBuilder(
@@ -410,7 +411,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
                 new Date(),
                 this.getNotAfter(),
                 name,
-                SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(keyPair.getPublic().getEncoded()))
+                SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(publicKey.getEncoded()))
         );
         MLog.d("Built cert");
 
@@ -430,10 +431,8 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
             @Override
             public byte[] getSignature() {
                 try {
-                    Signature sig = Signature.getInstance("SHA256withECDSA", pivProvider);
-                    sig.initSign(keyPair.getPrivate());
-                    sig.update(this.buffer.toByteArray());
-                    return sig.sign();
+                    // TODO: sign() gives a raw signature. Does it need some pre- or postprocessing?
+                    return openpgp.sign(message);
                 } catch (Exception e) {
                     MLog.e("Failed to init content signer", e);
                     return null;
@@ -445,22 +444,24 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         X509Certificate builtCert = (X509Certificate) CertificateFactory.getInstance("X.509")
                 .generateCertificate(new ByteArrayInputStream(certBytes));
 
-        pivSession.putCertificate(usedSlot, builtCert);
+        openpgp.putCertificate(KeyRef.SIG, builtCert);
+        MLog.d("Put certificate to slot");
+
         MusapCertificate cert = new MusapCertificate(builtCert);
 
         MusapKey.Builder keyBuilder = new MusapKey.Builder();
         keyBuilder.setCertificate(cert);
         keyBuilder.setKeyName(req.getKeyAlias());
-        keyBuilder.addAttribute(ATTRIBUTE_SERIAL, Integer.toHexString(pivSession.getSerialNumber()));
+        keyBuilder.addAttribute(ATTRIBUTE_SERIAL, Integer.toHexString(openpgp.getAid().getSerial()));
         keyBuilder.setSscdType(this.getSscdInfo().getSscdType());
+        keyBuilder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
         keyBuilder.setSscdId(this.getSscdInfo().getSscdId());
         keyBuilder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
         keyBuilder.setKeyId(IdGenerator.generateKeyId());
 
         this.keygenFuture.complete(new KeyGenerationResult(keyBuilder.build()));
 
-        MLog.d("Put certificate to slot");
-
+        MLog.d("Finished keygen");
         showRemoveYubiKeyDialog(req.getActivity());
     }
 
@@ -469,37 +470,25 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         String msg = "Test string";
 
         try {
-            PivSession pivSession = new PivSession(connection);
+            OpenPgpSession openpgp = new OpenPgpSession(connection);
 
-            pivSession.authenticate(this.type, this.managementKey);
+            MLog.d("Opened OpenPGP session");
 
-            Slot slot = Slot.SIGNATURE;
+            MLog.d("Device supports ECC=" + openpgp.supports(OpenPgpSession.FEATURE_EC_KEYS));
 
-            PivProvider pivProvider = new PivProvider(pivSession);
-            Security.insertProviderAt(pivProvider, 1); // JCA Security providers are indexed from 1
+            Security.removeProvider("BC");
+            Security.insertProviderAt(new BouncyCastleProvider(), 1);
+            openpgp.verifyUserPin(pin.toCharArray(), false);
 
-            KeyStore keyStore = KeyStore.getInstance("YKPiv", pivProvider);
+            byte[] message = sigReq.getData();
 
-            keyStore.load(null);
+            // TODO: This produces a raw signature. Does it need processing?
+            byte[] sigResult = openpgp.sign(message);
 
-            PublicKey publicKey = keyStore.getCertificate(slot.getStringAlias()).getPublicKey();
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey(slot.getStringAlias(), pin.toCharArray());
-
-            String algorithm = "SHA256withECDSA";
-
-            Signature signature = Signature.getInstance(algorithm, pivProvider);
-            signature.initSign(privateKey);
-            signature.update(msg.getBytes(StandardCharsets.UTF_8));
-            byte[] sigResult = signature.sign();
-
-            MLog.d("Signed");
-
-            Signature verify = Signature.getInstance(algorithm);
-            verify.initVerify(publicKey);
-            verify.update(msg.getBytes(StandardCharsets.UTF_8));
-            boolean valid = verify.verify(sigResult);
-
-            MLog.d("Valid signature=" + valid);
+            Signature verifier = Signature.getInstance("Ed25519");
+            verifier.initVerify(openpgp.getPublicKey(KeyRef.SIG).toPublicKey());
+            verifier.update(message);
+            MLog.d("Signature valid=" + verifier.verify(sigResult));
 
             // Dismiss old dialog if it it showing
             getActivity().runOnUiThread(() -> {
@@ -518,24 +507,10 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     }
 
     /**
-     * Convert MUSAP Key type to YubiKey Key type
-     * @param req
-     * @return
+     * Make a "not after" date for the generated certificate.
+     * Returns a date 5 years from now.
+     * @return Not after date.
      */
-    private KeyType resolveKeyType(KeyGenReq req) {
-
-        KeyAlgorithm algorithm = req.getAlgorithm();
-        if (algorithm == null) return KeyType.ECCP384;
-        if (algorithm.isEc()) {
-            if (algorithm.bits == 256) return KeyType.ECCP256;
-            if (algorithm.bits == 384) return KeyType.ECCP384;
-        } else if (algorithm.isRsa()) {
-            if (algorithm.bits == 1024) return KeyType.RSA1024;
-            if (algorithm.bits == 2048) return KeyType.RSA2048;
-        }
-        return KeyType.ECCP384;
-    }
-
     private Date getNotAfter() {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
@@ -543,4 +518,142 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         return c.getTime();
     }
 
+
+//    @Override
+//    public MusapKey bindKey(KeyBindReq req) throws Exception {
+//        return null;
+//    }
+//
+//    @Override
+//    public MusapKey generateKey(KeyGenReq req) throws Exception {
+//
+//        this.keyGenReq = req;
+//        this.sigReq = null;
+//        this.keygenFuture = new CompletableFuture<>();
+//
+//        Context c = req.getActivity();
+//        View v = LayoutInflater.from(c).inflate(R.layout.dialog_pin, null);
+//
+//        String pin = "123456";
+//
+//        this.yubiKeyGen(pin, req, null);
+//
+//        return null;
+//    }
+//
+//    private void yubiKeyGen(String pin, KeyGenReq req, GenerateKeyCallback callback) {
+//        try {
+//            yubiKitManager.startNfcDiscovery(new NfcConfiguration(), req.getActivity(), device -> {
+//                MLog.d("Found NFC");
+//                connect(device, req, pin);
+//            });
+//        } catch (NfcNotAvailable e) {
+//            if (e.isDisabled()) {
+//                Toast.makeText(c, "NFC is not enabled", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(c, "NFC is not available", Toast.LENGTH_SHORT).show();
+//            }
+//            yubiKitManager.stopNfcDiscovery(req.getActivity());
+//        }
+//    }
+//
+//    private void connect(final NfcYubiKeyDevice device, final KeyGenReq req, String pin)  {
+//
+//        device.requestConnection(SmartCardConnection.class, result -> {
+//            // The result is a Result<SmartCardConnection, IOException>, which represents either a successful connection, or an error.
+//            try {
+//                boolean success = result.isSuccess();
+//                MLog.d("Connection successful=" + success);
+//
+//                // If the connection is not successful, try again
+//                if (!success) {
+//                    MLog.d("Failed to connect");
+//                    this.showKeyGenFailedDualog(req);
+//                } else {
+//                    MLog.d("PIN=" + pin);
+//                    keyGenOnDevice(req, pin, result.getValue());
+//                }
+//            } catch (Exception e) {
+//                MLog.e("Failed to connect", e);
+//                this.showKeyGenFailedDualog(req);
+//                yubiKitManager.stopNfcDiscovery(req.getActivity());
+//            }
+//        });
+//    }
+//
+//    private void keyGenOnDevice(KeyGenReq req, String pin, SmartCardConnection connection) throws Exception {
+//        OpenPgpSession openpgp = new OpenPgpSession(connection);
+//        MLog.d("Opened OpenPGP session");
+//
+//        MLog.d("Device supports ECC=" + openpgp.supports(OpenPgpSession.FEATURE_EC_KEYS));
+//
+//        Security.removeProvider("BC");
+//        Security.insertProviderAt(new BouncyCastleProvider(), 1);
+//        openpgp.verifyAdminPin(DEFAULT_ADMIN_PIN);
+//
+//
+//        byte[] message = "hello".getBytes(StandardCharsets.UTF_8);
+//        PublicKey publicKey = openpgp.generateEcKey(KeyRef.SIG, OpenPgpCurve.Ed25519).toPublicKey();
+//        openpgp.verifyUserPin(DEFAULT_USER_PIN, false);
+//        byte[] signature = openpgp.sign(message);
+//
+//        Signature verifier = Signature.getInstance("Ed25519");
+//        verifier.initVerify(publicKey);
+//        verifier.update(message);
+//        MLog.d("Signature valid=" + verifier.verify(signature));
+//    }
+//
+//    public void showKeyGenFailedDualog(KeyGenReq req) {
+//
+//        // Dismiss old dialog if it it showing
+//        req.getActivity().runOnUiThread(() -> {
+//            if (currentPrompt != null) {
+//                currentPrompt.dismiss();
+//            }
+//        });
+//
+//        Context c = req.getActivity();
+//        View v = LayoutInflater.from(c).inflate(R.layout.dialog_keygen_failed, null);
+//
+//        req.getActivity().runOnUiThread(() -> {
+//            currentPrompt = new AlertDialog.Builder(c)
+//                    .setTitle("Key Generation Failed")
+//                    .setView(v)
+//                    .create();
+//            currentPrompt.show();
+//        });
+//    }
+//
+//        @Override
+//    public MusapSignature sign(SignatureReq req) throws Exception {
+//        return null;
+//    }
+//
+//    @Override
+//    public MusapSscd getSscdInfo() {
+//        return new MusapSscd.Builder()
+//                .setSscdName("Yubikey OpenPGP")
+//                .setSscdType(SSCD_TYPE)
+//                .setCountry("FI")
+//                .setProvider("Yubico")
+//                .setKeygenSupported(true)
+//                .setSupportedAlgorithms(Arrays.asList(KeyAlgorithm.ECC_P256_K1, KeyAlgorithm.ECC_P384_K1))
+//                .setSupportedFormats(Arrays.asList(SignatureFormat.RAW))
+//                .build();
+//    }
+//
+//    @Override
+//    public String generateSscdId(MusapKey key) {
+//        return SSCD_TYPE + "/" + key.getAttributeValue(ATTRIBUTE_SERIAL);
+//    }
+//
+//    @Override
+//    public boolean isKeygenSupported() {
+//        return true;
+//    }
+//
+//    @Override
+//    public YubiKeySettings getSettings() {
+//        return this.settings;
+//    }
 }
