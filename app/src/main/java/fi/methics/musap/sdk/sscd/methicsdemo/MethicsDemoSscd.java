@@ -83,7 +83,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
     public MusapSignature sign(SignatureReq req) throws Exception {
         DemoSigReq jReq = new DemoSigReq();
         jReq.msisdn  = req.getKey().getAttributeValue(ATTRIBUTE_MSISDN);
-        jReq.message = "Sign with MUSAP"; // TODO
+        jReq.message = req.getDisplayText();
         jReq.dtbs    = MBase64.toBase64String(req.getData());
         jReq.async   = true;
 
@@ -110,7 +110,7 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
     @Override
     public MusapSscd getSscdInfo() {
         return new MusapSscd.Builder()
-                .setSscdName("Methics Demo")
+                .setSscdName(this.settings.getSscdName())
                 .setSscdType(SSCD_TYPE)
                 .setCountry("FI")
                 .setProvider("Methics")
@@ -206,7 +206,6 @@ public class MethicsDemoSscd implements MusapSscdInterface<MethicsDemoSettings> 
                 builder.setCertificate(signature.getSignerCertificate());
                 builder.setKeyName(req.getKeyAlias());
                 builder.setSscdType(SSCD_TYPE);
-                builder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
                 builder.setSscdId(this.getSscdInfo().getSscdId());
                 builder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
                 builder.addAttribute(ATTRIBUTE_MSISDN, msisdn);

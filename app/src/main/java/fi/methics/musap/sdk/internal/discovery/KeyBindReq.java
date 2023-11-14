@@ -12,6 +12,7 @@ import fi.methics.musap.sdk.internal.datatype.StepUpPolicy;
 public class KeyBindReq {
 
     private String keyAlias;
+    private String displayText;
     private String did;
     private String role;
     private StepUpPolicy stepUpPolicy;
@@ -52,8 +53,33 @@ public class KeyBindReq {
         return view;
     }
 
+    /**
+     * Get a key attribute value
+     * @param name Attribute name
+     * @return Attribute value or null if not found
+     */
+    public String getAttribute(String name) {
+        if (name == null) return null;
+        for (KeyAttribute attr : getAttributes()) {
+            if (attr == null) continue;
+            if (name.equals(attr.name)) {
+                return attr.value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the text to display to the user during the signature request
+     * @return Display text (a.k.a. DTBD). Default is "Sign with MUSAP".
+     */
+    public String getDisplayText() {
+        return this.displayText;
+    }
+
     public static class Builder {
         private String keyAlias;
+        private String displayText = "Activate MUSAP";
         private String did;
         private String role;
         private StepUpPolicy stepUpPolicy;
@@ -109,6 +135,11 @@ public class KeyBindReq {
             return this;
         }
 
+        public Builder setDisplayText(String text) {
+            this.displayText = text;
+            return this;
+        }
+
         public KeyBindReq createKeyBindReq() {
             KeyBindReq req = new KeyBindReq();
             req.keyAlias     = keyAlias;
@@ -118,6 +149,7 @@ public class KeyBindReq {
             req.role         = role;
             req.view         = view;
             req.activity     = activity;
+            req.displayText  = displayText;
             return req;
         }
     }

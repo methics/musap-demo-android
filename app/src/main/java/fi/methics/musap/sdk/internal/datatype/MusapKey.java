@@ -25,10 +25,8 @@ public class MusapKey {
     private List<String> keyUsages;
     private List<MusapLoA> loa;
     private KeyAlgorithm algorithm;
-    private String keyUri;
 
     private String did;
-
     private String state;
 
     private KeyAttestation attestation;
@@ -45,7 +43,6 @@ public class MusapKey {
         this.keyUsages        = builder.keyUsages;
         this.loa              = builder.loa;
         this.algorithm        = builder.algorithm;
-        this.keyUri           = builder.keyUri;
         this.attestation      = builder.attestation;
         this.attributes       = builder.attributes;
         this.createdDate      = Instant.now();
@@ -108,7 +105,7 @@ public class MusapKey {
     }
 
     public KeyURI getKeyUri() {
-        return new KeyURI(this.keyUri);
+        return new KeyURI(this);
     }
 
     public KeyAttestation getAttestation() {
@@ -117,6 +114,16 @@ public class MusapKey {
 
     public List<KeyAttribute> getAttributes() {
         return this.attributes;
+    }
+
+    public String getKeyAttribute(String name) {
+        if (name == null) return null;
+        if (this.attributes == null) return null;
+        for (KeyAttribute attr : this.attributes) {
+            if (attr == null) continue;
+            if (name.equals(attr.name)) return attr.value;
+        }
+        return null;
     }
 
     public KeyAttribute getAttribute(String name) {
@@ -237,7 +244,6 @@ public class MusapKey {
         private List<String> keyUsages;
         private List<MusapLoA> loa;
         private KeyAlgorithm algorithm;
-        private String keyUri;
 
         private KeyAttestation attestation;
 
@@ -291,11 +297,6 @@ public class MusapKey {
 
         public Builder setAlgorithm(KeyAlgorithm algorithm) {
             this.algorithm = algorithm;
-            return this;
-        }
-
-        public Builder setKeyUri(String keyUri) {
-            this.keyUri = keyUri;
             return this;
         }
 

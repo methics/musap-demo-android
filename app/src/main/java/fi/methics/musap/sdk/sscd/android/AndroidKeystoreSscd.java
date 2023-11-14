@@ -80,7 +80,6 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
         MusapKey generatedKey = new MusapKey.Builder()
                 .setSscdType(MusapConstants.ANDROID_KS_TYPE)
                 .setKeyName(req.getKeyAlias())
-                .setKeyUri(new KeyURI(req.getKeyAlias(), sscd.getSscdType(), "loa3").getUri())
                 .setSscdId(sscd.getSscdId())
                 .setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3))
                 .setPublicKey(new PublicKey(keyPair))
