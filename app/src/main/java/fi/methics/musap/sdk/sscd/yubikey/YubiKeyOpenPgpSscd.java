@@ -470,37 +470,25 @@ public class YubiKeyOpenPgpSscd implements MusapSscdInterface<YubiKeySettings> {
         String msg = "Test string";
 
         try {
-            PivSession pivSession = new PivSession(connection);
+            OpenPgpSession openpgp = new OpenPgpSession(connection);
 
-            pivSession.authenticate(this.type, this.managementKey);
+            MLog.d("Opened OpenPGP session");
 
-            Slot slot = Slot.SIGNATURE;
+            MLog.d("Device supports ECC=" + openpgp.supports(OpenPgpSession.FEATURE_EC_KEYS));
 
-            PivProvider pivProvider = new PivProvider(pivSession);
-            Security.insertProviderAt(pivProvider, 1); // JCA Security providers are indexed from 1
+            Security.removeProvider("BC");
+            Security.insertProviderAt(new BouncyCastleProvider(), 1);
+            openpgp.verifyUserPin(pin.toCharArray(), false);
 
-            KeyStore keyStore = KeyStore.getInstance("YKPiv", pivProvider);
+            byte[] message = sigReq.getData();
 
-            keyStore.load(null);
+            // TODO: This produces a raw signature. Does it need processing?
+            byte[] sigResult = openpgp.sign(message);
 
-            PublicKey publicKey = keyStore.getCertificate(slot.getStringAlias()).getPublicKey();
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey(slot.getStringAlias(), pin.toCharArray());
-
-            String algorithm = "SHA256withECDSA";
-
-            Signature signature = Signature.getInstance(algorithm, pivProvider);
-            signature.initSign(privateKey);
-            signature.update(msg.getBytes(StandardCharsets.UTF_8));
-            byte[] sigResult = signature.sign();
-
-            MLog.d("Signed");
-
-            Signature verify = Signature.getInstance(algorithm);
-            verify.initVerify(publicKey);
-            verify.update(msg.getBytes(StandardCharsets.UTF_8));
-            boolean valid = verify.verify(sigResult);
-
-            MLog.d("Valid signature=" + valid);
+            Signature verifier = Signature.getInstance("Ed25519");
+            verifier.initVerify(openpgp.getPublicKey(KeyRef.SIG).toPublicKey());
+            verifier.update(message);
+            MLog.d("Signature valid=" + verifier.verify(sigResult));
 
             // Dismiss old dialog if it it showing
             getActivity().runOnUiThread(() -> {
