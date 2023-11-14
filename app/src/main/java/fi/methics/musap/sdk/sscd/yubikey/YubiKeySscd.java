@@ -73,7 +73,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     private static final String SSCD_TYPE        = "Yubikey";
     private static final String ATTRIBUTE_SERIAL = "SerialNumber";
 
-    private YubiKeySettings settings = new YubiKeySettings();
+    private final YubiKeySettings settings = new YubiKeySettings();
 
     private AlertDialog currentPrompt;
     private CompletableFuture<KeyGenerationResult> keygenFuture;
@@ -87,7 +87,6 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
 
     private KeyGenReq keyGenReq;
     private SignatureReq sigReq;
-    private GenerateKeyCallback callback;
 
     private final Context c;
 
@@ -112,18 +111,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         this.sigReq = null;
         this.keygenFuture = new CompletableFuture<>();
 
-        Context c = req.getActivity();
-        View v = LayoutInflater.from(c).inflate(R.layout.dialog_pin, null);
         showInsertPinDialog();
-        //req.getActivity().runOnUiThread(() -> new AlertDialog.Builder(c)
-        //        .setTitle("PIN")
-        //        .setView(v)
-        //        .setPositiveButton("OK", (dialogInterface, i) -> {
-        //            String pin = ((TextView) v.findViewById(R.id.dialog_pin_edittext)).getText().toString();
-        //            MLog.d("PIN=" + pin);
-        //        })
-        //        .setNeutralButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel())
-        //        .show());
 
         KeyGenerationResult result = keygenFuture.get();
         if (result.key       != null) return result.key;
@@ -152,20 +140,13 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         return SSCD_TYPE + "/" + key.getAttributeValue(ATTRIBUTE_SERIAL);
     }
 
-    public void signAsync(SignatureReq req) {
-        this.sigReq    = req;
-        this.keyGenReq = null;
-
-        this.showInsertPinDialog();
-    }
-
     private Activity getActivity() {
         if (this.sigReq != null) return this.sigReq.getActivity();
         if (this.keyGenReq != null) return this.keyGenReq.getActivity();
         return null;
     }
 
-    private void showInsertYubiKeyDialog(String pin, Activity activity, GenerateKeyCallback callback) {
+    private void showInsertYubiKeyDialog(String pin, Activity activity) {
 
         // Dismiss old dialog if it it showing
         activity.runOnUiThread(() -> {
@@ -186,18 +167,10 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         });
 
         if (this.keyGenReq != null) {
-            this.yubiKeyGen(pin, this.keyGenReq, callback);
+            this.yubiKeyGen(pin, this.keyGenReq);
         } else {
             this.yubiSign(pin, this.sigReq);
         }
-    }
-
-    public void genKeyAsync(KeyGenReq req, GenerateKeyCallback callback) {
-        // Save request type
-        this.keyGenReq = req;
-        this.sigReq = null;
-
-        this.showInsertPinDialog();
     }
 
     private void showInsertPinDialog() {
@@ -221,7 +194,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
                         String pin = ((TextView) v.findViewById(R.id.dialog_pin_edittext)).getText().toString();
                         MLog.d("PIN=" + pin);
 
-                        showInsertYubiKeyDialog(pin, activity, callback);
+                        showInsertYubiKeyDialog(pin, activity);
                     })
                     .setNeutralButton("Cancel", (dialogInterface, i) ->  {
                         dialogInterface.cancel();
@@ -297,7 +270,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
     }
 
 
-    private void yubiKeyGen(String pin, KeyGenReq req, GenerateKeyCallback callback) {
+    private void yubiKeyGen(String pin, KeyGenReq req) {
         try {
             yubiKitManager.startNfcDiscovery(new NfcConfiguration(), req.getActivity(), device -> {
                 MLog.d("Found NFC");
