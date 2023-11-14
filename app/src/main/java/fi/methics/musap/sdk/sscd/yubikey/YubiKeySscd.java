@@ -44,6 +44,7 @@ import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
@@ -61,6 +62,7 @@ import fi.methics.musap.sdk.internal.datatype.MusapLoA;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.util.IdGenerator;
 import fi.methics.musap.sdk.internal.util.KeyGenerationResult;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.internal.util.SigningResult;
@@ -406,7 +408,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
                 name,
                 new BigInteger("123456789"),
                 new Date(),
-                new Date(),
+                this.getNotAfter(),
                 name,
                 SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(keyPair.getPublic().getEncoded()))
         );
@@ -454,7 +456,7 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         keyBuilder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
         keyBuilder.setSscdId(this.getSscdInfo().getSscdId());
         keyBuilder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
-        // TODO: Find out Yubikey serial number
+        keyBuilder.setKeyId(IdGenerator.generateKeyId());
 
         this.keygenFuture.complete(new KeyGenerationResult(keyBuilder.build()));
 
@@ -533,6 +535,13 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
             if (algorithm.bits == 2048) return KeyType.RSA2048;
         }
         return KeyType.ECCP384;
+    }
+
+    private Date getNotAfter() {
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        c.add(Calendar.YEAR, 5);
+        return c.getTime();
     }
 
 }
