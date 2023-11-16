@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class MBase64 {
 
-    private static final int FLAGS = Base64.NO_WRAP;
+    private static final int FLAGS = Base64.NO_WRAP | Base64.URL_SAFE | Base64.NO_PADDING;
 
     /**
      * Encode a string to a base 64 string.
