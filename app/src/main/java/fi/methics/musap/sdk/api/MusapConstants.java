@@ -6,5 +6,5 @@ public class MusapConstants {
     public static final String SSCD_ID   = "SSCD_ID";
     public static final String SSCD_NAME = "SSCD_NAME";
 
-    public static final String ANDROID_KS_TYPE = "Android Keystore";
+    public static final String ANDROID_KS_TYPE = "aks";
 }

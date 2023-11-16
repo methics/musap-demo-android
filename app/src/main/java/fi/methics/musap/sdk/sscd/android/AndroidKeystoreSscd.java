@@ -3,12 +3,17 @@ package fi.methics.musap.sdk.sscd.android;
 import android.content.Context;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.util.Base64;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.Security;
 import java.security.Signature;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECGenParameterSpec;
@@ -30,6 +35,7 @@ import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
+import fi.methics.musap.sdk.internal.util.IdGenerator;
 import fi.methics.musap.sdk.internal.util.MBase64;
 import fi.methics.musap.sdk.internal.util.MLog;
 
@@ -64,12 +70,23 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
         String                algorithm = this.resolveAlgorithm(req);
         AlgorithmParameterSpec algSspec = this.resolveAlgorithmParameterSpec(req);
 
+        MLog.d("Generating with algorithm " + algorithm);
+
+        Security.insertProviderAt(new BouncyCastleProvider(), 1);
+
         KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(req.getKeyAlias(),
                 KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
                 .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512);
 
-        if (algSspec != null) builder.setAlgorithmParameterSpec(algSspec);
+        if (algSspec != null) {
+            builder.setAlgorithmParameterSpec(algSspec);
+            MLog.d("Algorithm spec " + algSspec);
+        } else {
+            MLog.d("No algoritm spec given");
+        }
+
         KeyGenParameterSpec spec = builder.build();
+        MLog.d("Algorithm spec " + spec);
 
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(algorithm, "AndroidKeyStore");
         kpg.initialize(spec);
@@ -83,6 +100,7 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
                 .setSscdId(sscd.getSscdId())
                 .setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3))
                 .setPublicKey(new PublicKey(keyPair))
+                .setKeyId(IdGenerator.generateKeyId())
                 .build();
         MLog.d("Generated key with KeyURI " + generatedKey.getKeyUri());
 
@@ -102,13 +120,29 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
         }
 
         SignatureAlgorithm algorithm = req.getAlgorithm();
-        MLog.d("Signing " + MBase64.toBase64String(req.getData()) + " with algorithm " + algorithm);
+        MLog.d("Signing " + new String(req.getData()) + " with algorithm " + algorithm);
         Signature s = Signature.getInstance(algorithm.getJavaAlgorithm());
+
         s.initSign(((KeyStore.PrivateKeyEntry) entry).getPrivateKey());
         s.update(req.getData());
+
         byte[] signature = s.sign();
+        MLog.d("Signature byte len=" + signature.length);
+        MLog.d("Signature hex=" + bytesToHex(signature));
+        MLog.d("Signature=" + Base64.encodeToString(signature, Base64.DEFAULT));
 
         return new MusapSignature(signature, req.getKey(), algorithm, req.getFormat());
+    }
+
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 
     @Override
@@ -130,7 +164,7 @@ public class AndroidKeystoreSscd implements MusapSscdInterface<AndroidKeystoreSe
 
     @Override
     public String generateSscdId(MusapKey key) {
-        return "AKS";
+        return "Android Keystore";
     }
 
     @Override

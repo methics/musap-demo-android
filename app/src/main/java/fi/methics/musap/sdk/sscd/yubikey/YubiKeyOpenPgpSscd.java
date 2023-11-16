@@ -454,7 +454,6 @@ public class YubiKeyOpenPgpSscd implements MusapSscdInterface<YubiKeySettings> {
         keyBuilder.setKeyName(req.getKeyAlias());
         keyBuilder.addAttribute(ATTRIBUTE_SERIAL, Integer.toHexString(openpgp.getAid().getSerial()));
         keyBuilder.setSscdType(this.getSscdInfo().getSscdType());
-        keyBuilder.setKeyUri(new KeyURI(req.getKeyAlias(), this.getSscdInfo().getSscdType(), "loa3").getUri());
         keyBuilder.setSscdId(this.getSscdInfo().getSscdId());
         keyBuilder.setLoa(Arrays.asList(MusapLoA.EIDAS_SUBSTANTIAL, MusapLoA.ISO_LOA3));
         keyBuilder.setKeyId(IdGenerator.generateKeyId());

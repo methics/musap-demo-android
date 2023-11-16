@@ -1,5 +1,7 @@
 package fi.methics.musap.sdk.internal.datatype;
 
+import android.util.Base64;
+
 import java.security.KeyPair;
 
 import fi.methics.musap.sdk.internal.util.MBase64;
@@ -29,7 +31,7 @@ public class PublicKey {
      * @return PEM String
      */
     public String getPEM() {
-        String base64Signature = MBase64.toBase64String(this.getDER());
+        String base64Signature = Base64.encodeToString(this.getDER(), Base64.DEFAULT);
         StringBuilder pem = new StringBuilder();
         pem.append("-----BEGIN PUBLIC KEY-----\n");
         int width  = 64;

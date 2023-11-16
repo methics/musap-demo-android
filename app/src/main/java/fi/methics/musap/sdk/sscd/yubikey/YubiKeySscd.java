@@ -390,10 +390,13 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         // Pin and used slot comes from the user
         final Slot usedSlot = Slot.SIGNATURE;
 
+        KeyType type = this.resolveKeyType(req);
+        MLog.d("Using key type " + type.name());
+
         ecKpg.initialize(
                 new PivAlgorithmParameterSpec(
                         usedSlot,
-                        this.resolveKeyType(req),
+                        type,
                         null, // PinPolicy
                         null, // TouchPolicy
                         pin.toCharArray() // PIV PIN
@@ -402,6 +405,8 @@ public class YubiKeySscd implements MusapSscdInterface<YubiKeySettings> {
         KeyPair keyPair = ecKpg.generateKeyPair();
 
         MLog.d("Generated KeyPair");
+
+        MLog.d("PublicKey=" + keyPair.getPublic().toString());
 
         X500Name name = new X500Name("CN=MUSAP Test");
         X509v3CertificateBuilder builder = new X509v3CertificateBuilder(
