@@ -1,9 +1,6 @@
 package fi.methics.musap.ui.sign;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,26 +8,28 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.Payload;
-import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.crypto.impl.ECDSA;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 import fi.methics.musap.R;
+import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
-import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.datatype.SignatureAlgorithm;
 import fi.methics.musap.sdk.internal.sign.MusapSigner;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MLog;
-import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.internal.util.StringUtil;
 
 
@@ -74,6 +73,7 @@ public class SigningFragment extends Fragment {
             jws = this.buildSampleJws(algorithm);
             text.setText(jws.getPayload().toString());
             data = jws.getSigningInput();
+
         } else {
             jws = null;
             final String dtbs = args.getString(SignMethodRecyclerViewAdapter.DTBS);
@@ -99,6 +99,7 @@ public class SigningFragment extends Fragment {
                             JWSObject signed = attachSignature(jws, mSig);
                             signatureStr = signed.serialize();
                             MLog.d("Public key: " + mSig.getKey().getPublicKey().getPEM());
+
                         } else {
                             signatureStr = mSig.getB64Signature();
                         }
@@ -132,7 +133,7 @@ public class SigningFragment extends Fragment {
         try {
             Base64URL header    = orig.getHeader().toBase64URL();
             Base64URL payload   = orig.getPayload().toBase64URL();
-            Base64URL signature = Base64URL.encode(sig.getRawSignature());
+            Base64URL signature = Base64URL.encode(this.transcodeSignature(sig.getRawSignature()));
             return new JWSObject(header, payload, signature);
         } catch (Exception e) {
             MLog.e("Failed to parse JWS", e);
@@ -158,4 +159,16 @@ public class SigningFragment extends Fragment {
         final Payload  payload = claims.toPayload();
         return new JWSObject(header, payload);
     }
+
+    /**
+     * Transcode raw signature the form JWT uses.
+     * @param rawSignature
+     * @return
+     * @throws JOSEException
+     */
+    private byte[] transcodeSignature(byte[] rawSignature) throws JOSEException {
+        final int length = 64; // This is algorithm specific. secp256r1 uses 64 bits
+        return ECDSA.transcodeSignatureToConcat(rawSignature, length);
+    }
+
 }
