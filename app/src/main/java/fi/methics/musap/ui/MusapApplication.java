@@ -4,8 +4,15 @@ import android.app.Application;
 
 import java.time.Duration;
 
+import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.api.MusapClient;
+import fi.methics.musap.sdk.api.MusapException;
+import fi.methics.musap.sdk.internal.datatype.MusapLink;
+import fi.methics.musap.sdk.internal.datatype.RelyingParty;
+import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.sscd.android.AndroidKeystoreSscd;
+import fi.methics.musap.sdk.sscd.external.ExternalSscd;
+import fi.methics.musap.sdk.sscd.external.ExternalSscdSettings;
 import fi.methics.musap.sdk.sscd.methicsdemo.MethicsDemoSettings;
 import fi.methics.musap.sdk.sscd.methicsdemo.MethicsDemoSscd;
 import fi.methics.musap.sdk.sscd.rest204.Rest204Settings;
@@ -39,6 +46,34 @@ public class MusapApplication extends Application {
         rest204Settings.setBindSignatureProfile("http://mss.ficom.fi/TS102206/v1.0.0/signature-profile.xml");
         rest204Settings.setSignatureProfile("http://mss.ficom.fi/TS102206/v1.0.0/digestive-signature-profile.xml");
         MusapClient.enableSscd(new Rest204Sscd(this, rest204Settings));
+
+        ExternalSscdSettings settings = new ExternalSscdSettings("LOCAL");
+        settings.setSscdName("server-eemeli");
+        MusapClient.enableSscd(new ExternalSscd(this, settings));
+
+        if (!MusapClient.isLinkEnabled()) {
+            MusapClient.enrollDataWithLink("https://demo.methics.fi/musapdemo", new MusapCallback<MusapLink>() {
+                @Override
+                public void onSuccess(MusapLink o) {
+                    MLog.d("Enrolled successfully");
+                    MusapClient.coupleWithLink("https://demo.methics.fi/musapdemo", "2D65EL", new MusapCallback<RelyingParty>() {
+                        @Override
+                        public void onSuccess(RelyingParty relyingParty) {
+                            MLog.d("Linked successfully");
+                        }
+                        @Override
+                        public void onException(MusapException e) {
+                            MLog.e("Linking failed", e);
+                        }
+                    });
+                }
+                @Override
+                public void onException(MusapException e) {
+                    MLog.e("Failed to enroll", e);
+                }
+            });
+        }
+
     }
 
 }
