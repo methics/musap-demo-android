@@ -110,12 +110,12 @@ public class SigningFragment extends Fragment {
 
                     @Override
                     public void onException(MusapException e) {
-                        MLog.e("Failed to sign", e.getCause());
+                        MLog.e("Failed to sign", e);
                         Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
                     }
                 });
             } catch (MusapException e) {
-                MLog.e("Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", e.getCause());
+                MLog.e("Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", e);
                 Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
             }
         });
