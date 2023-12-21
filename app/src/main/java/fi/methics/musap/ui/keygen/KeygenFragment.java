@@ -67,20 +67,19 @@ public class KeygenFragment extends Fragment {
                             .setView(this.getView())
                             .setRole("personal")
                             .setKeyAlias(alias)
-                            //.setKeyAlgorithm(KeyAlgorithm.RSA_2K)
                             .createKeyGenReq();
 
                     MusapClient.generateKey(sscd, req, new MusapCallback<MusapKey>() {
                         @Override
                         public void onSuccess(MusapKey result) {
                             MLog.d("Successfully generated key " + alias);
-                            Toast.makeText(KeygenFragment.this.getContext(), "Generated key " + alias, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(KeygenFragment.this.getContext(), "Generated key", Toast.LENGTH_SHORT).show();
                             binding.edittextAlias.getText().clear();
                         }
 
                         @Override
                         public void onException(MusapException e) {
-                            Toast.makeText(KeygenFragment.this.getContext(), "Failed to generate key " + alias + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(KeygenFragment.this.getContext(), "Failed to generate key: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             binding.edittextAlias.getText().clear();
                             MLog.e("Failed to generate key " + alias, e);
                         }
@@ -104,14 +103,13 @@ public class KeygenFragment extends Fragment {
 
                         @Override
                         public void onException(MusapException e) {
-                            Toast.makeText(KeygenFragment.this.getContext(), "Failed to bind key " + alias + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(KeygenFragment.this.getContext(), "Failed to bind key: " + e.toString(), Toast.LENGTH_LONG).show();
                             binding.edittextAlias.getText().clear();
                             MLog.e("Failed to bind key " + alias, e);
                         }
                     });
                 }
             } catch (Exception e) {
-//                throw new RuntimeException(e);
                 MLog.e("Failed to generate key", e);
             }
 

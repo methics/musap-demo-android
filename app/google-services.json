@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "875861172153",
+    "project_id": "musap-demo",
+    "storage_bucket": "musap-demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875861172153:android:cfad04f703d277bdb4a068",
+        "android_client_info": {
+          "package_name": "fi.methics.musap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBC0rkmIxgHHUN3gCFRAWpx6ehjRy6_mUw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

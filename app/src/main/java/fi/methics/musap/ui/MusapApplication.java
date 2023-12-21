@@ -1,8 +1,15 @@
 package fi.methics.musap.ui;
 
-import android.app.Application;
+import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
 
-import java.time.Duration;
+import android.app.Application;
+import android.util.Log;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.api.MusapClient;
@@ -34,7 +41,7 @@ public class MusapApplication extends Application {
 
         MethicsDemoSettings demoSettings = new MethicsDemoSettings("https://demo.methics.fi/appactivation/appactivation/sign?msisdn=");
         demoSettings.setSscdName("Alauda PBY");
-        MusapClient.enableSscd(new MethicsDemoSscd(this,demoSettings));
+        MusapClient.enableSscd(new MethicsDemoSscd(this, demoSettings));
         MusapClient.enableSscd(new YubiKeyOpenPgpSscd(this));
         Rest204Settings rest204Settings = new Rest204Settings("https://demo.methics.fi/rest/service");
         rest204Settings.setApId("http://musap-ap");
@@ -52,11 +59,11 @@ public class MusapApplication extends Application {
         MusapClient.enableSscd(new ExternalSscd(this, settings));
 
         if (!MusapClient.isLinkEnabled()) {
-            MusapClient.enrollDataWithLink("https://demo.methics.fi/musapdemo", new MusapCallback<MusapLink>() {
+            MusapClient.enableLink("https://demo.methics.fi/musapdemo", null, new MusapCallback<MusapLink>() {
                 @Override
                 public void onSuccess(MusapLink o) {
                     MLog.d("Enrolled successfully");
-                    MusapClient.coupleWithLink("https://demo.methics.fi/musapdemo", "2D65EL", new MusapCallback<RelyingParty>() {
+                    MusapClient.coupleWithRelyingParty("FN6DDY", new MusapCallback<RelyingParty>() {
                         @Override
                         public void onSuccess(RelyingParty relyingParty) {
                             MLog.d("Linked successfully");
