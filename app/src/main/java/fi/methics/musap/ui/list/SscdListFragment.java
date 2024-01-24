@@ -20,13 +20,10 @@ import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.internal.util.MLog;
 
 /**
- * A fragment representing a list of Items.
+ * SscdListFragments lists all user enabled and active SSCDs.
  */
 public class SscdListFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
 
     /**
@@ -36,28 +33,10 @@ public class SscdListFragment extends Fragment {
     public SscdListFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static SscdListFragment newInstance(int columnCount) {
-        SscdListFragment fragment = new SscdListFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
-        //    @Override
-        //    public void handleOnBackPressed() {
-        //        NavController navController = Navigation.findNavController(KeystoreFragment.this.getActivity(), R.id.nav_host_fragment_activity_main);
-        //        navController.navigate(R.id.action_keystoreFragment_to_navigation_dashboard);
-        //    }
-        //};
-        //requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override

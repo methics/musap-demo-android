@@ -19,7 +19,6 @@ public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMeth
 
     private final List<String> mValues;
 
-    protected static final String KEY_ALIAS = "keyalias";
     protected static final String KEY_URI   = "keyuri";
     protected static final String DTBS      = "dtbs";
 
