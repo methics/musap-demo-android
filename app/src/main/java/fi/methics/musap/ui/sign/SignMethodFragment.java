@@ -24,12 +24,11 @@ import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.internal.util.MLog;
 
 /**
- * A fragment representing a list of Items.
+ * SignMethodFragments lists all methods the user can use to sign data.
  */
 public class SignMethodFragment extends Fragment {
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    private int mColumnCount = 1;
+    private static final int mColumnCount = 1;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -38,23 +37,10 @@ public class SignMethodFragment extends Fragment {
     public SignMethodFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static SignMethodFragment newInstance(int columnCount) {
-        SignMethodFragment fragment = new SignMethodFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
     }
 
     @Override
