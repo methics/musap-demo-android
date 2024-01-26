@@ -10,3 +10,9 @@ This app aims to demonstrate a wide variety of SSCDs that can be integrated to M
 2. Yubikey
 3. ETSI TS 102 204 REST
 4. MUSAP Library (external signature)
+
+## Getting Started
+
+Import the project with Android Studio:
+
+```File -> New -> Project from Version Control...```
