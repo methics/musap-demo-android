@@ -20,6 +20,7 @@ import fi.methics.musap.databinding.FragmentKeygenBinding;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
@@ -65,7 +66,8 @@ public class KeygenFragment extends Fragment {
                             .setView(this.getView())
                             .setRole("personal")
                             .setKeyAlias(alias)
-                            //.setKeyAlgorithm(KeyAlgorithm.RSA_2K)
+//                            .setKeyAlgorithm(KeyAlgorithm.ECC_P256_R1)
+                            .setKeyAlgorithm(KeyAlgorithm.RSA_2K)
                             .createKeyGenReq();
 
                     MusapClient.generateKey(sscd, req, new MusapCallback<MusapKey>() {
