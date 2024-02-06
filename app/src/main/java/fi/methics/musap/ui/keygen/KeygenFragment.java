@@ -109,7 +109,6 @@ public class KeygenFragment extends Fragment {
                     });
                 }
             } catch (Exception e) {
-//                throw new RuntimeException(e);
                 MLog.e("Failed to generate key", e);
             }
 
