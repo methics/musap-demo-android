@@ -19,6 +19,7 @@ import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapConstants;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.util.MLog;
+import fi.methics.musap.sdk.internal.util.MusapSscd;
 
 public class EnabledSscdDetailsFragment extends Fragment {
 
@@ -37,8 +38,8 @@ public class EnabledSscdDetailsFragment extends Fragment {
             MLog.d("Cannot handle null SSCD Name");
             return root;
         }
-        MusapSscdInterface sscd = null;
-        for (MusapSscdInterface s : MusapClient.listEnabledSscds()) {
+        MusapSscd sscd = null;
+        for (MusapSscd s : MusapClient.listEnabledSscds()) {
             if (sscdName.equals(s.getSscdInfo().getSscdName())) {
                 MLog.d("Found SSCD " + s.getSscdInfo().getSscdName());
                 sscd = s;

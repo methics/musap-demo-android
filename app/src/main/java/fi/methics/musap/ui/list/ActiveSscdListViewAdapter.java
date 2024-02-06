@@ -14,8 +14,8 @@ import java.util.List;
 import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentSscdBinding;
 import fi.methics.musap.sdk.api.MusapConstants;
-import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.util.MLog;
+import fi.methics.musap.sdk.internal.util.MusapSscd;
 
 public class ActiveSscdListViewAdapter extends RecyclerView.Adapter<ActiveSscdListViewAdapter.ViewHolder> {
 
@@ -44,7 +44,7 @@ public class ActiveSscdListViewAdapter extends RecyclerView.Adapter<ActiveSscdLi
     public void onBindViewHolder(final ViewHolder holder, int position) {
         MLog.d("ActiveSscdListViewAdapter.onBindViewHolder(holder, " + position + ")");
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).getSscdName() + mValues.get(position).getSscdId());
+        holder.mIdView.setText(mValues.get(position).getSscdInfo().getSscdName() + mValues.get(position).getSscdId());
     }
 
     @Override

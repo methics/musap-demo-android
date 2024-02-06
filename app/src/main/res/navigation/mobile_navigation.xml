@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_keystoreFragment_to_keystoreDetailsFragment"
             app:destination="@id/keystore_details_fragment" />
+        <action
+            android:id="@+id/action_navigation_keystore_list_to_sscdDetailFragment"
+            app:destination="@id/sscdDetailFragment" />
     </fragment>
 
     <fragment
@@ -54,5 +57,10 @@
         android:id="@+id/keystore_details_fragment"
         android:label="@string/title_keystore_details"
         android:name="fi.methics.musap.ui.list.EnabledSscdDetailsFragment"/>
+    <fragment
+        android:id="@+id/sscdDetailFragment"
+        android:name="fi.methics.musap.ui.list.SscdDetailFragment"
+        android:label="fragment_sscd_detail"
+        tools:layout="@layout/fragment_sscd_detail" />
 
 </navigation>
