@@ -2,6 +2,7 @@ package fi.methics.musap.ui.list;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -58,8 +59,10 @@ public class EnabledSscdListViewAdapter extends RecyclerView.Adapter<EnabledSscd
             mContentView = binding.content;
 
             mIdView.setOnClickListener(view -> {
+                Log.d("sscd", "Passing SSCID " + mItem.getSscdInfo().getSscdId());
                 Bundle args = new Bundle();
                 args.putString(MusapConstants.SSCD_NAME, mItem.getSscdInfo().getSscdName());
+                args.putString(SscdDetailFragment.SSCD_ID, mItem.getSscdInfo().getSscdId());
                 controller.navigate(R.id.action_navigation_keystore_list_to_sscdDetailFragment, args);
             });
         }

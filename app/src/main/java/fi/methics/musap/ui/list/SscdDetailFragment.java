@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 import fi.methics.musap.databinding.FragmentSscdDetailBinding;
 import fi.methics.musap.sdk.api.MusapClient;
+import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
 import fi.methics.musap.sdk.internal.datatype.SscdInfo;
 import fi.methics.musap.sdk.internal.discovery.SscdSearchReq;
 import fi.methics.musap.sdk.internal.util.MusapSscd;
@@ -25,7 +27,7 @@ public class SscdDetailFragment extends Fragment {
 
     private FragmentSscdDetailBinding binding;
 
-    private static final String SSCD_ID = "sscdid";
+    public static final String SSCD_ID = "sscdid";
 
     private String sscdId;
 
@@ -45,6 +47,7 @@ public class SscdDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            Log.d("sscd", "Got arguments");
             sscdId = getArguments().getString(SSCD_ID);
         }
     }
@@ -53,6 +56,8 @@ public class SscdDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentSscdDetailBinding.inflate(inflater);
+
+        Log.d("sscd", "Showing details of SSCD ID " + this.sscdId);
 
         SscdSearchReq req = new SscdSearchReq.Builder()
                 .setSscd(new SscdInfo.Builder().setSscdId(this.sscdId).build())
@@ -65,13 +70,25 @@ public class SscdDetailFragment extends Fragment {
             return binding.getRoot();
         }
 
-        MusapSscd sscd = found.get(0);
-        SscdInfo info = sscd.getSscdInfo();
-        binding.textSscdCountryVal.setText(info.getCountry());
-        binding.textSscdTypeVal.setText(info.getSscdType());
-        binding.textSscdProviderVal.setText(info.getProvider());
-        binding.textSscdNameVal.setText(info.getSscdName());
+        List<MusapSscd> found2 =  MusapClient.listEnabledSscds();
+        for (MusapSscd sscd: found2) {
+            if (sscd.getSscdInfo().getSscdId().equals(this.sscdId)) {
+                SscdInfo info = sscd.getSscdInfo();
+                binding.textSscdCountryVal.setText(info.getCountry());
+                binding.textSscdTypeVal.setText(info.getSscdType());
+                binding.textSscdProviderVal.setText(info.getProvider());
+                binding.textSscdNameVal.setText(info.getSscdName());
 
+                for (KeyAlgorithm algorithm: info.getSupportedAlgorithms()) {
+                    TextView view = new TextView(this.requireContext());
+                    view.setTextAppearance(android.R.style.TextAppearance_Large);
+                    view.setText(algorithm.toString());
+                    binding.layoutAlgos.addView(view);
+                }
+
+                break;
+            }
+        }
         return binding.getRoot();
     }
 
