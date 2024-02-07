@@ -19,8 +19,8 @@ import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentEnabledSscdDetailsBinding;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapConstants;
-import fi.methics.musap.sdk.internal.datatype.MusapSscd;
 import fi.methics.musap.sdk.internal.util.MLog;
+import fi.methics.musap.sdk.internal.util.MusapSscd;
 
 public class ActiveSscdDetailsFragment extends Fragment {
 
@@ -42,7 +42,6 @@ public class ActiveSscdDetailsFragment extends Fragment {
         MusapSscd sscd = null;
         for (MusapSscd s : MusapClient.listActiveSscds()) {
             if (sscdid.equals(s.getSscdId())) {
-                MLog.d("Found SSCD " + s.getSscdName());
                 sscd = s;
                 break;
             } else {

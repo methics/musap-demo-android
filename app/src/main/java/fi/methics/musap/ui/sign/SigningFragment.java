@@ -1,6 +1,7 @@
 package fi.methics.musap.ui.sign;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +63,10 @@ public class SigningFragment extends Fragment {
 
         KeyAlgorithm keyAlgo = key.getAlgorithm();
         if (keyAlgo == null) {
+            Log.d("sign", "Using default signing algorithm");
             keyAlgo = KeyAlgorithm.ECC_P256_R1;
+        } else {
+            Log.d("sign", "Using keys algorithm + " + keyAlgo);
         }
         SignatureAlgorithm algorithm = keyAlgo.isEc() ? SignatureAlgorithm.SHA256_WITH_ECDSA :
                                                         SignatureAlgorithm.SHA256_WITH_RSA;

@@ -10,13 +10,14 @@ import java.util.stream.Collectors;
 
 import fi.methics.musap.databinding.FragmentSscdBinding;
 import fi.methics.musap.sdk.extension.MusapSscdInterface;
+import fi.methics.musap.sdk.internal.util.MusapSscd;
 
 public class EnabledSscdDetailsViewAdapter extends RecyclerView.Adapter<EnabledSscdDetailsViewAdapter.ViewHolder> {
 
-    private final MusapSscdInterface sscd;
+    private final MusapSscd sscd;
 
 
-    public EnabledSscdDetailsViewAdapter(MusapSscdInterface sscd) {
+    public EnabledSscdDetailsViewAdapter(MusapSscd sscd) {
         this.sscd = sscd;
     }
 

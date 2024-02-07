@@ -10,22 +10,21 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import fi.methics.musap.databinding.FragmentKeygenBinding;
+import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
-import fi.methics.musap.sdk.extension.MusapSscdInterface;
 import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
-import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.util.MLog;
-import fi.methics.musap.sdk.api.MusapCallback;
+import fi.methics.musap.sdk.internal.util.MusapSscd;
 
 public class KeygenFragment extends Fragment {
 
@@ -40,7 +39,7 @@ public class KeygenFragment extends Fragment {
         Button generate = binding.buttonGenerate;
 
         MLog.d("Keygen Fragment created");
-        Map<RadioButton, MusapSscdInterface<?>> radioButtons = this.createRadiButtons();
+        Map<RadioButton, MusapSscd> radioButtons = this.createRadiButtons();
 
         // Set a random key name as default.
         binding.edittextAlias.setText(UUID.randomUUID().toString());
@@ -49,7 +48,7 @@ public class KeygenFragment extends Fragment {
             String alias = binding.edittextAlias.getText().toString();
             MLog.d("Alias=" + alias);
 
-            MusapSscdInterface<?> sscd = this.getSelectedSscd(radioButtons);
+            MusapSscd sscd = this.getSelectedSscd(radioButtons);
             if (sscd == null) {
                 MLog.d("No SSCD selected");
                 return;
@@ -58,14 +57,15 @@ public class KeygenFragment extends Fragment {
             try {
                 MLog.d("Generating key");
 
-                if (sscd.isKeygenSupported()) {
+                if (sscd.getSscdInfo().isKeygenSupported()) {
 
                     KeyGenReq req = new KeyGenReq.Builder()
                             .setActivity(this.getActivity())
                             .setView(this.getView())
                             .setRole("personal")
                             .setKeyAlias(alias)
-                            //.setKeyAlgorithm(KeyAlgorithm.RSA_2K)
+//                            .setKeyAlgorithm(KeyAlgorithm.ECC_P256_R1)
+                            .setKeyAlgorithm(KeyAlgorithm.RSA_2K)
                             .createKeyGenReq();
 
                     MusapClient.generateKey(sscd, req, new MusapCallback<MusapKey>() {
@@ -109,7 +109,6 @@ public class KeygenFragment extends Fragment {
                     });
                 }
             } catch (Exception e) {
-//                throw new RuntimeException(e);
                 MLog.e("Failed to generate key", e);
             }
 
@@ -122,12 +121,12 @@ public class KeygenFragment extends Fragment {
      * Create RadioButtons for each SSCD
      * @return RadioButton to SSCD map
      */
-    private Map<RadioButton, MusapSscdInterface<?>> createRadiButtons() {
-        final Map<RadioButton, MusapSscdInterface<?>> sscds = new HashMap<>();
+    private Map<RadioButton, MusapSscd> createRadiButtons() {
+        final Map<RadioButton, MusapSscd> sscds = new HashMap<>();
         int i = 0;
         MLog.d("Found " + sscds.size() + " SSCDs");
 
-        for (MusapSscdInterface sscd : MusapClient.listEnabledSscds()) {
+        for (MusapSscd sscd : MusapClient.listEnabledSscds()) {
             i++;
             RadioButton rb = new RadioButton(this.getContext());
             rb.setText(sscd.getSscdInfo().getSscdName());
@@ -144,9 +143,9 @@ public class KeygenFragment extends Fragment {
      * @param radioButtons RadioButtons created with {@link #createRadiButtons()}
      * @return
      */
-    private MusapSscdInterface<?> getSelectedSscd(Map<RadioButton, MusapSscdInterface<?>> radioButtons) {
+    private MusapSscd getSelectedSscd(Map<RadioButton, MusapSscd> radioButtons) {
         MLog.d("Looking for selected radio button");
-        MusapSscdInterface<?> sscd = null;
+        MusapSscd sscd = null;
         for (RadioButton rb : radioButtons.keySet()) {
             if (rb.isChecked()) {
                 sscd = radioButtons.get(rb);

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.stream.Collectors;
 
 import fi.methics.musap.databinding.FragmentSscdBinding;
-import fi.methics.musap.sdk.internal.datatype.MusapSscd;
+import fi.methics.musap.sdk.internal.util.MusapSscd;
 
 public class ActiveSscdDetailsViewAdapter extends RecyclerView.Adapter<ActiveSscdDetailsViewAdapter.ViewHolder> {
 
@@ -29,15 +29,15 @@ public class ActiveSscdDetailsViewAdapter extends RecyclerView.Adapter<ActiveSsc
     public void onBindViewHolder(final ViewHolder holder, int position) {
         switch (position) {
             case 0: holder.mIdView.setText("SSCD Name"); break;
-            case 1: holder.mIdView.setText(sscd.getSscdName()); break;
+            case 1: holder.mIdView.setText(sscd.getSscdInfo().getSscdName()); break;
             case 2: holder.mIdView.setText("SSCD Type"); break;
-            case 3: holder.mIdView.setText(sscd.getSscdType()); break;
+            case 3: holder.mIdView.setText(sscd.getSscdInfo().getSscdType()); break;
             case 4: holder.mIdView.setText("SSCD Provider");break;
-            case 5: holder.mIdView.setText(sscd.getProvider());break;
+            case 5: holder.mIdView.setText(sscd.getSscdInfo().getProvider());break;
             case 6: holder.mIdView.setText("Country");break;
-            case 7: holder.mIdView.setText(sscd.getCountry());break;
+            case 7: holder.mIdView.setText(sscd.getSscdInfo().getCountry());break;
             case 8: holder.mIdView.setText("Algorithms");break;
-            case 9: holder.mIdView.setText(String.join(",", sscd.getSupportedAlgorithms().stream().map(a -> a.toString()).collect(Collectors.toList()))); break;
+            case 9: holder.mIdView.setText(String.join(",", sscd.getSscdInfo().getSupportedAlgorithms().stream().map(a -> a.toString()).collect(Collectors.toList()))); break;
         }
 
     }
