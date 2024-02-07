@@ -60,7 +60,7 @@
     <fragment
         android:id="@+id/sscdDetailFragment"
         android:name="fi.methics.musap.ui.list.SscdDetailFragment"
-        android:label="fragment_sscd_detail"
+        android:label="@string/title_keystore_details"
         tools:layout="@layout/fragment_sscd_detail" />
 
 </navigation>
