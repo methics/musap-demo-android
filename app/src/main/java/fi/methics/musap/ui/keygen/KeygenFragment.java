@@ -25,6 +25,7 @@ import fi.methics.musap.sdk.internal.discovery.KeyBindReq;
 import fi.methics.musap.sdk.internal.keygeneration.KeyGenReq;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.internal.util.MusapSscd;
+import fi.methics.musap.sdk.sscd.external.ExternalSscd;
 
 public class KeygenFragment extends Fragment {
 
@@ -84,7 +85,6 @@ public class KeygenFragment extends Fragment {
                         }
                     });
                 } else {
-
                     KeyBindReq req = new KeyBindReq.Builder()
                             .setActivity(this.getActivity())
                             .setView(this.getView())
@@ -127,6 +127,16 @@ public class KeygenFragment extends Fragment {
         MLog.d("Found " + sscds.size() + " SSCDs");
 
         for (MusapSscd sscd : MusapClient.listEnabledSscds()) {
+
+            // External SSCD
+            if (sscd.getSscdId().equalsIgnoreCase("6")) {
+                // If we have not done coupling yet, don't put external sscd to the list
+                if (MusapClient.listRelyingParties().isEmpty()) {
+                    MLog.d("No relying parties");
+                    continue;
+                }
+            }
+
             i++;
             RadioButton rb = new RadioButton(this.getContext());
             rb.setText(sscd.getSscdInfo().getSscdName());

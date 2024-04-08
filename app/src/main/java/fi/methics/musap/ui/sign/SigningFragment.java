@@ -28,7 +28,6 @@ import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
 import fi.methics.musap.sdk.internal.datatype.SignatureAlgorithm;
-import fi.methics.musap.sdk.internal.sign.MusapSigner;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.internal.util.StringUtil;
@@ -69,7 +68,7 @@ public class SigningFragment extends Fragment {
             Log.d("sign", "Using keys algorithm + " + keyAlgo);
         }
         SignatureAlgorithm algorithm = keyAlgo.isEc() ? SignatureAlgorithm.SHA256_WITH_ECDSA :
-                                                        SignatureAlgorithm.SHA256_WITH_RSA;
+                SignatureAlgorithm.SHA256_WITH_RSA;
 
         final JWSObject jws;
         byte[] data;
@@ -90,38 +89,32 @@ public class SigningFragment extends Fragment {
                 .setData(data)
                 .createSignatureReq();
 
+
         sign.setOnClickListener(view -> {
+            MusapClient.sign(req, new MusapCallback<MusapSignature>() {
+                @Override
+                public void onSuccess(MusapSignature mSig) {
 
-            MusapSigner signer = new MusapSigner(key, this.getActivity());
-            try {
-                signer.sign(req, new MusapCallback<MusapSignature>() {
-                    @Override
-                    public void onSuccess(MusapSignature mSig) {
+                    String signatureStr;
+                    if ("jws".equalsIgnoreCase(dtbsType)) {
+                        JWSObject signed = attachSignature(jws, mSig);
+                        signatureStr = signed.serialize();
+                        MLog.d("Public key: " + mSig.getKey().getPublicKey().getPEM());
 
-                        String signatureStr;
-                        if ("jws".equalsIgnoreCase(dtbsType)) {
-                            JWSObject signed = attachSignature(jws, mSig);
-                            signatureStr = signed.serialize();
-                            MLog.d("Public key: " + mSig.getKey().getPublicKey().getPEM());
-
-                        } else {
-                            signatureStr = mSig.getB64Signature();
-                        }
-                        MLog.d("Signature successful: " + signatureStr);
-                        sigResult.setText(signatureStr);
-                        sign.setVisibility(View.INVISIBLE);
+                    } else {
+                        signatureStr = mSig.getB64Signature();
                     }
+                    MLog.d("Signature successful: " + signatureStr);
+                    sigResult.setText(signatureStr);
+                    sign.setVisibility(View.INVISIBLE);
+                }
 
-                    @Override
-                    public void onException(MusapException e) {
-                        MLog.e("Failed to sign", e.getCause());
-                        Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } catch (MusapException e) {
-                MLog.e("Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", e.getCause());
-                Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
-            }
+                @Override
+                public void onException(MusapException e) {
+                    MLog.e("Failed to sign", e.getCause());
+                    Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         return v;
