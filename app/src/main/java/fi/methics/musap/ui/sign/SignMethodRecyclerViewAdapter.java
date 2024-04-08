@@ -5,12 +5,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentSignMethodBinding;
+import fi.methics.musap.sdk.internal.datatype.KeyURI;
 
 import java.util.List;
 
@@ -18,6 +18,7 @@ import java.util.List;
 public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMethodRecyclerViewAdapter.ViewHolder> {
 
     private final List<String> mValues;
+    private final List<KeyURI> keyUris;
 
     protected static final String KEY_URI   = "keyuri";
     protected static final String DTBS      = "dtbs";
@@ -27,8 +28,9 @@ public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMeth
     private final Bundle args;
 
 
-    public SignMethodRecyclerViewAdapter(List<String> items, NavController navController, Bundle args) {
-        mValues = items;
+    public SignMethodRecyclerViewAdapter(List<String> items, List<KeyURI> keyUris, NavController navController, Bundle args) {
+        this.mValues = items;
+        this.keyUris = keyUris;
         this.controller = navController;
         this.args = args;
     }
@@ -42,6 +44,7 @@ public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMeth
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position));
+        holder.keyUri = keyUris.get(position);
 //        holder.mContentView.setText(mValues.get(position).content);
     }
 
@@ -54,18 +57,16 @@ public class SignMethodRecyclerViewAdapter extends RecyclerView.Adapter<SignMeth
         public final TextView mIdView;
         public final TextView mContentView;
         public String mItem;
+        public KeyURI keyUri;
 
         public ViewHolder(FragmentSignMethodBinding binding) {
             super(binding.getRoot());
             mIdView      = binding.itemNumber;
             mContentView = binding.content;
 
-
             mIdView.setOnClickListener(view -> {
-                String keyUri = mItem;
-
                 Bundle args = new Bundle();
-                args.putString(KEY_URI, keyUri);
+                args.putString(KEY_URI, keyUri.getUri());
                 args.putAll(SignMethodRecyclerViewAdapter.this.args);
                 controller.navigate(R.id.action_signMethodFragment_to_androidKeystoreSignFragment, args);
             });

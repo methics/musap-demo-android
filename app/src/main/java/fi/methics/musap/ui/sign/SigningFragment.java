@@ -89,18 +89,17 @@ public class SigningFragment extends Fragment {
                 .setData(data)
                 .createSignatureReq();
 
+        req.setActivity(this.requireActivity());
 
         sign.setOnClickListener(view -> {
             MusapClient.sign(req, new MusapCallback<MusapSignature>() {
                 @Override
                 public void onSuccess(MusapSignature mSig) {
-
                     String signatureStr;
                     if ("jws".equalsIgnoreCase(dtbsType)) {
                         JWSObject signed = attachSignature(jws, mSig);
                         signatureStr = signed.serialize();
                         MLog.d("Public key: " + mSig.getKey().getPublicKey().getPEM());
-
                     } else {
                         signatureStr = mSig.getB64Signature();
                     }
