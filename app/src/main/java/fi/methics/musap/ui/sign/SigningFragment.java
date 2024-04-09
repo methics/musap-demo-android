@@ -2,6 +2,7 @@ package fi.methics.musap.ui.sign;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,7 @@ import com.nimbusds.jose.crypto.impl.ECDSA;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 
-import java.io.IOException;
+import java.util.Random;
 
 import fi.methics.musap.R;
 import fi.methics.musap.databinding.FragmentSignBinding;
@@ -59,9 +60,11 @@ public class SigningFragment extends Fragment {
         this.binding = FragmentSignBinding.inflate(inflater);
 
         Button sign = binding.buttonAksSign;
-        TextView text = binding.textAksDtbs;
         TextView sigResult = binding.textSignatureResult;
+        sigResult.setMovementMethod(new ScrollingMovementMethod());
         final Bundle args = getArguments();
+
+        this.hideProgressBar();
 
         final String keyuri   = args.getString(SignMethodRecyclerViewAdapter.KEY_URI);
         final String dtbsType = args.getString("dtbstype");
@@ -82,15 +85,21 @@ public class SigningFragment extends Fragment {
         byte[] data;
         if ("jws".equalsIgnoreCase(dtbsType)) {
             jws = this.buildSampleJws(algorithm);
-            text.setText(jws.getPayload().toString());
+            this.setDtbs(jws.getPayload().toString());
             data = jws.getSigningInput();
 
         } else {
             jws = null;
-            final String dtbs = args.getString(SignMethodRecyclerViewAdapter.DTBS);
-            text.setText(dtbs);
+//            final String dtbs = args.getString(SignMethodRecyclerViewAdapter.DTBS);
+            final String dtbs = this.generateDtbs();
+            this.setDtbs(dtbs);
             data = StringUtil.toUTF8Bytes(dtbs);
         }
+
+        String eventId = this.generateEventId();
+        this.setEventId(eventId);
+
+        this.setPreSignUi();
 
         final SignatureReq req = new SignatureReq.Builder(algorithm)
                 .setKey(key)
@@ -99,6 +108,8 @@ public class SigningFragment extends Fragment {
         req.setActivity(this.requireActivity());
 
         sign.setOnClickListener(view -> {
+            this.showProgressBar();
+
             if (AppStorage.getMsisdn(this.requireActivity()) == null) {
                 View dialogView = LayoutInflater.from(this.requireActivity()).inflate(R.layout.dialog_enter_msisdn, null);
 
@@ -118,9 +129,14 @@ public class SigningFragment extends Fragment {
             } else {
                 String msisdn = AppStorage.getMsisdn(this.requireActivity());
                 req.addAttribute("msisdn", msisdn);
+                req.addAttribute("eventid", eventId);
+
                 MusapClient.sign(req, new MusapCallback<MusapSignature>() {
                     @Override
                     public void onSuccess(MusapSignature mSig) {
+                        setPostSignUi();
+                        hideProgressBar();
+
                         String signatureStr;
                         if ("jws".equalsIgnoreCase(dtbsType)) {
                             JWSObject signed = attachSignature(jws, mSig);
@@ -145,6 +161,7 @@ public class SigningFragment extends Fragment {
 
                     @Override
                     public void onException(MusapException e) {
+                        hideProgressBar();
                         MLog.e("Failed to sign", e.getCause());
                         Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
                     }
@@ -204,4 +221,52 @@ public class SigningFragment extends Fragment {
         return ECDSA.transcodeSignatureToConcat(rawSignature, length);
     }
 
+    /**
+     * Generate random 4 character string to use as event id
+     * @return
+     */
+    private String generateEventId() {
+        int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 4;
+        Random random = new Random();
+
+        return random.ints(leftLimit, rightLimit + 1)
+                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+    }
+
+    private void setDtbs(String dtbs) {
+        binding.textSignInput.setText("Sign Input: " + dtbs);
+    }
+
+    private void setEventId(String eventId) {
+        binding.textEventid.setText("Event ID: " + eventId);
+    }
+
+    // Hide signature UI elements
+    private void setPreSignUi() {
+        binding.textAttrs.setVisibility(View.INVISIBLE);
+        binding.textSignature.setVisibility(View.INVISIBLE);
+    }
+
+    // Hide UI elements
+    private void setPostSignUi() {
+        binding.textAttrs.setVisibility(View.VISIBLE);
+        binding.textSignature.setVisibility(View.VISIBLE);
+    }
+
+    private void showProgressBar() {
+        binding.progressbarSign.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        binding.progressbarSign.setVisibility(View.INVISIBLE);
+    }
+
+    private String generateDtbs() {
+        return "Approve Acme LLC NDA 23.4.2024";
+    }
 }

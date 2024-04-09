@@ -86,6 +86,10 @@ public class SignRadioButtonFragment extends Fragment {
 
     private void setOnClickListener() {
         binding.buttonSign.setOnClickListener(view -> {
+            if (this.getSelectedKeyUri() == null) {
+                return;
+            }
+
             Bundle args = new Bundle();
             args.putString(KEY_URI, this.getSelectedKeyUri());
             args.putAll(this.getArguments());
@@ -97,6 +101,10 @@ public class SignRadioButtonFragment extends Fragment {
     private String getSelectedKeyUri() {
         int id = binding.signRadioGroupKeystores.getCheckedRadioButtonId();
         View selected = binding.signRadioGroupKeystores.findViewById(id);
+        if (selected == null) {
+            return null;
+        }
+
         String displayName = ((RadioButton) selected).getText().toString();
         return this.displayNameToUri.get(displayName);
     }
