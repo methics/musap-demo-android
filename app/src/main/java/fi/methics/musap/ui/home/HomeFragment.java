@@ -29,6 +29,10 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        if (this.isCouplingDone()) {
+            this.setCouplingOk();
+        }
+
         binding.button.setOnClickListener(view -> askCouplingCode());
 
         return root;
@@ -66,6 +70,15 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(HomeFragment.this.requireActivity(), "Coupling failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void setCouplingOk() {
+        binding.textView.setText("Coupling complete");
+        binding.button.setVisibility(View.INVISIBLE);
+    }
+
+    private boolean isCouplingDone() {
+        return MusapClient.listRelyingParties() != null && !MusapClient.listRelyingParties().isEmpty();
     }
 
     @Override
