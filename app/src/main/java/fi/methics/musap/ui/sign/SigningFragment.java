@@ -21,10 +21,14 @@ import com.nimbusds.jose.crypto.impl.ECDSA;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 
+import java.io.IOException;
+
 import fi.methics.musap.R;
+import fi.methics.musap.databinding.FragmentSignBinding;
 import fi.methics.musap.sdk.api.MusapCallback;
 import fi.methics.musap.sdk.api.MusapClient;
 import fi.methics.musap.sdk.api.MusapException;
+import fi.methics.musap.sdk.internal.datatype.CmsSignature;
 import fi.methics.musap.sdk.internal.datatype.KeyAlgorithm;
 import fi.methics.musap.sdk.internal.datatype.MusapKey;
 import fi.methics.musap.sdk.internal.datatype.MusapSignature;
@@ -41,6 +45,8 @@ public class SigningFragment extends Fragment {
         // Required empty public constructor
     }
 
+    private FragmentSignBinding binding;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,11 +56,11 @@ public class SigningFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View v = inflater.inflate(R.layout.fragment_sign, container, false);
+        this.binding = FragmentSignBinding.inflate(inflater);
 
-        Button sign = v.findViewById(R.id.button_aks_sign);
-        TextView text = v.findViewById(R.id.text_aks_dtbs);
-        TextView sigResult = v.findViewById(R.id.text_signature_result);
+        Button sign = binding.buttonAksSign;
+        TextView text = binding.textAksDtbs;
+        TextView sigResult = binding.textSignatureResult;
         final Bundle args = getArguments();
 
         final String keyuri   = args.getString(SignMethodRecyclerViewAdapter.KEY_URI);
@@ -91,6 +97,7 @@ public class SigningFragment extends Fragment {
                 .setData(data)
                 .createSignatureReq();
         req.setActivity(this.requireActivity());
+
         sign.setOnClickListener(view -> {
             if (AppStorage.getMsisdn(this.requireActivity()) == null) {
                 View dialogView = LayoutInflater.from(this.requireActivity()).inflate(R.layout.dialog_enter_msisdn, null);
@@ -125,6 +132,15 @@ public class SigningFragment extends Fragment {
                         MLog.d("Signature successful: " + signatureStr);
                         sigResult.setText(signatureStr);
                         sign.setVisibility(View.INVISIBLE);
+
+                        try {
+                            CmsSignature cms = new CmsSignature(mSig.getRawSignature());
+                            String givenName = cms.getSignerCertificate().getGivenName();
+                            String surname = cms.getSignerCertificate().getSurname();
+                            binding.textAttrsValue.setText("GivenName=" + givenName + ", Surname=" + surname);
+                        } catch (Exception e) {
+                            Log.e("sign", "Fail", e);
+                        }
                     }
 
                     @Override
@@ -136,8 +152,7 @@ public class SigningFragment extends Fragment {
             }
         });
 
-
-        return v;
+        return binding.getRoot();
     }
 
 
