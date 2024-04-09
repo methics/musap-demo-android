@@ -11,7 +11,14 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import fi.methics.musap.R;
+import fi.methics.musap.sdk.api.MusapClient;
+import fi.methics.musap.sdk.internal.datatype.KeyURI;
+import fi.methics.musap.sdk.internal.datatype.MusapKey;
 
 public class SignSscdSelectionFragment extends Fragment {
 

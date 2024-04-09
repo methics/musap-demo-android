@@ -48,6 +48,7 @@ public class MusapApplication extends Application {
         MusapClient.enableSscd(new Rest204Sscd(this, rest204Settings), "5");
 
         MusapClient.enableSscd(new ExternalSscd(this, new ExternalSscdSettings("DNA").setProvider("DNA")), "6");
+        MusapClient.enableSscd(new ExternalSscd(this, new ExternalSscdSettings("PBY").setProvider("PBY")), "7");
 
         this.enrollMusapLink();
     }

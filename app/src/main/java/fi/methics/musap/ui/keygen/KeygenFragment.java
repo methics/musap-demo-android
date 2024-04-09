@@ -132,7 +132,14 @@ public class KeygenFragment extends Fragment {
 
             i++;
             RadioButton rb = new RadioButton(this.getContext());
-            rb.setText(sscd.getSscdInfo().getSscdName());
+            String name;
+            if (sscd.getSscdInfo().getSscdName().equalsIgnoreCase("external signature")) {
+                name = sscd.getSscdInfo().getSscdName() + " (" + sscd.getSscdInfo().getProvider() + ")";
+            } else {
+                name = sscd.getSscdInfo().getSscdName();
+            }
+
+            rb.setText(name);
             rb.setId(100+i);
             MLog.d("Added radio button " + sscd.getSscdInfo().getSscdName() + " with id " + sscd.hashCode());
             binding.radioGroupKeystores.addView(rb);

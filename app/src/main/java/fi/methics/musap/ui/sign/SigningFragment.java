@@ -1,5 +1,6 @@
 package fi.methics.musap.ui.sign;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import fi.methics.musap.sdk.internal.datatype.SignatureAlgorithm;
 import fi.methics.musap.sdk.internal.sign.SignatureReq;
 import fi.methics.musap.sdk.internal.util.MLog;
 import fi.methics.musap.sdk.internal.util.StringUtil;
+import fi.methics.musap.ui.AppStorage;
 
 
 public class SigningFragment extends Fragment {
@@ -88,36 +90,56 @@ public class SigningFragment extends Fragment {
                 .setKey(key)
                 .setData(data)
                 .createSignatureReq();
-
         req.setActivity(this.requireActivity());
-
         sign.setOnClickListener(view -> {
-            MusapClient.sign(req, new MusapCallback<MusapSignature>() {
-                @Override
-                public void onSuccess(MusapSignature mSig) {
-                    String signatureStr;
-                    if ("jws".equalsIgnoreCase(dtbsType)) {
-                        JWSObject signed = attachSignature(jws, mSig);
-                        signatureStr = signed.serialize();
-                        MLog.d("Public key: " + mSig.getKey().getPublicKey().getPEM());
-                    } else {
-                        signatureStr = mSig.getB64Signature();
-                    }
-                    MLog.d("Signature successful: " + signatureStr);
-                    sigResult.setText(signatureStr);
-                    sign.setVisibility(View.INVISIBLE);
-                }
+            if (AppStorage.getMsisdn(this.requireActivity()) == null) {
+                View dialogView = LayoutInflater.from(this.requireActivity()).inflate(R.layout.dialog_enter_msisdn, null);
 
-                @Override
-                public void onException(MusapException e) {
-                    MLog.e("Failed to sign", e.getCause());
-                    Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
-                }
-            });
+                AlertDialog dialog = new AlertDialog.Builder(this.requireActivity())
+                        .setTitle("Enter your Phone Number")
+                        .setView(dialogView)
+                        .setPositiveButton("OK", (dialogInterface, i) -> {
+                            String msisdn = ((TextView) dialogView.findViewById(R.id.dialog_msisdn_edittext)).getText().toString();
+                            MLog.d("MSISDN=" + msisdn);
+                            AppStorage.storeMsisdn(this.requireActivity(), msisdn);
+                        })
+                        .setNeutralButton("Cancel", (dialogInterface, i) ->  {
+                            dialogInterface.cancel();
+                        })
+                        .create();
+                dialog.show();
+            } else {
+                String msisdn = AppStorage.getMsisdn(this.requireActivity());
+                req.addAttribute("msisdn", msisdn);
+                MusapClient.sign(req, new MusapCallback<MusapSignature>() {
+                    @Override
+                    public void onSuccess(MusapSignature mSig) {
+                        String signatureStr;
+                        if ("jws".equalsIgnoreCase(dtbsType)) {
+                            JWSObject signed = attachSignature(jws, mSig);
+                            signatureStr = signed.serialize();
+                            MLog.d("Public key: " + mSig.getKey().getPublicKey().getPEM());
+                        } else {
+                            signatureStr = mSig.getB64Signature();
+                        }
+                        MLog.d("Signature successful: " + signatureStr);
+                        sigResult.setText(signatureStr);
+                        sign.setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onException(MusapException e) {
+                        MLog.e("Failed to sign", e.getCause());
+                        Toast.makeText(getContext(), "Failed to sign: " + e.getMessage() + "(" + e.getErrorName() + ")", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         });
+
 
         return v;
     }
+
 
     /**
      * Attach signature to the JWSObject

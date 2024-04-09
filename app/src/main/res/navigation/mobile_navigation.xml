@@ -40,7 +40,7 @@
     </fragment>
     <fragment
         android:id="@+id/sign_sign_method_fragment"
-        android:name="fi.methics.musap.ui.sign.SignMethodFragment"
+        android:name="fi.methics.musap.ui.sign.SignRadioButtonFragment"
         android:label="@string/title_keystore_list"
         tools:layout="@layout/fragment_sign_method_list" >
         <action
